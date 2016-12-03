@@ -46,6 +46,7 @@ public class RigidBodyController : MonoBehaviour {
 		collisions.Reset();
 		UpdateRaycastOrigins();
 		DetectGround();
+		DetectSlope();
 	}
 
 	void OrientToGravityFocus(){
@@ -84,14 +85,38 @@ public class RigidBodyController : MonoBehaviour {
 			//into contact with the 
 			if(isHit){
 				collisions.below = true;
+				collisions.surfaceNormal = hit.normal;
+				collisions.slopeAngle = Vector3.Angle(hit.normal,body.transform.up);
 			}
 		}
 		if(collisions.below) print("Collision below");
 		else print("No collision below");
+		print("Slope angle = " + collisions.slopeAngle.ToString());
+		print("Slope normal = " + collisions.surfaceNormal.ToString());
 	}
 
-	//Horizontal rays detect slopes and walls
-	void DetectSlopeAndWalls(){
+	//Fire a ray backwards from the bottom corner behind the player.
+	//If this hits terrain, then the character is descending a slope.
+	//Set descending flag to true and store angle.
+	void DetectSlope(){
+		//Project velocity onto players horzontal vector. +ve for right, -ve for left
+//		float currentSpeed = Vector3.Dot(body.velocity, body.transform.right);
+//		float direction = Mathf.Sign(currentSpeed);
+
+		float rayLength = 0.05f;
+		RaycastHit hitLeft;
+		RaycastHit hitRight;
+
+		collisions.left = Physics.Raycast(raycastOrigins.bottomLeft, -body.transform.right, out hitLeft, rayLength, collisionMask);
+		collisions.right = Physics.Raycast(raycastOrigins.bottomRight, body.transform.right, out hitRight, rayLength, collisionMask);
+
+		Debug.DrawRay(raycastOrigins.bottomLeft, -body.transform.right * rayLength, Color.red);
+		Debug.DrawRay(raycastOrigins.bottomRight, body.transform.right * rayLength, Color.red);
+
+		
+		print("Left ray detects obstacle = " + collisions.left.ToString());
+		print("Right ray detects obstacle = " + collisions.right.ToString());
+
 
 	}
 
@@ -128,14 +153,14 @@ public class RigidBodyController : MonoBehaviour {
 	//Horizontal movement. Takes parameters for the rate of acceleration in the desired direction,
 	//breaking movement in the current direction, and max speed to accelerate too.
 	void MoveHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed){
-		//Get the current velocity in the desired direction
-		float currentSpeed = Vector3.Dot(body.velocity, direction*body.transform.right);
+		//Get the current speed in the desired direction
+		float currentSpeedInDesiredDirection = Vector3.Dot(body.velocity, direction*body.transform.right);
 
 		//dot product of desired and current velocity will be negative if walking the wrong way
-		if (Mathf.Sign(maxSpeed) < 0){
+		if (Mathf.Sign(currentSpeedInDesiredDirection) < 0){
 			Break(direction, breakForce);
 		}
-		else if (currentSpeed < maxSpeed){
+		else if (currentSpeedInDesiredDirection < maxSpeed){
 			body.AddForce(this.transform.right * direction * speedUpForce);
 		}
 	}
@@ -163,14 +188,14 @@ public class RigidBodyController : MonoBehaviour {
 	 public struct CollisionInfo{
         public bool above, below;
         public bool left, right;
+		public Vector3 surfaceNormal;
 		public float slopeAngle;
-		public float oldSlopeAngle;
 
         public void Reset(){
             above = below = false;
             left = right = false;
-			oldSlopeAngle = slopeAngle;
-
+			surfaceNormal = new Vector3(0f, 0f, 0f);
+			slopeAngle = 0f;
         }
 	 }
 
