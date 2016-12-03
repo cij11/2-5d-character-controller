@@ -156,17 +156,78 @@ public class RigidBodyController : MonoBehaviour {
 		//Get the current speed in the desired direction
 		float currentSpeedInDesiredDirection = Vector3.Dot(body.velocity, direction*body.transform.right);
 
+		//get vector parallel to surface normal.
+		Vector3 surfaceNormalParallel = new Vector3(collisions.surfaceNormal.y, -collisions.surfaceNormal.x, 0);
+
+		//The vector we will apply walk forces to
+		Vector3 horizontalVector = body.transform.right;
+
+		//if moving down hill, align the force vector perpendicular ot the surface normal
+			//If grounded
+			//And moving left right with a collision right
+			//then moving downhill
+			//So
+			//Movement to the left should be aligned with the slope
+
+			//or
+
+			//If grounded
+			//and moving right with a collision left
+			//then moving downhill
+			//So
+			//movement to the right should be aligned with the slope
+		if (collisions.below){
+			//If player wants to move left
+			if (direction < 0){
+				//If there is a collision behind the player
+				if(collisions.right){
+					//Then set the movement direction to align with the slope
+					horizontalVector = surfaceNormalParallel;
+				}
+			}
+			//If player wants to move right
+			else{
+				//If there is a collision behind the player
+				if(collisions.left){
+					//Then set the movement direction to align with the slope
+					horizontalVector = surfaceNormalParallel;
+				}
+			}
+		}
+
 		//dot product of desired and current velocity will be negative if walking the wrong way
 		if (Mathf.Sign(currentSpeedInDesiredDirection) < 0){
 			Break(direction, breakForce);
 		}
 		else if (currentSpeedInDesiredDirection < maxSpeed){
-			body.AddForce(this.transform.right * direction * speedUpForce);
+			body.AddForce(horizontalVector * direction * speedUpForce);
 		}
 	}
 
 	void Break(float direction, float breakForce){
-		body.AddForce(this.transform.right *direction * breakForce);
+		Vector3 horizontalVector = body.transform.right;
+		//get vector parallel to surface normal.
+		Vector3 surfaceNormalParallel = new Vector3(collisions.surfaceNormal.y, -collisions.surfaceNormal.x, 0);
+
+		if (collisions.below){
+			//If player wants to move left
+			if (direction < 0){
+				//If there is a collision behind the player
+				if(collisions.right){
+					//Then set the movement direction to align with the slope
+					horizontalVector = surfaceNormalParallel;
+				}
+			}
+			//If player wants to move right
+			else{
+				//If there is a collision behind the player
+				if(collisions.left){
+					//Then set the movement direction to align with the slope
+					horizontalVector = surfaceNormalParallel;
+				}
+			}
+		}
+		body.AddForce(horizontalVector *direction * breakForce);
 	}
 
 	void ApplyGravity(){
