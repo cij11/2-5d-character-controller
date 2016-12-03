@@ -141,8 +141,19 @@ public class RigidBodyController : MonoBehaviour {
 
 		//Jump
 		if(Input.GetKeyDown("space")){
+			//If moving down, set the vertical velocity to jump velocity.
+			//Otherwise, boost upwards velocity by jump velocity
+			
+			//Projection of our velocity directed up (if +ve,) or down (if -ve)
+			float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
+
 			//Only allow jumping if standing on something
 			if (collisions.below){
+				//If moving down
+				if (verticalSpeed < 0){
+					//Cancel the current downwards velocity
+					body.velocity = body.velocity + body.transform.up * -verticalSpeed;
+				}
 				Vector3 jumpBoost = transform.up * jumpVelocity;
 				Vector3 oldVel = body.velocity;
 				body.velocity = oldVel + jumpBoost;
