@@ -12,8 +12,13 @@ public class RigidBodyController : MonoBehaviour {
 	//Speed the character walks at when left or right held
 	float maxWalkSpeed = 12;
 	//Time to attain walk velocity from stationary.
-	float speedUpMagnifier = 20f; 
-	float breakPower = 60f;
+	float landSpeedUpForce = 20f; 
+	float landBreakForce = 60f;
+
+	float maxAirSpeed = 12;
+	float airSpeedUpForce = 10f;
+	float airBreakForce = 30f;
+
 	float gravityPower = 14f;
 
 	float jumpVelocity = 10f;
@@ -91,11 +96,22 @@ public class RigidBodyController : MonoBehaviour {
 	}
 
 	void Move(){
+		//Left and right move. more responsive controls on the ground compared to the air
 		if(Input.GetKey("a")){
-			Walk(-1);
+			if (collisions.below){
+				MoveHorizontal(-1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
+			}
+			else{
+				MoveHorizontal(-1, airSpeedUpForce, airBreakForce, maxAirSpeed);
+			}
 		}
 		if(Input.GetKey("d")){
-			Walk(1);
+			if (collisions.below){
+				MoveHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
+			}
+			else{
+				MoveHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
+			}
 		}
 
 		//Jump
@@ -109,21 +125,23 @@ public class RigidBodyController : MonoBehaviour {
 		}
 	}
 
-	void Walk(float direction){
+	//Horizontal movement. Takes parameters for the rate of acceleration in the desired direction,
+	//breaking movement in the current direction, and max speed to accelerate too.
+	void MoveHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed){
 		//Get the current velocity in the desired direction
-		float currentWalkSpeed = Vector3.Dot(body.velocity, direction*body.transform.right);
+		float currentSpeed = Vector3.Dot(body.velocity, direction*body.transform.right);
 
 		//dot product of desired and current velocity will be negative if walking the wrong way
-		if (Mathf.Sign(currentWalkSpeed) < 0){
-			Break(direction);
+		if (Mathf.Sign(maxSpeed) < 0){
+			Break(direction, breakForce);
 		}
-		else if (currentWalkSpeed < maxWalkSpeed){
-			body.AddForce(this.transform.right * direction * speedUpMagnifier);
+		else if (currentSpeed < maxSpeed){
+			body.AddForce(this.transform.right * direction * speedUpForce);
 		}
 	}
 
-	void Break(float direction){
-		body.AddForce(this.transform.right *direction * breakPower);
+	void Break(float direction, float breakForce){
+		body.AddForce(this.transform.right *direction * breakForce);
 	}
 
 	void ApplyGravity(){
