@@ -36,7 +36,7 @@ public class RigidBodyController : MonoBehaviour {
 		//Get a vector to point feet at. This might be the center of a hull for a round world, or down for a ship
 		//with artificial gravity. Give this body position as arguement to calculate down or radial orientation position
 		Vector3 pointToOrientTo = gravityFocus;
-
+/*
 		Vector3 vectorToMountCenter = pointToOrientTo - body.position;
 		vectorToMountCenter.Normalize ();
 		Vector3 relativeDown = vectorToMountCenter;
@@ -44,6 +44,11 @@ public class RigidBodyController : MonoBehaviour {
 
 		//Look at a spot immediately left of the unit, then look intot the scene.
 		body.transform.rotation = Quaternion.LookRotation (Vector3.forward, -relativeDown);
+*/
+		//Align the up vector of the body with the vector from the focus towards the body.
+		Vector3 vectorFromFocusToBody = body.position - gravityFocus;
+		vectorFromFocusToBody.Normalize();
+		body.transform.rotation = Quaternion.FromToRotation(body.transform.up, vectorFromFocusToBody) * transform.rotation;
 	}
 
 	void Move(){
