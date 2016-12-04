@@ -156,24 +156,6 @@ public class RigidBodyController : MonoBehaviour {
 				if (collisions.slopeAngle < maxSlopeIdle){
 					//Change to sticky material of conditions for resting on a slope are met
 					physCollider.material = physicMatrials[1];
-					//Then apply a small force opposing the current motion along the slope
-				
-/*					//get vector parallel to surface normal.
-					Vector3 surfaceNormalParallel = new Vector3(collisions.surfaceNormal.y, -collisions.surfaceNormal.x, 0);
-					//Projection of velocity along slope
-					float currentSpeedAlongSlope = Vector3.Dot(body.velocity, surfaceNormalParallel);
-
-					//Apply an opposing friction force
-					//Apply a small force if the character is moving faster than the static friction cuttoff
-					if (Mathf.Abs(currentSpeedAlongSlope) > staticFrictionCutoff){
-						body.AddForce(surfaceNormalParallel * -Mathf.Sign(currentSpeedAlongSlope) * surfaceFrictionForce);
-					}
-					//And a large force if they are moving slower
-					else
-					{
-						body.AddForce(surfaceNormalParallel * -currentSpeedAlongSlope * surfaceFrictionForce * 10);
-					}
-					*/
 				}
 			}
 		}
@@ -186,16 +168,13 @@ public class RigidBodyController : MonoBehaviour {
 			//Projection of our velocity directed up (if +ve,) or down (if -ve)
 			float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
 
-			//Only allow jumping if standing on something
+			//Only allow jumping if standing on or adjacent to something
 			if (collisions.below || collisions.left || collisions.right){
-				//If moving down
-				if (verticalSpeed < 0){
-					//Cancel the current downwards velocity
-					body.velocity = body.velocity + body.transform.up * -verticalSpeed;
+				//If moving less than jump Velocity vertically
+				if (verticalSpeed < jumpVelocity){
+					//Cancel the current downwards velocity, and set it to the jump velocity
+					body.velocity = body.velocity + body.transform.up * (-verticalSpeed + jumpVelocity);
 				}
-				Vector3 jumpBoost = transform.up * jumpVelocity;
-				Vector3 oldVel = body.velocity;
-				body.velocity = oldVel + jumpBoost;
 			}
 		}
 	}
