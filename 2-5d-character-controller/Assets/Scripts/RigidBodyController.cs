@@ -93,12 +93,12 @@ public class RigidBodyController : MonoBehaviour {
 			if(isHit){
 				collisions.below = true;
 				collisions.surfaceNormal = hit.normal;
-				collisions.slopeAngle = Vector3.Angle(hit.normal,body.transform.up);
+				collisions.groundSlopeAngle = Vector3.Angle(hit.normal,body.transform.up);
 			}
 		}
 		if(collisions.below) print("Collision below");
 		else print("No collision below");
-		print("Slope angle = " + collisions.slopeAngle.ToString());
+		print("Slope angle = " + collisions.groundSlopeAngle.ToString());
 		print("Slope normal = " + collisions.surfaceNormal.ToString());
 	}
 
@@ -120,9 +120,16 @@ public class RigidBodyController : MonoBehaviour {
 		Debug.DrawRay(raycastOrigins.bottomLeft, -body.transform.right * rayLength, Color.red);
 		Debug.DrawRay(raycastOrigins.bottomRight, body.transform.right * rayLength, Color.red);
 
+		//Store the angles of any detected walls too 
+		if(collisions.left){
+			collisions.leftWallAngle = Vector3.Angle(body.transform.up, hitLeft.normal);
+		}
+		if(collisions.right){
+			collisions.rightWallAngle = Vector3.Angle(body.transform.up, hitRight.normal);
+		}
 		
-		print("Left ray detects obstacle = " + collisions.left.ToString());
-		print("Right ray detects obstacle = " + collisions.right.ToString());
+		print("Left ray wall angle = " + collisions.leftWallAngle.ToString());
+		print("Right ray wall angle = " + collisions.rightWallAngle.ToString());
 
 
 	}
@@ -153,7 +160,7 @@ public class RigidBodyController : MonoBehaviour {
 			//And player is grounded
 			if(collisions.below){
 				//And this is a slope the player can stand/idle/rest on
-				if (collisions.slopeAngle < maxSlopeIdle){
+				if (collisions.groundSlopeAngle < maxSlopeIdle){
 					//Change to sticky material of conditions for resting on a slope are met
 					physCollider.material = physicMatrials[1];
 				}
@@ -168,6 +175,8 @@ public class RigidBodyController : MonoBehaviour {
 			//Projection of our velocity directed up (if +ve,) or down (if -ve)
 			float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
 
+			//Detect ground and add upwards component to velocity if standing.
+			//If terrain is too steep, walljump instead
 			//Only allow jumping if standing on or adjacent to something
 			if (collisions.below || collisions.left || collisions.right){
 				//If moving less than jump Velocity vertically
@@ -176,6 +185,7 @@ public class RigidBodyController : MonoBehaviour {
 					body.velocity = body.velocity + body.transform.up * (-verticalSpeed + jumpVelocity);
 				}
 			}
+			//Detect wall, and jump up and away from the wall if adjacent.
 		}
 	}
 
@@ -279,13 +289,17 @@ public class RigidBodyController : MonoBehaviour {
         public bool above, below;
         public bool left, right;
 		public Vector3 surfaceNormal;
-		public float slopeAngle;
+		public float groundSlopeAngle;
+		public float leftWallAngle;
+		public float rightWallAngle;
 
         public void Reset(){
             above = below = false;
             left = right = false;
 			surfaceNormal = new Vector3(0f, 0f, 0f);
-			slopeAngle = 0f;
+			groundSlopeAngle = 0f;
+			leftWallAngle = 0f;
+			rightWallAngle = 0f;
         }
 	 }
 
