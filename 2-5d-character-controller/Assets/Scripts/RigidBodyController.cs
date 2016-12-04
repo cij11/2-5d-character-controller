@@ -4,6 +4,7 @@ using System.Collections;
 public class RigidBodyController : MonoBehaviour {
 	public Vector3 gravityFocus = new Vector3(0, 0, 0);
 	Rigidbody body;
+	Collider physCollider;
 	float width = 1f;
 	float height = 1f;
 
@@ -29,10 +30,16 @@ public class RigidBodyController : MonoBehaviour {
 	int verticalRayCount = 3;
 	float verticalRaySpacing;
 	public LayerMask collisionMask;
+	float maxSlopeIdle = 60;
+	float surfaceFrictionForce = 5;
+	float staticFrictionCutoff = 0.5f;
+
+	public PhysicMaterial[] physicMatrials;
 
 	// Use this for initialization
 	void Start () {
 		body = GetComponent<Rigidbody>();
+		physCollider = GetComponent<Collider>();
 		UpdateRaycastOrigins();
 		CalculateRaySpacing();
 	}
@@ -139,6 +146,38 @@ public class RigidBodyController : MonoBehaviour {
 			}
 		}
 
+		//Reset to slippery material
+		physCollider.material = physicMatrials[0];
+		//If no directional input is presssed. Press 's' to enable skiing.
+		if (!Input.GetKey("a") && !Input.GetKey("d") &&!Input.GetKey("s")){
+			//And player is grounded
+			if(collisions.below){
+				//And this is a slope the player can stand/idle/rest on
+				if (collisions.slopeAngle < maxSlopeIdle){
+					//Change to sticky material of conditions for resting on a slope are met
+					physCollider.material = physicMatrials[1];
+					//Then apply a small force opposing the current motion along the slope
+				
+/*					//get vector parallel to surface normal.
+					Vector3 surfaceNormalParallel = new Vector3(collisions.surfaceNormal.y, -collisions.surfaceNormal.x, 0);
+					//Projection of velocity along slope
+					float currentSpeedAlongSlope = Vector3.Dot(body.velocity, surfaceNormalParallel);
+
+					//Apply an opposing friction force
+					//Apply a small force if the character is moving faster than the static friction cuttoff
+					if (Mathf.Abs(currentSpeedAlongSlope) > staticFrictionCutoff){
+						body.AddForce(surfaceNormalParallel * -Mathf.Sign(currentSpeedAlongSlope) * surfaceFrictionForce);
+					}
+					//And a large force if they are moving slower
+					else
+					{
+						body.AddForce(surfaceNormalParallel * -currentSpeedAlongSlope * surfaceFrictionForce * 10);
+					}
+					*/
+				}
+			}
+		}
+
 		//Jump
 		if(Input.GetKeyDown("space")){
 			//If moving down, set the vertical velocity to jump velocity.
@@ -148,7 +187,7 @@ public class RigidBodyController : MonoBehaviour {
 			float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
 
 			//Only allow jumping if standing on something
-			if (collisions.below){
+			if (collisions.below || collisions.left || collisions.right){
 				//If moving down
 				if (verticalSpeed < 0){
 					//Cancel the current downwards velocity
