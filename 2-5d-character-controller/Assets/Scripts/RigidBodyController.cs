@@ -17,8 +17,8 @@ public class RigidBodyController : MonoBehaviour {
 	float landBreakForce = 60f;
 
 	float maxAirSpeed = 12;
-	float airSpeedUpForce = 10f;
-	float airBreakForce = 30f;
+	float airSpeedUpForce = 8f;
+	float airBreakForce = 20f;
 
 	float gravityPower = 14f;
 
