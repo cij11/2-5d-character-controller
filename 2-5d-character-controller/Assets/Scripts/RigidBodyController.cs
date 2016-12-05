@@ -54,6 +54,7 @@ public class RigidBodyController : MonoBehaviour {
 		UpdateRaycastOrigins();
 		DetectGround();
 		DetectSlope();
+		DetectLedge();
 	}
 
 	void OrientToGravityFocus(){
@@ -114,23 +115,45 @@ public class RigidBodyController : MonoBehaviour {
 		RaycastHit hitLeft;
 		RaycastHit hitRight;
 
-		collisions.left = Physics.Raycast(raycastOrigins.bottomLeft, -body.transform.right, out hitLeft, rayLength, collisionMask);
-		collisions.right = Physics.Raycast(raycastOrigins.bottomRight, body.transform.right, out hitRight, rayLength, collisionMask);
+		collisions.leftBot = Physics.Raycast(raycastOrigins.bottomLeft, -body.transform.right, out hitLeft, rayLength, collisionMask);
+		collisions.rightBot = Physics.Raycast(raycastOrigins.bottomRight, body.transform.right, out hitRight, rayLength, collisionMask);
 
 		Debug.DrawRay(raycastOrigins.bottomLeft, -body.transform.right * rayLength, Color.red);
 		Debug.DrawRay(raycastOrigins.bottomRight, body.transform.right * rayLength, Color.red);
 
 		//Store the angles of any detected walls too 
-		if(collisions.left){
+		if(collisions.leftBot){
 			collisions.leftWallAngle = Vector3.Angle(body.transform.up, hitLeft.normal);
 		}
-		if(collisions.right){
+		if(collisions.rightBot){
 			collisions.rightWallAngle = Vector3.Angle(body.transform.up, hitRight.normal);
 		}
 		
 		print("Left ray wall angle = " + collisions.leftWallAngle.ToString());
 		print("Right ray wall angle = " + collisions.rightWallAngle.ToString());
 
+
+	}
+
+	//Not currently used for anything 
+	void DetectLedge(){
+		float rayLength = 0.05f;
+		RaycastHit hitLeft;
+		RaycastHit hitRight;
+
+		collisions.leftTop = Physics.Raycast(raycastOrigins.topLeft, -body.transform.right, out hitLeft, rayLength, collisionMask);
+		collisions.rightTop = Physics.Raycast(raycastOrigins.topRight, body.transform.right, out hitRight, rayLength, collisionMask);
+
+		Debug.DrawRay(raycastOrigins.topLeft, -body.transform.right * rayLength, Color.red);
+		Debug.DrawRay(raycastOrigins.topRight, body.transform.right * rayLength, Color.red);
+
+		//Allow top rays to store wall 
+		if(collisions.leftTop){
+			collisions.leftTopWallAngle = Vector3.Angle(body.transform.up, hitLeft.normal);
+		}
+		if(collisions.rightTop){
+			collisions.rightTopWallAngle = Vector3.Angle(body.transform.up, hitRight.normal);
+		}
 
 	}
 
@@ -181,10 +204,10 @@ public class RigidBodyController : MonoBehaviour {
 				GroundJump();
 			}
 			else{
-				if (collisions.left){
+				if (collisions.leftBot || collisions.leftTop){
 					WallJump(1f);
 				}
-				else if (collisions.right){
+				else if (collisions.rightBot || collisions.rightTop){
 					WallJump(-1f);
 				}
 			}
@@ -207,6 +230,11 @@ public class RigidBodyController : MonoBehaviour {
 	void WallJump(float direction){
 		//Cancel all existing velocity, and set equal to a 45 degree jump in the given direction
 		body.velocity = body.transform.up * jumpVelocity + body.transform.right * direction * jumpVelocity;
+	}
+
+	//If on a ledge, jump straight up
+	void LedgeJump(){
+
 	}
 	//Horizontal movement. Takes parameters for the rate of acceleration in the desired direction,
 	//breaking movement in the current direction, and max speed to accelerate too.
@@ -238,7 +266,7 @@ public class RigidBodyController : MonoBehaviour {
 			//If player wants to move left
 			if (direction < 0){
 				//If there is a collision behind the player
-				if(collisions.right){
+				if(collisions.rightBot){
 					//Then set the movement direction to align with the slope
 					horizontalVector = surfaceNormalParallel;
 				}
@@ -246,7 +274,7 @@ public class RigidBodyController : MonoBehaviour {
 			//If player wants to move right
 			else{
 				//If there is a collision behind the player
-				if(collisions.left){
+				if(collisions.leftBot){
 					//Then set the movement direction to align with the slope
 					horizontalVector = surfaceNormalParallel;
 				}
@@ -271,7 +299,7 @@ public class RigidBodyController : MonoBehaviour {
 			//If player wants to move left
 			if (direction < 0){
 				//If there is a collision behind the player
-				if(collisions.right){
+				if(collisions.rightBot){
 					//Then set the movement direction to align with the slope
 					horizontalVector = surfaceNormalParallel;
 				}
@@ -279,7 +307,7 @@ public class RigidBodyController : MonoBehaviour {
 			//If player wants to move right
 			else{
 				//If there is a collision behind the player
-				if(collisions.left){
+				if(collisions.leftBot){
 					//Then set the movement direction to align with the slope
 					horizontalVector = surfaceNormalParallel;
 				}
@@ -306,19 +334,25 @@ public class RigidBodyController : MonoBehaviour {
 
 	 public struct CollisionInfo{
         public bool above, below;
-        public bool left, right;
+        public bool leftBot, rightBot;
+		public bool leftTop, rightTop;
 		public Vector3 surfaceNormal;
 		public float groundSlopeAngle;
 		public float leftWallAngle;
 		public float rightWallAngle;
+		public float leftTopWallAngle;
+		public float rightTopWallAngle;
 
         public void Reset(){
             above = below = false;
-            left = right = false;
+            leftBot = rightBot = false;
+			leftTop = rightTop = false;
 			surfaceNormal = new Vector3(0f, 0f, 0f);
 			groundSlopeAngle = 0f;
 			leftWallAngle = 0f;
 			rightWallAngle = 0f;
+			leftTopWallAngle = 0f;
+			rightTopWallAngle = 0f;
         }
 	 }
 
