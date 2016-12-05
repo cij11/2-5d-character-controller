@@ -172,23 +172,42 @@ public class RigidBodyController : MonoBehaviour {
 			//If moving down, set the vertical velocity to jump velocity.
 			//Otherwise, boost upwards velocity by jump velocity
 			
-			//Projection of our velocity directed up (if +ve,) or down (if -ve)
-			float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
+
 
 			//Detect ground and add upwards component to velocity if standing.
 			//If terrain is too steep, walljump instead
 			//Only allow jumping if standing on or adjacent to something
-			if (collisions.below || collisions.left || collisions.right){
-				//If moving less than jump Velocity vertically
-				if (verticalSpeed < jumpVelocity){
-					//Cancel the current downwards velocity, and set it to the jump velocity
-					body.velocity = body.velocity + body.transform.up * (-verticalSpeed + jumpVelocity);
+			if (collisions.below && collisions.groundSlopeAngle < maxSlopeIdle){
+				GroundJump();
+			}
+			else{
+				if (collisions.left){
+					WallJump(1f);
+				}
+				else if (collisions.right){
+					WallJump(-1f);
 				}
 			}
 			//Detect wall, and jump up and away from the wall if adjacent.
 		}
 	}
 
+	//If the current vertical speed is < the jump velocity, cancel any existing
+	//vertical speed and set to jump velocity
+	void GroundJump(){
+					//Projection of our velocity directed up (if +ve,) or down (if -ve)
+			float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
+						//If moving less than jump Velocity vertically
+				if (verticalSpeed < jumpVelocity){
+					//Cancel the current downwards velocity, and set it to the jump velocity
+					body.velocity = body.velocity + body.transform.up * (-verticalSpeed + jumpVelocity);
+				}
+	}
+
+	void WallJump(float direction){
+		//Cancel all existing velocity, and set equal to a 45 degree jump in the given direction
+		body.velocity = body.transform.up * jumpVelocity + body.transform.right * direction * jumpVelocity;
+	}
 	//Horizontal movement. Takes parameters for the rate of acceleration in the desired direction,
 	//breaking movement in the current direction, and max speed to accelerate too.
 	void MoveHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed){
