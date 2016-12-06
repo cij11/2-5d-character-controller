@@ -27,14 +27,20 @@ public class RigidBodyController : MonoBehaviour {
 	CollisionInfo collisions;
 	RaycastOrigins raycastOrigins;
 	float skinWidth = 0.01f;
-	int verticalRayCount = 3;
+	int verticalRayCount = 8;
 	float verticalRaySpacing;
 	public LayerMask collisionMask;
 	float maxSlopeIdle = 60;
 	float surfaceFrictionForce = 5;
 	float staticFrictionCutoff = 0.5f;
 
-	public PhysicMaterial[] physicMatrials;
+	//Store state variables and timers - eg, double jump used, time since touched wall
+	StateInfo stateInfo;
+	//Force that will be applied to keep character sticking to a wall if grabbing or sliding down it
+	float wallHugForce = 5f;
+	//Time in seconds that a wall jump can still occur after releasing the wall
+	float wallJumpTimeWindow = 0.1f;
+	public PhysicMaterial[] physicMaterials;
 
 	// Use this for initialization
 	void Start () {
@@ -49,12 +55,16 @@ public class RigidBodyController : MonoBehaviour {
 		OrientToGravityFocus();
 		Move();
 		ApplyGravity();
+		ApplyWallHugForce();
+		AssignPhysicMaterial();
 
 		collisions.Reset();
 		UpdateRaycastOrigins();
 		DetectGround();
 		DetectSlope();
-		DetectLedge();
+		DetectWall();
+
+		stateInfo.Update();
 	}
 
 	void OrientToGravityFocus(){
@@ -136,7 +146,7 @@ public class RigidBodyController : MonoBehaviour {
 	}
 
 	//Not currently used for anything 
-	void DetectLedge(){
+	void DetectWall(){
 		float rayLength = 0.05f;
 		RaycastHit hitLeft;
 		RaycastHit hitRight;
@@ -155,6 +165,56 @@ public class RigidBodyController : MonoBehaviour {
 			collisions.rightTopWallAngle = Vector3.Angle(body.transform.up, hitRight.normal);
 		}
 
+	}
+
+    //If in a position to grab or slide down a wall, apply a small force towards the wall
+    void ApplyWallHugForce()
+    {
+        if (!collisions.below)
+        {
+            if (collisions.leftTop || (collisions.leftBot && collisions.leftWallAngle > 85))
+            {
+				//adjacent to left wall, so apply wall hug force, and reset timer for that side
+				body.AddForce(-body.transform.right * wallHugForce);
+				stateInfo.leftWallHugTimer = 0f;
+            }
+            if (collisions.rightTop || (collisions.rightBot && collisions.rightWallAngle > 85))
+            {
+				//Likewise for the right wall
+				body.AddForce(body.transform.right * wallHugForce);
+				stateInfo.rightWallHugTimer = 0f;
+            }
+        }
+    }
+
+	void AssignPhysicMaterial(){
+		//Reset to slippery material by default
+		physCollider.material = physicMaterials[0];
+
+		//If grabbing adjacent to a wall and in the air, set high static friction, unless holding down
+		if(!collisions.below){
+			if(collisions.leftTop || collisions.rightTop || (collisions.leftBot && collisions.leftWallAngle > 85) || (collisions.rightBot && collisions.rightWallAngle > 85)){
+				if(Input.GetKey("s")){
+					//If down is held, set the material to be smoother
+					physCollider.material = physicMaterials[3];
+				}
+				else{
+					//else make very sticky
+					physCollider.material = physicMaterials[2];
+				}
+			}
+		}
+		//If no directional input is presssed. Press 's' to enable skiing.
+		if (!Input.GetKey("a") && !Input.GetKey("d") &&!Input.GetKey("s")){
+			//And player is grounded
+			if(collisions.below){
+				//And this is a slope the player can stand/idle/rest on
+				if (collisions.groundSlopeAngle < maxSlopeIdle){
+					//Change to sticky material of conditions for resting on a slope are met
+					physCollider.material = physicMaterials[1];
+				}
+			}
+		}
 	}
 
 	void Move(){
@@ -176,20 +236,6 @@ public class RigidBodyController : MonoBehaviour {
 			}
 		}
 
-		//Reset to slippery material
-		physCollider.material = physicMatrials[0];
-		//If no directional input is presssed. Press 's' to enable skiing.
-		if (!Input.GetKey("a") && !Input.GetKey("d") &&!Input.GetKey("s")){
-			//And player is grounded
-			if(collisions.below){
-				//And this is a slope the player can stand/idle/rest on
-				if (collisions.groundSlopeAngle < maxSlopeIdle){
-					//Change to sticky material of conditions for resting on a slope are met
-					physCollider.material = physicMatrials[1];
-				}
-			}
-		}
-
 		//Jump
 		if(Input.GetKeyDown("space")){
 			//If moving down, set the vertical velocity to jump velocity.
@@ -204,12 +250,15 @@ public class RigidBodyController : MonoBehaviour {
 				GroundJump();
 			}
 			else{
-				if (collisions.leftBot || collisions.leftTop){
+				//Potentially just need the wall hug timers...
+				if (collisions.leftBot || collisions.leftTop || stateInfo.leftWallHugTimer < wallJumpTimeWindow){
 					WallJump(1f);
 				}
-				else if (collisions.rightBot || collisions.rightTop){
+				else if (collisions.rightBot || collisions.rightTop  || stateInfo.rightWallHugTimer < wallJumpTimeWindow){
 					WallJump(-1f);
 				}
+
+				//
 			}
 			//Detect wall, and jump up and away from the wall if adjacent.
 		}
@@ -360,6 +409,21 @@ public class RigidBodyController : MonoBehaviour {
 	struct RaycastOrigins{
 		public Vector3 topLeft, topRight;
 		public Vector3 bottomLeft, bottomRight;
+	}
+
+	public struct StateInfo{
+		public float leftWallHugTimer;
+		public float rightWallHugTimer;
+		public void Update(){
+			leftWallHugTimer+=Time.deltaTime;
+			if (leftWallHugTimer > 10f){
+				leftWallHugTimer = 10f;
+			}
+			rightWallHugTimer+=Time.deltaTime;
+			if (rightWallHugTimer > 10f){
+				rightWallHugTimer = 10f;
+			}
+		}
 	}
 
 	void CalculateRaySpacing(){
