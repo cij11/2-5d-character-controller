@@ -36,10 +36,12 @@ public class RigidBodyController : MonoBehaviour {
 
 	//Store state variables and timers - eg, double jump used, time since touched wall
 	StateInfo stateInfo;
+
 	//Force that will be applied to keep character sticking to a wall if grabbing or sliding down it
 	float wallHugForce = 5f;
 	//Time in seconds that a wall jump can still occur after releasing the wall
 	float wallJumpTimeWindow = 0.1f;
+	int maxDoubleJumps = 2;
 	public PhysicMaterial[] physicMaterials;
 
 	// Use this for initialization
@@ -54,6 +56,8 @@ public class RigidBodyController : MonoBehaviour {
 	void Update () {
 		OrientToGravityFocus();
 		Move();
+		Jump();
+		
 		ApplyGravity();
 		ApplyWallHugForce();
 		AssignPhysicMaterial();
@@ -235,13 +239,15 @@ public class RigidBodyController : MonoBehaviour {
 				MoveHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
 			}
 		}
+	}
 
-		//Jump
+	//Determine what type of jump is appropriate when jump pressed, and apply
+	void Jump(){
+		//Reset doublejump counter if grounded
+		if (collisions.below){
+			stateInfo.remainingDoubleJumps = maxDoubleJumps;
+		}
 		if(Input.GetKeyDown("space")){
-			//If moving down, set the vertical velocity to jump velocity.
-			//Otherwise, boost upwards velocity by jump velocity
-			
-
 
 			//Detect ground and add upwards component to velocity if standing.
 			//If terrain is too steep, walljump instead
@@ -257,10 +263,13 @@ public class RigidBodyController : MonoBehaviour {
 				else if (collisions.rightBot || collisions.rightTop  || stateInfo.rightWallHugTimer < wallJumpTimeWindow){
 					WallJump(-1f);
 				}
-
-				//
+				//Even if we can't ground jump or wall jump, we might be able to double jump
+				else if (stateInfo.remainingDoubleJumps > 0){
+					//decrement counter
+					stateInfo.remainingDoubleJumps--;
+					DoubleJump();
+				}
 			}
-			//Detect wall, and jump up and away from the wall if adjacent.
 		}
 	}
 
@@ -284,6 +293,11 @@ public class RigidBodyController : MonoBehaviour {
 	//If on a ledge, jump straight up
 	void LedgeJump(){
 
+	}
+
+	void DoubleJump(){
+		//Same as ground jump for now. Later, give option to change direction on double jump
+		GroundJump();
 	}
 	//Horizontal movement. Takes parameters for the rate of acceleration in the desired direction,
 	//breaking movement in the current direction, and max speed to accelerate too.
@@ -414,6 +428,7 @@ public class RigidBodyController : MonoBehaviour {
 	public struct StateInfo{
 		public float leftWallHugTimer;
 		public float rightWallHugTimer;
+		public int remainingDoubleJumps;
 		public void Update(){
 			leftWallHugTimer+=Time.deltaTime;
 			if (leftWallHugTimer > 10f){
