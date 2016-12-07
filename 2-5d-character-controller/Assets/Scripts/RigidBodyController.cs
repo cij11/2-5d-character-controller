@@ -42,6 +42,8 @@ public class RigidBodyController : MonoBehaviour {
 	//Time in seconds that a wall jump can still occur after releasing the wall
 	float wallJumpTimeWindow = 0.1f;
 	int maxDoubleJumps = 2;
+
+	float jetpackPower = 18f;
 	public PhysicMaterial[] physicMaterials;
 
 	// Use this for initialization
@@ -57,7 +59,8 @@ public class RigidBodyController : MonoBehaviour {
 		OrientToGravityFocus();
 		Move();
 		Jump();
-		
+		Jetpack();
+
 		ApplyGravity();
 		ApplyWallHugForce();
 		AssignPhysicMaterial();
@@ -377,6 +380,12 @@ public class RigidBodyController : MonoBehaviour {
 			}
 		}
 		body.AddForce(horizontalVector *direction * breakForce);
+	}
+
+	void Jetpack(){
+		if(Input.GetKey("w")){
+			body.AddForce(body.transform.up * jetpackPower);
+		}
 	}
 
 	void ApplyGravity(){
