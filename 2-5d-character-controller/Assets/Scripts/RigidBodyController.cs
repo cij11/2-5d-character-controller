@@ -365,22 +365,23 @@ public class RigidBodyController : MonoBehaviour
         {
             horizontalVector = surfaceNormalParallel;
         }
-
-		float slopeAttenuatedSpeedUpForce = speedUpForce;
-		//If dot product of body right and surface normal is +ve then right is downhill, and left is uphill
-		if( Vector3.Dot(collisions.surfaceNormal, body.transform.right) > 0)
-		{
-			//Left is uphill, so reduce speedUpForce if moving left
-			if (direction < 0){
-				slopeAttenuatedSpeedUpForce *= 0.2f;
-			}
-		}
-		else{
-			//Right is uphill, so reduce speedUpForce if moving right
-			if (direction > 0){
-				slopeAttenuatedSpeedUpForce *= 0.2f;
-			}
-		}
+        //If dot product of body right and surface normal is +ve then right is downhill, and left is uphill
+        if (Vector3.Dot(collisions.surfaceNormal, body.transform.right) > 0)
+        {
+            //Left is uphill, so don't align horizontal vector with slope if moving left
+            if (direction < 0)
+            {
+                horizontalVector = body.transform.right;
+            }
+        }
+        else
+        {
+            //Right is uphill, so don't align with slope if moving right
+            if (direction > 0)
+            {
+                horizontalVector = body.transform.right;
+            }
+        }
 
         //dot product of desired and current velocity will be negative if walking the wrong way
         if (Mathf.Sign(currentSpeedInDesiredDirection) < 0)
@@ -389,8 +390,8 @@ public class RigidBodyController : MonoBehaviour
         }
         else if (currentSpeedInDesiredDirection < maxSpeed)
         {
-			//Cut off the applied force as slope approaches limit	
-            body.AddForce(horizontalVector * direction * slopeAttenuatedSpeedUpForce * Time.deltaTime);
+            //Cut off the applied force as slope approaches limit	
+            body.AddForce(horizontalVector * direction * speedUpForce * Time.deltaTime);
         }
     }
 
@@ -436,10 +437,11 @@ public class RigidBodyController : MonoBehaviour
         body.velocity = body.velocity - vectorToKillVelocity * speedInUndesiredDiretion;
     }
 
-	//Return the vector at 90 degrees to the arguement vector.
-	Vector3 CalculatePerpendicular(Vector3 vec){
-		return new Vector3(vec.y, -vec.x, 0);
-	}
+    //Return the vector at 90 degrees to the arguement vector.
+    Vector3 CalculatePerpendicular(Vector3 vec)
+    {
+        return new Vector3(vec.y, -vec.x, 0);
+    }
 
     //Find the corners of the square
     void UpdateRaycastOrigins()
