@@ -8,19 +8,17 @@ public class RigidBodyController : MonoBehaviour {
 	float width = 1f;
 	float height = 1f;
 
-	float walkPower = 2;
-
 	//Speed the character walks at when left or right held
 	float maxWalkSpeed = 12;
 	//Time to attain walk velocity from stationary.
-	float landSpeedUpForce = 20f; 
-	float landBreakForce = 60f;
+	float landSpeedUpForce = 1500f; 
+	float landBreakForce = 5000f;
 
 	float maxAirSpeed = 12;
-	float airSpeedUpForce = 8f;
-	float airBreakForce = 20f;
+	float airSpeedUpForce = 600f;
+	float airBreakForce = 1500f;
 
-	float gravityForce = 14f;
+	float gravityForce = 900f;
 
 	float jumpVelocity = 10f;
 
@@ -31,20 +29,19 @@ public class RigidBodyController : MonoBehaviour {
 	float verticalRaySpacing;
 	public LayerMask collisionMask;
 	float maxSlopeIdle = 60;
-	float surfaceFrictionForce = 5;
-	float staticFrictionCutoff = 0.5f;
 
 	//Store state variables and timers - eg, double jump used, time since touched wall
 	StateInfo stateInfo;
 
 	//Force that will be applied to keep character sticking to a wall if grabbing or sliding down it
-	float wallHugForce = 5f;
+	float wallHugForce = 200f;
 	//Time in seconds that a wall jump can still occur after releasing the wall
 	float wallJumpTimeWindow = 0.1f;
 	int maxDoubleJumps = 2;
 
-	float jetpackPower = 18f;
+	float jetpackForce = 1200f;
 	float parachuteFallSpeed = 1f;
+	float paracuteDeceleration = 1.5f;
 	public PhysicMaterial[] physicMaterials;
 
 	// Use this for initialization
@@ -184,13 +181,13 @@ public class RigidBodyController : MonoBehaviour {
             if (collisions.leftTop || (collisions.leftBot && collisions.leftWallAngle > 85))
             {
 				//adjacent to left wall, so apply wall hug force, and reset timer for that side
-				body.AddForce(-body.transform.right * wallHugForce);
+				body.AddForce(-body.transform.right * wallHugForce * Time.deltaTime);
 				stateInfo.leftWallHugTimer = 0f;
             }
             if (collisions.rightTop || (collisions.rightBot && collisions.rightWallAngle > 85))
             {
 				//Likewise for the right wall
-				body.AddForce(body.transform.right * wallHugForce);
+				body.AddForce(body.transform.right * wallHugForce * Time.deltaTime);
 				stateInfo.rightWallHugTimer = 0f;
             }
         }
@@ -354,7 +351,7 @@ public class RigidBodyController : MonoBehaviour {
 			Break(direction, breakForce);
 		}
 		else if (currentSpeedInDesiredDirection < maxSpeed){
-			body.AddForce(horizontalVector * direction * speedUpForce);
+			body.AddForce(horizontalVector * direction * speedUpForce * Time.deltaTime);
 		}
 	}
 
@@ -381,12 +378,12 @@ public class RigidBodyController : MonoBehaviour {
 				}
 			}
 		}
-		body.AddForce(horizontalVector *direction * breakForce);
+		body.AddForce(horizontalVector *direction * breakForce * Time.deltaTime);
 	}
 
 	void Jetpack(){
 		if(Input.GetKey("w")){
-			body.AddForce(body.transform.up * jetpackPower);
+			body.AddForce(body.transform.up * jetpackForce * Time.deltaTime);
 		}
 	}
 
@@ -398,14 +395,14 @@ public class RigidBodyController : MonoBehaviour {
 				//And the downwards speed is greater than the parachuteSpeed
 				if(Mathf.Abs(verticalSpeed) > parachuteFallSpeed){
 				//Apply a force counter to gravity
-					body.AddForce(body.transform.up * gravityForce);
+					body.AddForce(body.transform.up * gravityForce * paracuteDeceleration * Time.deltaTime);
 				}
 			}
 		}
 	}
 
 	void ApplyGravity(){
-		body.AddForce(-this.transform.up* gravityForce);
+		body.AddForce(-this.transform.up* gravityForce * Time.deltaTime);
 	}
 
 	//Find the corners of the square
