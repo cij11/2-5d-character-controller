@@ -20,7 +20,7 @@ public class RigidBodyController : MonoBehaviour {
 
 	float gravityForce = 900f;
 
-	float jumpVelocity = 10f;
+	float jumpSpeed = 10f;
 
 	CollisionInfo collisions;
 	RaycastOrigins raycastOrigins;
@@ -281,15 +281,17 @@ public class RigidBodyController : MonoBehaviour {
 					//Projection of our velocity directed up (if +ve,) or down (if -ve)
 			float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
 						//If moving less than jump Velocity vertically
-				if (verticalSpeed < jumpVelocity){
+				if (verticalSpeed < jumpSpeed){
 					//Cancel the current downwards velocity, and set it to the jump velocity
-					body.velocity = body.velocity + body.transform.up * (-verticalSpeed + jumpVelocity);
+				//	body.velocity = body.velocity + body.transform.up * (-verticalSpeed + jumpSpeed);
+					CancelVelocityAlongVector(body.transform.up);
+					body.velocity = body.velocity + body.transform.up * jumpSpeed;
 				}
 	}
 
 	void WallJump(float direction){
 		//Cancel all existing velocity, and set equal to a 45 degree jump in the given direction
-		body.velocity = body.transform.up * jumpVelocity + body.transform.right * direction * jumpVelocity;
+		body.velocity = body.transform.up * jumpSpeed + body.transform.right * direction * jumpSpeed;
 	}
 
 	//If on a ledge, jump straight up
@@ -403,6 +405,16 @@ public class RigidBodyController : MonoBehaviour {
 
 	void ApplyGravity(){
 		body.AddForce(-this.transform.up* gravityForce * Time.deltaTime);
+	}
+
+	//Use the dot product to find the scalar projection of the current velocity
+	//in the undesired direction.
+	//Subtract this scalar * the undesired direction from the body velocity
+	//to zero all movement in the diretion of the given vector
+	void CancelVelocityAlongVector(Vector3 vectorToKillVelocity){
+		vectorToKillVelocity.Normalize();
+		float speedInUndesiredDiretion = Vector3.Dot(body.velocity, vectorToKillVelocity);
+		body.velocity = body.velocity - vectorToKillVelocity * speedInUndesiredDiretion;
 	}
 
 	//Find the corners of the square
