@@ -20,7 +20,7 @@ public class RigidBodyController : MonoBehaviour {
 	float airSpeedUpForce = 8f;
 	float airBreakForce = 20f;
 
-	float gravityPower = 14f;
+	float gravityForce = 14f;
 
 	float jumpVelocity = 10f;
 
@@ -44,6 +44,7 @@ public class RigidBodyController : MonoBehaviour {
 	int maxDoubleJumps = 2;
 
 	float jetpackPower = 18f;
+	float parachuteFallSpeed = 1f;
 	public PhysicMaterial[] physicMaterials;
 
 	// Use this for initialization
@@ -60,6 +61,7 @@ public class RigidBodyController : MonoBehaviour {
 		Move();
 		Jump();
 		Jetpack();
+		Parachute();
 
 		ApplyGravity();
 		ApplyWallHugForce();
@@ -388,8 +390,22 @@ public class RigidBodyController : MonoBehaviour {
 		}
 	}
 
+	void Parachute(){
+		if(Input.GetKey("left shift")){
+			float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
+			//If the character is moving down
+			if (verticalSpeed < 0){
+				//And the downwards speed is greater than the parachuteSpeed
+				if(Mathf.Abs(verticalSpeed) > parachuteFallSpeed){
+				//Apply a force counter to gravity
+					body.AddForce(body.transform.up * gravityForce);
+				}
+			}
+		}
+	}
+
 	void ApplyGravity(){
-		body.AddForce(-this.transform.up* gravityPower);
+		body.AddForce(-this.transform.up* gravityForce);
 	}
 
 	//Find the corners of the square
