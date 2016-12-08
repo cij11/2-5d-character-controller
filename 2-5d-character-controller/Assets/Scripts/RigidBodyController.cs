@@ -3,6 +3,11 @@ using System.Collections;
 
 public class RigidBodyController : MonoBehaviour
 {
+    ContactState contactState = ContactState.GROUNDED;
+    MovementDirection verticalDirection = MovementDirection.NEUTRAL;
+    MovementDirection horizontalDirection = MovementDirection.NEUTRAL;
+    MovementDirection sideGrabbed = MovementDirection.NEUTRAL;
+
     public Vector3 gravityFocus = new Vector3(0, 0, 0);
     Rigidbody body;
     Collider physCollider;
@@ -27,7 +32,9 @@ public class RigidBodyController : MonoBehaviour
     RaycastOrigins raycastOrigins;
     float skinWidth = 0.01f;
     int verticalRayCount = 8;
+    int horizontalRayCount = 3;
     float verticalRaySpacing;
+    float horizontalRaySpacing;
     public LayerMask collisionMask;
     float maxSlopeIdle = 60;
 
@@ -58,6 +65,9 @@ public class RigidBodyController : MonoBehaviour
     void Update()
     {
         OrientToGravityFocus();
+        DetermineContactState();
+        DetermineMovementDirection();
+
         Move();
         Jump();
         Jetpack();
@@ -68,10 +78,7 @@ public class RigidBodyController : MonoBehaviour
         AssignPhysicMaterial();
 
         collisions.Reset();
-        UpdateRaycastOrigins();
-        DetectGround();
-        DetectSlope();
-        DetectWall();
+        Raycasts();
 
         stateInfo.Update();
     }
@@ -81,23 +88,59 @@ public class RigidBodyController : MonoBehaviour
         //Get a vector to point feet at. This might be the center of a hull for a round world, or down for a ship
         //with artificial gravity. Give this body position as arguement to calculate down or radial orientation position
         Vector3 pointToOrientTo = gravityFocus;
-        /*
-                Vector3 vectorToMountCenter = pointToOrientTo - body.position;
-                vectorToMountCenter.Normalize ();
-                Vector3 relativeDown = vectorToMountCenter;
-                Vector3 lookAtVector = this.body.position + new Vector3 (0f, 0f, 1f);
 
-                //Look at a spot immediately left of the unit, then look intot the scene.
-                body.transform.rotation = Quaternion.LookRotation (Vector3.forward, -relativeDown);
-        */
         //Align the up vector of the body with the vector from the focus towards the body.
         Vector3 vectorFromFocusToBody = body.position - gravityFocus;
         vectorFromFocusToBody.Normalize();
         body.transform.rotation = Quaternion.FromToRotation(body.transform.up, vectorFromFocusToBody) * transform.rotation;
     }
 
+    void DetermineContactState(){
+
+    }
+
+    ContactState CharacterContactState(){
+        ContactState charContactState = ContactState.GROUNDED;
+        sideGrabbed = MovementDirection.NEUTRAL;
+
+        if (collisions.below){
+            charContactState = ContactState.GROUNDED;
+        }
+        else if(false){ //ledge grabs not currently implemented
+            charContactState = ContactState.LEDGEGRAB;
+        }
+        else if(false){
+            charContactState = ContactState.LEDGEGRAB;
+        }
+        else if(collisions.left){
+            charContactState = ContactState.WALLGRAB;
+        }
+        else if(collisions.right){
+            charContactState = ContactState.WALLGRAB;
+        }
+        else{
+            charContactState = ContactState.AIRBORNE;
+        }
+        return charContactState;
+    }
+
+    float VerticalSpeed(){
+        return Vector3.Dot(body.velocity, body.transform.up);
+    }
+
+    float HorizontalSpeed(){
+        return Vector3.Dot(body.velocity, body.transform.right);
+    }
+
+    void Raycasts(){
+        UpdateRaycastOrigins();
+        RaycastDown();
+        RaycastLeft();
+        RaycastRight();
+    }
+
     //Cast rays down to see if near ground for purposes of jumping, air vs land control, and friction.
-    void DetectGround()
+    void RaycastDown()
     {
         float rayLength = 0.05f;
 
@@ -107,12 +150,9 @@ public class RigidBodyController : MonoBehaviour
             rayOrigin += body.transform.right * (verticalRaySpacing * i);
             RaycastHit hit;
             bool isHit = Physics.Raycast(rayOrigin, -body.transform.up, out hit, rayLength, collisionMask);
-
-
             Debug.DrawRay(rayOrigin, -body.transform.up * rayLength, Color.red);
 
-            //if there is a hit, move the character only enough to come
-            //into contact with the 
+            //If any ray hits, register a collision below, and store the surface angle and normal
             if (isHit)
             {
                 collisions.below = true;
@@ -120,71 +160,48 @@ public class RigidBodyController : MonoBehaviour
                 collisions.groundSlopeAngle = Vector3.Angle(hit.normal, body.transform.up);
             }
         }
-        if (collisions.below) print("Collision below");
-        else print("No collision below");
-        print("Slope angle = " + collisions.groundSlopeAngle.ToString());
-        print("Slope normal = " + collisions.surfaceNormal.ToString());
     }
 
-    //Fire a ray backwards from the bottom corner behind the player.
-    //If this hits terrain, then the character is descending a slope.
-    //Set descending flag to true and store angle.
-    void DetectSlope()
-    {
-        //Project velocity onto players horzontal vector. +ve for right, -ve for left
-        //		float currentSpeed = Vector3.Dot(body.velocity, body.transform.right);
-        //		float direction = Mathf.Sign(currentSpeed);
-
-        float rayLength = 0.05f;
-        RaycastHit hitLeft;
-        RaycastHit hitRight;
-
-        collisions.leftBot = Physics.Raycast(raycastOrigins.bottomLeft, -body.transform.right, out hitLeft, rayLength, collisionMask);
-        collisions.rightBot = Physics.Raycast(raycastOrigins.bottomRight, body.transform.right, out hitRight, rayLength, collisionMask);
-
-        Debug.DrawRay(raycastOrigins.bottomLeft, -body.transform.right * rayLength, Color.red);
-        Debug.DrawRay(raycastOrigins.bottomRight, body.transform.right * rayLength, Color.red);
-
-        //Store the angles of any detected walls too 
-        if (collisions.leftBot)
-        {
-            collisions.leftWallAngle = Vector3.Angle(body.transform.up, hitLeft.normal);
-        }
-        if (collisions.rightBot)
-        {
-            collisions.rightWallAngle = Vector3.Angle(body.transform.up, hitRight.normal);
-        }
-
-        print("Left ray wall angle = " + collisions.leftWallAngle.ToString());
-        print("Right ray wall angle = " + collisions.rightWallAngle.ToString());
-
-
-    }
-
-    //Not currently used for anything 
-    void DetectWall()
+    void RaycastLeft()
     {
         float rayLength = 0.05f;
-        RaycastHit hitLeft;
-        RaycastHit hitRight;
 
-        collisions.leftTop = Physics.Raycast(raycastOrigins.topLeft, -body.transform.right, out hitLeft, rayLength, collisionMask);
-        collisions.rightTop = Physics.Raycast(raycastOrigins.topRight, body.transform.right, out hitRight, rayLength, collisionMask);
-
-        Debug.DrawRay(raycastOrigins.topLeft, -body.transform.right * rayLength, Color.red);
-        Debug.DrawRay(raycastOrigins.topRight, body.transform.right * rayLength, Color.red);
-
-        //Allow top rays to store wall 
-        if (collisions.leftTop)
+        for (int i = 0; i < horizontalRayCount; i++)
         {
-            collisions.leftTopWallAngle = Vector3.Angle(body.transform.up, hitLeft.normal);
-        }
-        if (collisions.rightTop)
-        {
-            collisions.rightTopWallAngle = Vector3.Angle(body.transform.up, hitRight.normal);
-        }
+            Vector3 rayOrigin = raycastOrigins.topLeft;
+            rayOrigin -= body.transform.up * (horizontalRaySpacing * i);
+            RaycastHit hit;
+            bool isHit = Physics.Raycast(rayOrigin, -body.transform.right, out hit, rayLength, collisionMask);
+            Debug.DrawRay(rayOrigin, -body.transform.right * rayLength, Color.red);
 
+            //If any ray hits, register a collision below, and store the surface angle and normal
+            if (isHit)
+            {
+                collisions.left = true;
+            }
+        }
     }
+
+    void RaycastRight()
+    {
+        float rayLength = 0.05f;
+
+        for (int i = 0; i < horizontalRayCount; i++)
+        {
+            Vector3 rayOrigin = raycastOrigins.topRight;
+            rayOrigin -= body.transform.up * (horizontalRaySpacing * i);
+            RaycastHit hit;
+            bool isHit = Physics.Raycast(rayOrigin, body.transform.right, out hit, rayLength, collisionMask);
+            Debug.DrawRay(rayOrigin, body.transform.right * rayLength, Color.red);
+
+            //If any ray hits, register a collision below, and store the surface angle and normal
+            if (isHit)
+            {
+                collisions.right = true;
+            }
+        }
+    }
+
 
     //If in a position to grab or slide down a wall, apply a small force towards the wall
     void ApplyWallHugForce()
@@ -459,26 +476,19 @@ public class RigidBodyController : MonoBehaviour
     public struct CollisionInfo
     {
         public bool above, below;
-        public bool leftBot, rightBot;
-        public bool leftTop, rightTop;
+        public bool left, right;
+        public bool leftLedge, rightLedge;
         public Vector3 surfaceNormal;
         public float groundSlopeAngle;
-        public float leftWallAngle;
-        public float rightWallAngle;
-        public float leftTopWallAngle;
-        public float rightTopWallAngle;
 
         public void Reset()
         {
             above = below = false;
-            leftBot = rightBot = false;
-            leftTop = rightTop = false;
+            left = right = false;
+            leftLedge = rightLedge = false;
+
             surfaceNormal = new Vector3(0f, 0f, 0f);
             groundSlopeAngle = 0f;
-            leftWallAngle = 0f;
-            rightWallAngle = 0f;
-            leftTopWallAngle = 0f;
-            rightTopWallAngle = 0f;
         }
     }
 
@@ -512,6 +522,8 @@ public class RigidBodyController : MonoBehaviour
     void CalculateRaySpacing()
     {
         verticalRaySpacing = (width - skinWidth * 2f) / (verticalRayCount - 1);
+        //Don't cast rays all the way to the ground (eg, height * 0.75f) to prevent 'wall grabbing' bumps in the road
+        horizontalRaySpacing = (height*0.75f - skinWidth *2f)/ (horizontalRayCount-1);
     }
 
     //Display raycast origins
