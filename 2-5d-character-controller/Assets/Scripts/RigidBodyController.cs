@@ -65,8 +65,7 @@ public class RigidBodyController : MonoBehaviour
     void Update()
     {
         OrientToGravityFocus();
-        DetermineContactState();
-        DetermineMovementDirection();
+        contactState = CharacterContactState();
 
         Move();
         Jump();
@@ -93,10 +92,6 @@ public class RigidBodyController : MonoBehaviour
         Vector3 vectorFromFocusToBody = body.position - gravityFocus;
         vectorFromFocusToBody.Normalize();
         body.transform.rotation = Quaternion.FromToRotation(body.transform.up, vectorFromFocusToBody) * transform.rotation;
-    }
-
-    void DetermineContactState(){
-
     }
 
     ContactState CharacterContactState(){
@@ -178,6 +173,7 @@ public class RigidBodyController : MonoBehaviour
             if (isHit)
             {
                 collisions.left = true;
+                collisions.leftWallAngle = Vector3.Angle(hit.normal, -body.transform.right);
             }
         }
     }
@@ -198,6 +194,7 @@ public class RigidBodyController : MonoBehaviour
             if (isHit)
             {
                 collisions.right = true;
+                collisions.rightWallAngle = Vector3.Angle(hit.normal, body.transform.right);
             }
         }
     }
@@ -206,16 +203,13 @@ public class RigidBodyController : MonoBehaviour
     //If in a position to grab or slide down a wall, apply a small force towards the wall
     void ApplyWallHugForce()
     {
-        if (!collisions.below)
-        {
-            if (collisions.leftTop || (collisions.leftBot && collisions.leftWallAngle > 85))
-            {
+        if (CharacterContactState() == ContactState.WALLGRAB){
+            if(collisions.left){
                 //adjacent to left wall, so apply wall hug force, and reset timer for that side
                 body.AddForce(-body.transform.right * wallHugForce * Time.deltaTime);
                 stateInfo.leftWallHugTimer = 0f;
             }
-            if (collisions.rightTop || (collisions.rightBot && collisions.rightWallAngle > 85))
-            {
+            else{
                 //Likewise for the right wall
                 body.AddForce(body.transform.right * wallHugForce * Time.deltaTime);
                 stateInfo.rightWallHugTimer = 0f;
@@ -231,7 +225,7 @@ public class RigidBodyController : MonoBehaviour
         //If grabbing adjacent to a wall and in the air, set high static friction, unless holding down
         if (!collisions.below)
         {
-            if (collisions.leftTop || collisions.rightTop || (collisions.leftBot && collisions.leftWallAngle > 85) || (collisions.rightBot && collisions.rightWallAngle > 85))
+            if (collisions.left || collisions.right)
             {
                 if (Input.GetKey("s"))
                 {
@@ -309,11 +303,11 @@ public class RigidBodyController : MonoBehaviour
             else
             {
                 //Potentially just need the wall hug timers...
-                if (collisions.leftBot || collisions.leftTop || stateInfo.leftWallHugTimer < wallJumpTimeWindow)
+                if (collisions.left || stateInfo.leftWallHugTimer < wallJumpTimeWindow)
                 {
                     WallJump(1f);
                 }
-                else if (collisions.rightBot || collisions.rightTop || stateInfo.rightWallHugTimer < wallJumpTimeWindow)
+                else if (collisions.right || stateInfo.rightWallHugTimer < wallJumpTimeWindow)
                 {
                     WallJump(-1f);
                 }
@@ -480,6 +474,8 @@ public class RigidBodyController : MonoBehaviour
         public bool leftLedge, rightLedge;
         public Vector3 surfaceNormal;
         public float groundSlopeAngle;
+        public float leftWallAngle;
+        public float rightWallAngle;
 
         public void Reset()
         {
@@ -489,6 +485,8 @@ public class RigidBodyController : MonoBehaviour
 
             surfaceNormal = new Vector3(0f, 0f, 0f);
             groundSlopeAngle = 0f;
+            leftWallAngle = 0f;
+            rightWallAngle = 0f;
         }
     }
 
