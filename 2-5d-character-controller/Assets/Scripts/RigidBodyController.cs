@@ -36,7 +36,8 @@ public class RigidBodyController : MonoBehaviour
     float verticalRaySpacing;
     float horizontalRaySpacing;
     public LayerMask collisionMask;
-    float maxSlopeIdle = 60;
+    float maxSlopeIdle = 60f;
+    float minWallGrabAngle = 85f;
 
     //Store state variables and timers - eg, double jump used, time since touched wall
     StateInfo stateInfo;
@@ -76,6 +77,9 @@ public class RigidBodyController : MonoBehaviour
         ApplyWallHugForce();
         AssignPhysicMaterial();
 
+        print("Left wall angle: " + collisions.leftWallAngle);
+        print("Right wall angle: " + collisions.rightWallAngle);
+
         collisions.Reset();
         Raycasts();
 
@@ -107,11 +111,13 @@ public class RigidBodyController : MonoBehaviour
         else if(false){
             charContactState = ContactState.LEDGEGRAB;
         }
-        else if(collisions.left){
+        else if(collisions.left && collisions.leftWallAngle > minWallGrabAngle){
             charContactState = ContactState.WALLGRAB;
+            stateInfo.leftWallHugTimer = 0f;
         }
-        else if(collisions.right){
+        else if(collisions.right && collisions.rightWallAngle > minWallGrabAngle){
             charContactState = ContactState.WALLGRAB;
+            stateInfo.rightWallHugTimer = 0f;
         }
         else{
             charContactState = ContactState.AIRBORNE;
@@ -173,7 +179,7 @@ public class RigidBodyController : MonoBehaviour
             if (isHit)
             {
                 collisions.left = true;
-                collisions.leftWallAngle = Vector3.Angle(hit.normal, -body.transform.right);
+                collisions.leftWallAngle = Vector3.Angle(hit.normal, body.transform.up);
             }
         }
     }
@@ -194,7 +200,7 @@ public class RigidBodyController : MonoBehaviour
             if (isHit)
             {
                 collisions.right = true;
-                collisions.rightWallAngle = Vector3.Angle(hit.normal, body.transform.right);
+                collisions.rightWallAngle = Vector3.Angle(hit.normal, body.transform.up);
             }
         }
     }
@@ -207,12 +213,10 @@ public class RigidBodyController : MonoBehaviour
             if(collisions.left){
                 //adjacent to left wall, so apply wall hug force, and reset timer for that side
                 body.AddForce(-body.transform.right * wallHugForce * Time.deltaTime);
-                stateInfo.leftWallHugTimer = 0f;
             }
             else{
                 //Likewise for the right wall
                 body.AddForce(body.transform.right * wallHugForce * Time.deltaTime);
-                stateInfo.rightWallHugTimer = 0f;
             }
         }
     }
@@ -222,21 +226,18 @@ public class RigidBodyController : MonoBehaviour
         //Reset to slippery material by default
         physCollider.material = physicMaterials[0];
 
-        //If grabbing adjacent to a wall and in the air, set high static friction, unless holding down
-        if (!collisions.below)
+        //If grabbing adjacent to a wall set high static friction, unless holding down
+        if (contactState == ContactState.WALLGRAB)
         {
-            if (collisions.left || collisions.right)
+            if (Input.GetKey("s"))
             {
-                if (Input.GetKey("s"))
-                {
-                    //If down is held, set the material to be smoother
-                    physCollider.material = physicMaterials[3];
-                }
-                else
-                {
-                    //else make very sticky
-                    physCollider.material = physicMaterials[2];
-                }
+                //If down is held, set the material to be smoother
+                physCollider.material = physicMaterials[3];
+            }
+            else
+            {
+                //else make very sticky
+                physCollider.material = physicMaterials[2];
             }
         }
         //If no directional input is presssed. Press 's' to enable skiing.
