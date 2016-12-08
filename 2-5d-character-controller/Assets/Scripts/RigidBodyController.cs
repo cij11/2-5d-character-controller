@@ -68,6 +68,7 @@ public class RigidBodyController : MonoBehaviour
         OrientToGravityFocus();
         contactState = CharacterContactState();
 
+        //Make atomic
         Move();
         Jump();
         Jetpack();
@@ -75,6 +76,8 @@ public class RigidBodyController : MonoBehaviour
 
         ApplyGravity();
         ApplyWallHugForce();
+
+        //Replace. Make idle material by default, then change to other materials as action dictates.
         AssignPhysicMaterial();
 
         print("Left wall angle: " + collisions.leftWallAngle);
@@ -221,9 +224,10 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
+    //This should probably be set as part of the atomic actions the character can perform.
     void AssignPhysicMaterial()
     {
-        //Reset to slippery material by default
+        //Reset to idle rest material by default
         physCollider.material = physicMaterials[0];
 
         //If grabbing adjacent to a wall set high static friction, unless holding down
@@ -240,18 +244,14 @@ public class RigidBodyController : MonoBehaviour
                 physCollider.material = physicMaterials[2];
             }
         }
-        //If no directional input is presssed. Press 's' to enable skiing.
-        if (!Input.GetKey("a") && !Input.GetKey("d") && !Input.GetKey("s"))
+        //If grounded and the slope is steep, a directional button is pressed, or ski is pressed, set to low friction
+        if(contactState == ContactState.GROUNDED)
         {
             //And player is grounded
-            if (collisions.below)
+            if(Input.GetKey("a") || Input.GetKey("d") || Input.GetKey("s") || collisions.groundSlopeAngle > maxSlopeIdle)
             {
-                //And this is a slope the player can stand/idle/rest on
-                if (collisions.groundSlopeAngle < maxSlopeIdle)
-                {
-                    //Change to sticky material of conditions for resting on a slope are met
-                    physCollider.material = physicMaterials[1];
-                }
+                //Change to sticky material of conditions for resting on a slope are met
+                physCollider.material = physicMaterials[1];
             }
         }
     }
