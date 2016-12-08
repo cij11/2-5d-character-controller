@@ -1,5 +1,5 @@
 ﻿public enum ContactState{
-	GROUNDED, AIRBORNE, WALLGRAB, LEDGEGRAB
+	GROUNDED, AIRBORNE, WALLGRAB, LEDGEGRAB, STEEPSLOPE
 }
 
 public enum MovementDirection{

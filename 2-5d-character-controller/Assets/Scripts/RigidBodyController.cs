@@ -36,7 +36,8 @@ public class RigidBodyController : MonoBehaviour
     float verticalRaySpacing;
     float horizontalRaySpacing;
     public LayerMask collisionMask;
-    float maxSlopeIdle = 60f;
+    //Standing on a slope above this is steep - character will not rest on the slope, and will jump away
+    float steepSlopeAngle = 60f;
     float minWallGrabAngle = 85f;
 
     //Store state variables and timers - eg, double jump used, time since touched wall
@@ -69,8 +70,6 @@ public class RigidBodyController : MonoBehaviour
         contactState = CharacterContactState();
 
         //Make atomic
-        Move();
-        Jump();
         Jetpack();
         Parachute();
 
@@ -101,42 +100,63 @@ public class RigidBodyController : MonoBehaviour
         body.transform.rotation = Quaternion.FromToRotation(body.transform.up, vectorFromFocusToBody) * transform.rotation;
     }
 
-    ContactState CharacterContactState(){
+    ContactState CharacterContactState()
+    {
         ContactState charContactState = ContactState.GROUNDED;
         sideGrabbed = MovementDirection.NEUTRAL;
 
-        if (collisions.below){
-            charContactState = ContactState.GROUNDED;
+        if (collisions.below)
+        {
+            stateInfo.remainingDoubleJumps = maxDoubleJumps;
+            if (collisions.groundSlopeAngle < steepSlopeAngle)
+            {
+                charContactState = ContactState.GROUNDED;
+            }
+            else
+            {
+                charContactState = ContactState.STEEPSLOPE;
+            }
+
         }
-        else if(false){ //ledge grabs not currently implemented
+        else if (false)
+        { //ledge grabs not currently implemented
             charContactState = ContactState.LEDGEGRAB;
         }
-        else if(false){
+        else if (false)
+        {
             charContactState = ContactState.LEDGEGRAB;
         }
-        else if(collisions.left && collisions.leftWallAngle > minWallGrabAngle){
+        else if (collisions.left && collisions.leftWallAngle > minWallGrabAngle)
+        {
             charContactState = ContactState.WALLGRAB;
+            sideGrabbed = MovementDirection.LEFT;
             stateInfo.leftWallHugTimer = 0f;
         }
-        else if(collisions.right && collisions.rightWallAngle > minWallGrabAngle){
+        else if (collisions.right && collisions.rightWallAngle > minWallGrabAngle)
+        {
             charContactState = ContactState.WALLGRAB;
+            sideGrabbed = MovementDirection.RIGHT;
             stateInfo.rightWallHugTimer = 0f;
         }
-        else{
+        else
+        {
             charContactState = ContactState.AIRBORNE;
         }
         return charContactState;
     }
 
-    float VerticalSpeed(){
+    float VerticalSpeed()
+    {
         return Vector3.Dot(body.velocity, body.transform.up);
     }
 
-    float HorizontalSpeed(){
+    float HorizontalSpeed()
+    {
         return Vector3.Dot(body.velocity, body.transform.right);
     }
 
-    void Raycasts(){
+    void Raycasts()
+    {
         UpdateRaycastOrigins();
         RaycastDown();
         RaycastLeft();
@@ -212,12 +232,15 @@ public class RigidBodyController : MonoBehaviour
     //If in a position to grab or slide down a wall, apply a small force towards the wall
     void ApplyWallHugForce()
     {
-        if (CharacterContactState() == ContactState.WALLGRAB){
-            if(collisions.left){
+        if (CharacterContactState() == ContactState.WALLGRAB)
+        {
+            if (collisions.left)
+            {
                 //adjacent to left wall, so apply wall hug force, and reset timer for that side
                 body.AddForce(-body.transform.right * wallHugForce * Time.deltaTime);
             }
-            else{
+            else
+            {
                 //Likewise for the right wall
                 body.AddForce(body.transform.right * wallHugForce * Time.deltaTime);
             }
@@ -245,83 +268,72 @@ public class RigidBodyController : MonoBehaviour
             }
         }
         //If grounded and the slope is steep, a directional button is pressed, or ski is pressed, set to low friction
-        if(contactState == ContactState.GROUNDED)
+        if (contactState == ContactState.GROUNDED)
         {
             //And player is grounded
-            if(Input.GetKey("a") || Input.GetKey("d") || Input.GetKey("s") || collisions.groundSlopeAngle > maxSlopeIdle)
+            if (Input.GetKey("a") || Input.GetKey("d") || Input.GetKey("s"))
             {
                 //Change to sticky material of conditions for resting on a slope are met
                 physCollider.material = physicMaterials[1];
             }
         }
+        //If on a steep slope, set the material slippery
+        if (contactState == ContactState.STEEPSLOPE){
+            physCollider.material = physicMaterials[1];
+        }
     }
 
-    void Move()
+    public void MoveHorizontalCommand(float direction)
     {
-        //Left and right move. more responsive controls on the ground compared to the air
-        if (Input.GetKey("a"))
-        {
-            if (collisions.below)
-            {
+        if(contactState == ContactState.GROUNDED){
+            if (direction < 0){
                 MoveHorizontal(-1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
             }
-            else
-            {
-                MoveHorizontal(-1, airSpeedUpForce, airBreakForce, maxAirSpeed);
+            else{
+                 MoveHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
             }
         }
-        if (Input.GetKey("d"))
-        {
-            if (collisions.below)
-            {
-                MoveHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
+
+        if(contactState == ContactState.AIRBORNE){
+            if (direction < 0){
+                MoveHorizontal(-1, airSpeedUpForce, airBreakForce, maxAirSpeed);
             }
-            else
-            {
-                MoveHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
+            else{
+                 MoveHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
             }
         }
     }
 
     //Determine what type of jump is appropriate when jump pressed, and apply
-    void Jump()
+    public void JumpCommand()
     {
-        //Reset doublejump counter if grounded
-        if (collisions.below)
+        //Detect ground and add upwards component to velocity if standing.
+        //If terrain is too steep, walljump instead
+        //Only allow jumping if standing on or adjacent to something
+        if (contactState == ContactState.GROUNDED)
         {
-            stateInfo.remainingDoubleJumps = maxDoubleJumps;
+            GroundJump();
         }
-        if (Input.GetKeyDown("space"))
+        else if (contactState == ContactState.STEEPSLOPE){
+            //TODO Jump 45 degrees, away from the slope
+        }
+        else if (stateInfo.leftWallHugTimer < wallJumpTimeWindow)
         {
-
-            //Detect ground and add upwards component to velocity if standing.
-            //If terrain is too steep, walljump instead
-            //Only allow jumping if standing on or adjacent to something
-            if (collisions.below && collisions.groundSlopeAngle < maxSlopeIdle)
-            {
-                GroundJump();
-            }
-            else
-            {
-                //Potentially just need the wall hug timers...
-                if (collisions.left || stateInfo.leftWallHugTimer < wallJumpTimeWindow)
-                {
-                    WallJump(1f);
-                }
-                else if (collisions.right || stateInfo.rightWallHugTimer < wallJumpTimeWindow)
-                {
-                    WallJump(-1f);
-                }
-                //Even if we can't ground jump or wall jump, we might be able to double jump
-                else if (stateInfo.remainingDoubleJumps > 0)
-                {
-                    //decrement counter
-                    stateInfo.remainingDoubleJumps--;
-                    DoubleJump();
-                }
-            }
+            WallJump(1f);
+        }
+        else if (stateInfo.rightWallHugTimer < wallJumpTimeWindow)
+        {
+            WallJump(-1f);
+        }
+        //Even if we can't ground jump or wall jump, we might be able to double jump
+        else if (stateInfo.remainingDoubleJumps > 0)
+        {
+            //decrement counter
+            stateInfo.remainingDoubleJumps--;
+            DoubleJump();
         }
     }
+
 
     //If the current vertical speed is < the jump velocity, cancel any existing
     //vertical speed and set to jump velocity
@@ -522,7 +534,7 @@ public class RigidBodyController : MonoBehaviour
     {
         verticalRaySpacing = (width - skinWidth * 2f) / (verticalRayCount - 1);
         //Don't cast rays all the way to the ground (eg, height * 0.75f) to prevent 'wall grabbing' bumps in the road
-        horizontalRaySpacing = (height*0.75f - skinWidth *2f)/ (horizontalRayCount-1);
+        horizontalRaySpacing = (height * 0.75f - skinWidth * 2f) / (horizontalRayCount - 1);
     }
 
     //Display raycast origins
