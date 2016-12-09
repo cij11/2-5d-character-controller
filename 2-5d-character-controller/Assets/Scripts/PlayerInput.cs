@@ -20,10 +20,14 @@ public class PlayerInput : MonoBehaviour {
 		//	character.DownCommand();
 		}
 		if(Input.GetAxis("Vertical") > 0){
-		//	character.UpCommand();
+			character.JetpackCommand();
 		}
 		if(Input.GetKeyDown("space")){
 			character.JumpCommand(); 
+		}
+
+		if(Input.GetKey("left shift")){
+			character.ParachuteCommand();
 		}
 	}
 }

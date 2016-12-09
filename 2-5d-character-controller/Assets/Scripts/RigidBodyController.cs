@@ -68,11 +68,7 @@ public class RigidBodyController : MonoBehaviour
     {
         OrientToGravityFocus();
         DetermineContactState();
-
-        //Need to make atomic
-        Jetpack();
-        Parachute();
-
+        
         ApplyGravity();
         ApplyWallHugForce();
 
@@ -120,7 +116,8 @@ public class RigidBodyController : MonoBehaviour
 
         }
         //If there is a collision on the side but the slope is not vertical enough, the character is also on a steep slope.
-        else if((collisions.left && collisions.leftSurfaceAngle < minWallGrabAngle) || (collisions.right && collisions.rightSurfaceAngle < minWallGrabAngle)){
+        else if ((collisions.left && collisions.leftSurfaceAngle < minWallGrabAngle) || (collisions.right && collisions.rightSurfaceAngle < minWallGrabAngle))
+        {
             contactState = ContactState.STEEPSLOPE;
         }
         else if (false)
@@ -209,7 +206,7 @@ public class RigidBodyController : MonoBehaviour
                 collisions.left = true;
                 collisions.leftSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
                 if (collisions.leftSurfaceAngle > minWallGrabAngle)
-                   stateInfo.leftWallContactTimer = 0f;
+                    stateInfo.leftWallContactTimer = 0f;
             }
         }
     }
@@ -256,6 +253,7 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
+
     //This should probably be set as part of the atomic actions the character can perform.
     void AssignPhysicMaterial()
     {
@@ -287,28 +285,35 @@ public class RigidBodyController : MonoBehaviour
             }
         }
         //If on a steep slope, set the material slippery
-        if (contactState == ContactState.STEEPSLOPE){
+        if (contactState == ContactState.STEEPSLOPE)
+        {
             physCollider.material = physicMaterials[1];
         }
     }
 
     public void MoveHorizontalCommand(float direction)
     {
-        if(contactState == ContactState.GROUNDED){
-            if (direction < 0){
+        if (contactState == ContactState.GROUNDED)
+        {
+            if (direction < 0)
+            {
                 MoveHorizontal(-1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
             }
-            else{
-                 MoveHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
+            else
+            {
+                MoveHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
             }
         }
 
-        if(contactState == ContactState.AIRBORNE){
-            if (direction < 0){
+        if (contactState == ContactState.AIRBORNE)
+        {
+            if (direction < 0)
+            {
                 MoveHorizontal(-1, airSpeedUpForce, airBreakForce, maxAirSpeed);
             }
-            else{
-                 MoveHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
+            else
+            {
+                MoveHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
             }
         }
     }
@@ -323,14 +328,17 @@ public class RigidBodyController : MonoBehaviour
         {
             GroundJump();
         }
-        else if (contactState == ContactState.STEEPSLOPE){
+        else if (contactState == ContactState.STEEPSLOPE)
+        {
             //TODO Jump 45 degrees, away from the slope
             //if uphill is top right
-                //walljump left
-            if (UphillDirection() >0 ){
+            //walljump left
+            if (UphillDirection() > 0)
+            {
                 WallJump(-1);
             }
-            else{
+            else
+            {
                 //else if uphill is top left
                 //walljump right
                 WallJump(1);
@@ -440,33 +448,28 @@ public class RigidBodyController : MonoBehaviour
     }
 
     //Return -1 for left being uphill, 1 for right being uphill
-    float UphillDirection(){
+    float UphillDirection()
+    {
         float surfaceRightProjection = Vector3.Dot(collisions.surfaceNormal, body.transform.right);
         //Surface normal points in the opposite direction to uphill
         return -Mathf.Sign(surfaceRightProjection);
     }
-    void Jetpack()
+    public void JetpackCommand()
     {
-        if (Input.GetKey("w"))
-        {
-            body.AddForce(body.transform.up * jetpackForce * Time.deltaTime);
-        }
+        body.AddForce(body.transform.up * jetpackForce * Time.deltaTime);
     }
 
-    void Parachute()
+    public void ParachuteCommand()
     {
-        if (Input.GetKey("left shift"))
+        float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
+        //If the character is moving down
+        if (verticalSpeed < 0)
         {
-            float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
-            //If the character is moving down
-            if (verticalSpeed < 0)
+            //And the downwards speed is greater than the parachuteSpeed
+            if (Mathf.Abs(verticalSpeed) > parachuteFallSpeed)
             {
-                //And the downwards speed is greater than the parachuteSpeed
-                if (Mathf.Abs(verticalSpeed) > parachuteFallSpeed)
-                {
-                    //Apply a force counter to gravity
-                    body.AddForce(body.transform.up * gravityForce * paracuteDeceleration * Time.deltaTime);
-                }
+                //Apply a force counter to gravity
+                body.AddForce(body.transform.up * gravityForce * paracuteDeceleration * Time.deltaTime);
             }
         }
     }
