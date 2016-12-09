@@ -17,7 +17,7 @@ public class PlayerInput : MonoBehaviour {
 			character.MoveHorizontalCommand(1);
 		}
 		if(Input.GetAxis("Vertical") < 0){
-		//	character.DownCommand();
+			character.SlideCommand();
 		}
 		if(Input.GetAxis("Vertical") > 0){
 			character.JetpackCommand();
@@ -25,7 +25,6 @@ public class PlayerInput : MonoBehaviour {
 		if(Input.GetKeyDown("space")){
 			character.JumpCommand(); 
 		}
-
 		if(Input.GetKey("left shift")){
 			character.ParachuteCommand();
 		}

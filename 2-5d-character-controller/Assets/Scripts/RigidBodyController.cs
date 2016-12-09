@@ -68,7 +68,7 @@ public class RigidBodyController : MonoBehaviour
     {
         OrientToGravityFocus();
         DetermineContactState();
-        
+
         ApplyGravity();
         ApplyWallHugForce();
 
@@ -253,20 +253,20 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
-
-    //This should probably be set as part of the atomic actions the character can perform.
+    //Assign physic material to idle, unless on a steep slope, a wall, or input given
+    //to change it to frictionless or low friction.
     void AssignPhysicMaterial()
     {
         //Reset to idle rest material by default
-        physCollider.material = physicMaterials[0];
+        physCollider.material = physicMaterials[(int)PhysicMatTypes.IDLE_STANDING];
 
         //If grabbing adjacent to a wall set high static friction, unless holding down
         if (contactState == ContactState.WALLGRAB)
         {
-            if (Input.GetKey("s"))
+            if (stateInfo.isSlideCommandGiven)
             {
                 //If down is held, set the material to be smoother
-                physCollider.material = physicMaterials[3];
+                physCollider.material = physicMaterials[(int)PhysicMatTypes.LOW_KINETIC_NO_STATIC];
             }
             else
             {
@@ -278,21 +278,25 @@ public class RigidBodyController : MonoBehaviour
         if (contactState == ContactState.GROUNDED)
         {
             //And player is grounded
-            if (Input.GetKey("a") || Input.GetKey("d") || Input.GetKey("s"))
+            if (stateInfo.isMoveHorizontalCommandGiven || stateInfo.isSlideCommandGiven)
             {
-                //Change to sticky material of conditions for resting on a slope are met
-                physCollider.material = physicMaterials[1];
+                //Change to slippery material
+                physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
             }
         }
         //If on a steep slope, set the material slippery
         if (contactState == ContactState.STEEPSLOPE)
         {
-            physCollider.material = physicMaterials[1];
+            physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
         }
     }
 
     public void MoveHorizontalCommand(float direction)
     {
+        //Horizontal move command was given, so set this true to prevent
+        //physicMaterial resetting to idle in AssignPhysicMaterial method.
+        stateInfo.isMoveHorizontalCommandGiven = true;
+
         if (contactState == ContactState.GROUNDED)
         {
             if (direction < 0)
@@ -474,6 +478,10 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
+    public void SlideCommand(){
+        stateInfo.isSlideCommandGiven = true;
+    }
+
     void ApplyGravity()
     {
         body.AddForce(-this.transform.up * gravityForce * Time.deltaTime);
@@ -544,6 +552,9 @@ public class RigidBodyController : MonoBehaviour
         public float leftWallContactTimer;
         public float rightWallContactTimer;
         public int remainingDoubleJumps;
+
+        public bool isSlideCommandGiven;
+        public bool isMoveHorizontalCommandGiven;
         public void Update()
         {
             leftWallContactTimer += Time.deltaTime;
@@ -556,6 +567,8 @@ public class RigidBodyController : MonoBehaviour
             {
                 rightWallContactTimer = 10f;
             }
+           isSlideCommandGiven = false;
+           isMoveHorizontalCommandGiven = false;
         }
     }
 

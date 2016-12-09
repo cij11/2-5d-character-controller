@@ -5,3 +5,7 @@
 public enum MovementDirection{
 	UP, DOWN, LEFT, RIGHT, NEUTRAL
 }
+
+public enum PhysicMatTypes{
+	IDLE_STANDING, FRICTIONLESS, STICKY, LOW_KINETIC_NO_STATIC
+}
