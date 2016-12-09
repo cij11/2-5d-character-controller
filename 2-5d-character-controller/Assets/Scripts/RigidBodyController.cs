@@ -30,7 +30,7 @@ public class RigidBodyController : MonoBehaviour
 
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
-    float skinWidth = 0.01f;
+    float skinWidth = 0.005f;
     int verticalRayCount = 8;
     int horizontalRayCount = 3;
     float verticalRaySpacing;
@@ -67,9 +67,9 @@ public class RigidBodyController : MonoBehaviour
     void Update()
     {
         OrientToGravityFocus();
-        contactState = CharacterContactState();
+        DetermineContactState();
 
-        //Make atomic
+        //Need to make atomic
         Jetpack();
         Parachute();
 
@@ -79,8 +79,8 @@ public class RigidBodyController : MonoBehaviour
         //Replace. Make idle material by default, then change to other materials as action dictates.
         AssignPhysicMaterial();
 
-        print("Left wall angle: " + collisions.leftWallAngle);
-        print("Right wall angle: " + collisions.rightWallAngle);
+        print("Left wall angle: " + collisions.leftSurfaceAngle);
+        print("Right wall angle: " + collisions.rightSurfaceAngle);
 
         collisions.Reset();
         Raycasts();
@@ -100,49 +100,54 @@ public class RigidBodyController : MonoBehaviour
         body.transform.rotation = Quaternion.FromToRotation(body.transform.up, vectorFromFocusToBody) * transform.rotation;
     }
 
-    ContactState CharacterContactState()
+    void DetermineContactState()
     {
-        ContactState charContactState = ContactState.GROUNDED;
+        contactState = ContactState.GROUNDED;
         sideGrabbed = MovementDirection.NEUTRAL;
 
+        //If there is a collision below, the character is either grounded or on a steep slope
         if (collisions.below)
         {
             stateInfo.remainingDoubleJumps = maxDoubleJumps;
             if (collisions.groundSlopeAngle < steepSlopeAngle)
             {
-                charContactState = ContactState.GROUNDED;
+                contactState = ContactState.GROUNDED;
             }
             else
             {
-                charContactState = ContactState.STEEPSLOPE;
+                contactState = ContactState.STEEPSLOPE;
             }
 
         }
+        //If there is a collision on the side but the slope is not vertical enough, the character is also on a steep slope.
+        else if((collisions.left && collisions.leftSurfaceAngle < minWallGrabAngle) || (collisions.right && collisions.rightSurfaceAngle < minWallGrabAngle)){
+            contactState = ContactState.STEEPSLOPE;
+        }
         else if (false)
         { //ledge grabs not currently implemented
-            charContactState = ContactState.LEDGEGRAB;
+            contactState = ContactState.LEDGEGRAB;
         }
         else if (false)
         {
-            charContactState = ContactState.LEDGEGRAB;
+            contactState = ContactState.LEDGEGRAB;
         }
-        else if (collisions.left && collisions.leftWallAngle > minWallGrabAngle)
+        //If the character was in contact with a steep surface beside it within a few milliseconds, it counts as
+        //grabbing the wall
+        else if (stateInfo.leftWallContactTimer < wallJumpTimeWindow)
         {
-            charContactState = ContactState.WALLGRAB;
+            contactState = ContactState.WALLGRAB;
             sideGrabbed = MovementDirection.LEFT;
-            stateInfo.leftWallHugTimer = 0f;
         }
-        else if (collisions.right && collisions.rightWallAngle > minWallGrabAngle)
+        else if (stateInfo.rightWallContactTimer < wallJumpTimeWindow)
         {
-            charContactState = ContactState.WALLGRAB;
+            contactState = ContactState.WALLGRAB;
             sideGrabbed = MovementDirection.RIGHT;
-            stateInfo.rightWallHugTimer = 0f;
         }
         else
         {
-            charContactState = ContactState.AIRBORNE;
+            contactState = ContactState.AIRBORNE;
         }
-        return charContactState;
+        print(contactState.ToString());
     }
 
     float VerticalSpeed()
@@ -202,7 +207,9 @@ public class RigidBodyController : MonoBehaviour
             if (isHit)
             {
                 collisions.left = true;
-                collisions.leftWallAngle = Vector3.Angle(hit.normal, body.transform.up);
+                collisions.leftSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
+                if (collisions.leftSurfaceAngle > minWallGrabAngle)
+                   stateInfo.leftWallContactTimer = 0f;
             }
         }
     }
@@ -223,7 +230,9 @@ public class RigidBodyController : MonoBehaviour
             if (isHit)
             {
                 collisions.right = true;
-                collisions.rightWallAngle = Vector3.Angle(hit.normal, body.transform.up);
+                collisions.rightSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
+                if (collisions.rightSurfaceAngle > minWallGrabAngle)
+                    stateInfo.rightWallContactTimer = 0;
             }
         }
     }
@@ -232,7 +241,7 @@ public class RigidBodyController : MonoBehaviour
     //If in a position to grab or slide down a wall, apply a small force towards the wall
     void ApplyWallHugForce()
     {
-        if (CharacterContactState() == ContactState.WALLGRAB)
+        if (contactState == ContactState.WALLGRAB)
         {
             if (collisions.left)
             {
@@ -316,12 +325,23 @@ public class RigidBodyController : MonoBehaviour
         }
         else if (contactState == ContactState.STEEPSLOPE){
             //TODO Jump 45 degrees, away from the slope
+            //if uphill is top right
+                //walljump left
+            if (UphillDirection() >0 ){
+                WallJump(-1);
+            }
+            else{
+                //else if uphill is top left
+                //walljump right
+                WallJump(1);
+            }
+
         }
-        else if (stateInfo.leftWallHugTimer < wallJumpTimeWindow)
+        else if (stateInfo.leftWallContactTimer < wallJumpTimeWindow)
         {
             WallJump(1f);
         }
-        else if (stateInfo.rightWallHugTimer < wallJumpTimeWindow)
+        else if (stateInfo.rightWallContactTimer < wallJumpTimeWindow)
         {
             WallJump(-1f);
         }
@@ -390,7 +410,7 @@ public class RigidBodyController : MonoBehaviour
             horizontalVector = surfaceNormalParallel;
         }
         //If dot product of body right and surface normal is +ve then right is downhill, and left is uphill
-        if (Vector3.Dot(collisions.surfaceNormal, body.transform.right) > 0)
+        if (UphillDirection() > 0)
         {
             //Left is uphill, so don't align horizontal vector with slope if moving left
             if (direction < 0)
@@ -419,6 +439,12 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
+    //Return -1 for left being uphill, 1 for right being uphill
+    float UphillDirection(){
+        float surfaceRightProjection = Vector3.Dot(collisions.surfaceNormal, body.transform.right);
+        //Surface normal points in the opposite direction to uphill
+        return -Mathf.Sign(surfaceRightProjection);
+    }
     void Jetpack()
     {
         if (Input.GetKey("w"))
@@ -487,8 +513,8 @@ public class RigidBodyController : MonoBehaviour
         public bool leftLedge, rightLedge;
         public Vector3 surfaceNormal;
         public float groundSlopeAngle;
-        public float leftWallAngle;
-        public float rightWallAngle;
+        public float leftSurfaceAngle;
+        public float rightSurfaceAngle;
 
         public void Reset()
         {
@@ -498,8 +524,8 @@ public class RigidBodyController : MonoBehaviour
 
             surfaceNormal = new Vector3(0f, 0f, 0f);
             groundSlopeAngle = 0f;
-            leftWallAngle = 0f;
-            rightWallAngle = 0f;
+            leftSurfaceAngle = 0f;
+            rightSurfaceAngle = 0f;
         }
     }
 
@@ -512,20 +538,20 @@ public class RigidBodyController : MonoBehaviour
 
     public struct StateInfo
     {
-        public float leftWallHugTimer;
-        public float rightWallHugTimer;
+        public float leftWallContactTimer;
+        public float rightWallContactTimer;
         public int remainingDoubleJumps;
         public void Update()
         {
-            leftWallHugTimer += Time.deltaTime;
-            if (leftWallHugTimer > 10f)
+            leftWallContactTimer += Time.deltaTime;
+            if (leftWallContactTimer > 10f)
             {
-                leftWallHugTimer = 10f;
+                leftWallContactTimer = 10f;
             }
-            rightWallHugTimer += Time.deltaTime;
-            if (rightWallHugTimer > 10f)
+            rightWallContactTimer += Time.deltaTime;
+            if (rightWallContactTimer > 10f)
             {
-                rightWallHugTimer = 10f;
+                rightWallContactTimer = 10f;
             }
         }
     }
