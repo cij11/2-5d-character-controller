@@ -433,17 +433,39 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
-    void MoveSteepHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed){
-   //     float uphill = UphillDirection();
-        //If we are walking in the direction of the steep slope, point the movement
-        //vector horizontally and let reaction forces slow us.
-        //Otherwise, don't do anything. Just let the character slide down the slope...
-  //      if(Mathf.Sign(uphill) == Mathf.Sign(direction)){
-    //        body.AddForce(body.transform.right * direction * breakForce * Time.deltaTime);
-      //  }
+    void MoveSteepHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed)
+    {
+        float uphill = UphillDirection();
+
+        //If trying to break on a steep slope, direct a force downwards.
+        if (Mathf.Sign(direction) != Mathf.Sign(uphill))
+        {
+            //Only break if currently moving upwards
+            if (VerticalSpeed() > 0)
+            {
+                body.AddForce(-body.transform.up * breakForce * Time.deltaTime);
+            }
+            //Allow to accelerate downhill if not at max speed
+            else
+            {
+                if (Mathf.Abs(VerticalSpeed()) < maxWalkSpeed)
+                {
+                    body.AddForce(-body.transform.up * speedUpForce * Time.deltaTime);
+                }
+            }
+        }
+        //Otherwise, direct a force horizontally
+        else
+        {
+            if (Mathf.Abs(HorizontalSpeed()) < maxWalkSpeed)
+            {
+                body.AddForce(body.transform.right *direction * speedUpForce * Time.deltaTime);
+            }
+        }
     }
 
-    void MoveArialHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed){
+    void MoveArialHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed)
+    {
         //Get the current speed in the desired direction
         float currentSpeedInDesiredDirection = Vector3.Dot(body.velocity, direction * body.transform.right);
         Vector3 horizontalVector = body.transform.right;
@@ -486,7 +508,8 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
-    public void SlideCommand(){
+    public void SlideCommand()
+    {
         stateInfo.isSlideCommandGiven = true;
     }
 
@@ -575,8 +598,8 @@ public class RigidBodyController : MonoBehaviour
             {
                 rightWallContactTimer = 10f;
             }
-           isSlideCommandGiven = false;
-           isMoveHorizontalCommandGiven = false;
+            isSlideCommandGiven = false;
+            isMoveHorizontalCommandGiven = false;
         }
     }
 
