@@ -3,7 +3,7 @@ using System.Collections;
 
 public class RigidBodyController : MonoBehaviour
 {
-    ContactState contactState = ContactState.GROUNDED;
+    ContactState contactState = ContactState.FLATGROUND;
     MovementDirection verticalDirection = MovementDirection.NEUTRAL;
     MovementDirection horizontalDirection = MovementDirection.NEUTRAL;
     MovementDirection sideGrabbed = MovementDirection.NEUTRAL;
@@ -98,16 +98,16 @@ public class RigidBodyController : MonoBehaviour
 
     void DetermineContactState()
     {
-        contactState = ContactState.GROUNDED;
+        contactState = ContactState.FLATGROUND;
         sideGrabbed = MovementDirection.NEUTRAL;
 
-        //If there is a collision below, the character is either grounded or on a steep slope
+        //If there is a collision below, the character is either FLATGROUND or on a steep slope
         if (collisions.below)
         {
             stateInfo.remainingDoubleJumps = maxDoubleJumps;
             if (collisions.groundSlopeAngle < steepSlopeAngle)
             {
-                contactState = ContactState.GROUNDED;
+                contactState = ContactState.FLATGROUND;
             }
             else
             {
@@ -274,10 +274,10 @@ public class RigidBodyController : MonoBehaviour
                 physCollider.material = physicMaterials[2];
             }
         }
-        //If grounded and the slope is steep, a directional button is pressed, or ski is pressed, set to low friction
-        if (contactState == ContactState.GROUNDED)
+        //If FLATGROUND and the slope is steep, a directional button is pressed, or ski is pressed, set to low friction
+        if (contactState == ContactState.FLATGROUND)
         {
-            //And player is grounded
+            //And player is FLATGROUND
             if (stateInfo.isMoveHorizontalCommandGiven || stateInfo.isSlideCommandGiven)
             {
                 //Change to slippery material
@@ -297,15 +297,27 @@ public class RigidBodyController : MonoBehaviour
         //physicMaterial resetting to idle in AssignPhysicMaterial method.
         stateInfo.isMoveHorizontalCommandGiven = true;
 
-        if (contactState == ContactState.GROUNDED)
+        if (contactState == ContactState.FLATGROUND)
         {
             if (direction < 0)
             {
-                MoveHorizontal(-1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
+                MoveFlatHorizontal(-1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
             }
             else
             {
-                MoveHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
+                MoveFlatHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
+            }
+        }
+
+        if (contactState == ContactState.STEEPSLOPE)
+        {
+            if (direction < 0)
+            {
+                MoveSteepHorizontal(-1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
+            }
+            else
+            {
+                MoveSteepHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
             }
         }
 
@@ -313,11 +325,11 @@ public class RigidBodyController : MonoBehaviour
         {
             if (direction < 0)
             {
-                MoveHorizontal(-1, airSpeedUpForce, airBreakForce, maxAirSpeed);
+                MoveArialHorizontal(-1, airSpeedUpForce, airBreakForce, maxAirSpeed);
             }
             else
             {
-                MoveHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
+                MoveArialHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
             }
         }
     }
@@ -328,7 +340,7 @@ public class RigidBodyController : MonoBehaviour
         //Detect ground and add upwards component to velocity if standing.
         //If terrain is too steep, walljump instead
         //Only allow jumping if standing on or adjacent to something
-        if (contactState == ContactState.GROUNDED)
+        if (contactState == ContactState.FLATGROUND)
         {
             GroundJump();
         }
@@ -402,43 +414,39 @@ public class RigidBodyController : MonoBehaviour
     }
     //Horizontal movement. Takes parameters for the rate of acceleration in the desired direction,
     //breaking movement in the current direction, and max speed to accelerate too.
-    void MoveHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed)
+    void MoveFlatHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed)
     {
         //Get the current speed in the desired direction
         float currentSpeedInDesiredDirection = Vector3.Dot(body.velocity, direction * body.transform.right);
-
-        //get vector parallel to surface normal.
-        Vector3 surfaceNormalParallel = CalculatePerpendicular(collisions.surfaceNormal);
-
         //The vector we will apply walk forces to
+        Vector3 horizontalVector = CalculatePerpendicular(collisions.surfaceNormal);
+
+        //dot product of desired and current velocity will be negative if walking the wrong way
+        if (Mathf.Sign(currentSpeedInDesiredDirection) < 0)
+        {
+            body.AddForce(horizontalVector * direction * breakForce * Time.deltaTime);
+        }
+        else if (currentSpeedInDesiredDirection < maxSpeed)
+        {
+            //Cut off the applied force as slope approaches limit	
+            body.AddForce(horizontalVector * direction * speedUpForce * Time.deltaTime);
+        }
+    }
+
+    void MoveSteepHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed){
+   //     float uphill = UphillDirection();
+        //If we are walking in the direction of the steep slope, point the movement
+        //vector horizontally and let reaction forces slow us.
+        //Otherwise, don't do anything. Just let the character slide down the slope...
+  //      if(Mathf.Sign(uphill) == Mathf.Sign(direction)){
+    //        body.AddForce(body.transform.right * direction * breakForce * Time.deltaTime);
+      //  }
+    }
+
+    void MoveArialHorizontal(float direction, float speedUpForce, float breakForce, float maxSpeed){
+        //Get the current speed in the desired direction
+        float currentSpeedInDesiredDirection = Vector3.Dot(body.velocity, direction * body.transform.right);
         Vector3 horizontalVector = body.transform.right;
-
-        //if moving down hill, align the force vector perpendicular ot the surface normal
-
-        //If grounded
-        //movement to the right should be aligned with the slope
-        if (collisions.below)
-        {
-            horizontalVector = surfaceNormalParallel;
-        }
-        //If dot product of body right and surface normal is +ve then right is downhill, and left is uphill
-        if (UphillDirection() > 0)
-        {
-            //Left is uphill, so don't align horizontal vector with slope if moving left
-            if (direction < 0)
-            {
-                horizontalVector = body.transform.right;
-            }
-        }
-        else
-        {
-            //Right is uphill, so don't align with slope if moving right
-            if (direction > 0)
-            {
-                horizontalVector = body.transform.right;
-            }
-        }
-
         //dot product of desired and current velocity will be negative if walking the wrong way
         if (Mathf.Sign(currentSpeedInDesiredDirection) < 0)
         {
