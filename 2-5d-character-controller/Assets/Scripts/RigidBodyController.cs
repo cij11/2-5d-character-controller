@@ -27,6 +27,7 @@ public class RigidBodyController : MonoBehaviour
     float gravityForce = 900f;
 
     float jumpSpeed = 10f;
+    float ledgeJumpClearanceSpeed = 0.4f;
 
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
@@ -374,13 +375,21 @@ public class RigidBodyController : MonoBehaviour
             }
 
         }
-        else if (stateInfo.leftWallContactTimer < wallJumpTimeWindow)
-        {
-            WallJump(1f);
+        else if (contactState == ContactState.WALLGRAB){
+            if (sideGrabbed == MovementDirection.LEFT){
+                WallJump(1);
+            }
+            else{
+                WallJump(-1);
+            }
         }
-        else if (stateInfo.rightWallContactTimer < wallJumpTimeWindow)
-        {
-            WallJump(-1f);
+        else if (contactState == ContactState.LEDGEGRAB){
+            if (sideGrabbed == MovementDirection.LEFT){
+                LedgeJump(1);
+            }
+            else{
+                LedgeJump(-1);
+            }
         }
         //Even if we can't ground jump or wall jump, we might be able to double jump
         else if (stateInfo.remainingDoubleJumps > 0)
@@ -414,10 +423,10 @@ public class RigidBodyController : MonoBehaviour
         body.velocity = body.transform.up * jumpSpeed + body.transform.right * direction * jumpSpeed;
     }
 
-    //If on a ledge, jump straight up
-    void LedgeJump()
+    //If on a ledge, jump up, and slightly away from the wall.
+    void LedgeJump(float direction)
     {
-
+        body.velocity = body.transform.up * jumpSpeed + body.transform.right * direction * ledgeJumpClearanceSpeed;
     }
 
     void DoubleJump()
