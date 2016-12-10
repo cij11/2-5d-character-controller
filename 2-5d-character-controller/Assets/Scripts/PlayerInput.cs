@@ -28,5 +28,12 @@ public class PlayerInput : MonoBehaviour {
 		if(Input.GetKey("left shift")){
 			character.ParachuteCommand();
 		}
+
+		if(Input.GetKeyDown("g")){
+			character.GrabBackgroundCommand();
+		}
+		if(Input.GetKeyUp("g")){
+			character.ReleaseBackgroundCommand();
+		}
 	}
 }

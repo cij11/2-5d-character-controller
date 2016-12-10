@@ -53,6 +53,7 @@ public class RigidBodyController : MonoBehaviour
     float parachuteFallSpeed = 1f;
     float paracuteDeceleration = 1.5f;
     public PhysicMaterial[] physicMaterials;
+    public FixedJoint backgroundGrabJoint;
 
     // Use this for initialization
     void Start()
@@ -101,8 +102,11 @@ public class RigidBodyController : MonoBehaviour
         contactState = ContactState.FLATGROUND;
         sideGrabbed = MovementDirection.NEUTRAL;
 
+        if(backgroundGrabJoint != null){
+            contactState = ContactState.BACKGROUNDGRAB;
+        }
         //If there is a collision below, the character is either FLATGROUND or on a steep slope
-        if (collisions.below)
+        else if (collisions.below)
         {
             stateInfo.remainingDoubleJumps = maxDoubleJumps;
             if (collisions.groundSlopeAngle < steepSlopeAngle)
@@ -113,7 +117,6 @@ public class RigidBodyController : MonoBehaviour
             {
                 contactState = ContactState.STEEPSLOPE;
             }
-
         }
         //If there is a collision on the side but the slope is not vertical enough, the character is also on a steep slope.
         else if ((collisions.left && collisions.leftSurfaceAngle < minWallGrabAngle) || (collisions.right && collisions.rightSurfaceAngle < minWallGrabAngle))
@@ -495,11 +498,15 @@ public class RigidBodyController : MonoBehaviour
     }
 
     public void GrabBackgroundCommand(){
-
+        gameObject.AddComponent<FixedJoint>();
+        backgroundGrabJoint = GetComponent<FixedJoint>();
     }
 
     public void ReleaseBackgroundCommand(){
-
+        if(backgroundGrabJoint != null){
+          Destroy(backgroundGrabJoint);
+          backgroundGrabJoint = null;
+        }
     }
 
     void ApplyGravity()
@@ -575,7 +582,7 @@ public class RigidBodyController : MonoBehaviour
 
         public bool isSlideCommandGiven;
         public bool isMoveHorizontalCommandGiven;
-        
+
         public void Update()
         {
             leftWallContactTimer += Time.deltaTime;
