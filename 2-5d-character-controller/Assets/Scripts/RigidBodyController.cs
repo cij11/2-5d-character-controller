@@ -98,16 +98,6 @@ public class RigidBodyController : MonoBehaviour
 
     void DetermineContactState()
     {
-
-        GameObject objectHitByRay;
-RaycastHit hit;
-if (Physics.Raycast(transform.position, -Vector3.up, out hit)){
-if(hit.collider != null){
-objectHitByRay = hit.collider.gameObject;
-}
-}
-
-
         contactState = ContactState.FLATGROUND;
         sideGrabbed = MovementDirection.NEUTRAL;
 
@@ -421,7 +411,6 @@ objectHitByRay = hit.collider.gameObject;
         }
         else if (currentSpeedInDesiredDirection < maxSpeed)
         {
-            //Cut off the applied force as slope approaches limit	
             body.AddForce(horizontalVector * direction * speedUpForce * Time.deltaTime);
         }
     }
@@ -469,7 +458,6 @@ objectHitByRay = hit.collider.gameObject;
         }
         else if (currentSpeedInDesiredDirection < maxSpeed)
         {
-            //Cut off the applied force as slope approaches limit	
             body.AddForce(horizontalVector * direction * speedUpForce * Time.deltaTime);
         }
     }
@@ -504,6 +492,14 @@ objectHitByRay = hit.collider.gameObject;
     public void SlideCommand()
     {
         stateInfo.isSlideCommandGiven = true;
+    }
+
+    public void GrabBackgroundCommand(){
+
+    }
+
+    public void ReleaseBackgroundCommand(){
+
     }
 
     void ApplyGravity()
@@ -579,6 +575,7 @@ objectHitByRay = hit.collider.gameObject;
 
         public bool isSlideCommandGiven;
         public bool isMoveHorizontalCommandGiven;
+        
         public void Update()
         {
             leftWallContactTimer += Time.deltaTime;
