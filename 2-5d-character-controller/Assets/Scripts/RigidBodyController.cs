@@ -125,13 +125,15 @@ public class RigidBodyController : MonoBehaviour
         }
         //If the sides detect a collision but there is nothing above and to the side of the character,
         //then it is on a ledge. 
-        else if (collisions.left && !collisions.topLeft)
+        else if (stateInfo.leftWallContactTimer < wallJumpTimeWindow && !collisions.topLeft)
         {
             contactState = ContactState.LEDGEGRAB;
+            sideGrabbed = MovementDirection.LEFT;
         }
-        else if (collisions.right && !collisions.topRight)
+        else if (stateInfo.rightWallContactTimer < wallJumpTimeWindow && !collisions.topRight)
         {
             contactState = ContactState.LEDGEGRAB;
+            sideGrabbed = MovementDirection.RIGHT;
         }
         //If the character was in contact with a steep surface beside it within a few milliseconds, it counts as
         //grabbing the wall
@@ -266,7 +268,7 @@ public class RigidBodyController : MonoBehaviour
     //If in a position to grab or slide down a wall, apply a small force towards the wall
     void ApplyWallHugForce()
     {
-        if (contactState == ContactState.WALLGRAB)
+        if (contactState == ContactState.WALLGRAB || contactState == ContactState.LEDGEGRAB)
         {
             if (collisions.left)
             {
@@ -289,7 +291,7 @@ public class RigidBodyController : MonoBehaviour
         physCollider.material = physicMaterials[(int)PhysicMatTypes.IDLE_STANDING];
 
         //If grabbing adjacent to a wall set high static friction, unless holding down
-        if (contactState == ContactState.WALLGRAB)
+        if (contactState == ContactState.WALLGRAB || contactState == ContactState.LEDGEGRAB)
         {
             if (stateInfo.isSlideCommandGiven)
             {
@@ -335,7 +337,7 @@ public class RigidBodyController : MonoBehaviour
             MoveSteepHorizontal(Mathf.Sign(direction), landSpeedUpForce, landBreakForce, maxWalkSpeed);
         }
 
-        if(contactState == ContactState.WALLGRAB){
+        if(contactState == ContactState.WALLGRAB || contactState == ContactState.LEDGEGRAB){
             MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
         }
 
