@@ -98,6 +98,16 @@ public class RigidBodyController : MonoBehaviour
 
     void DetermineContactState()
     {
+
+        GameObject objectHitByRay;
+RaycastHit hit;
+if (Physics.Raycast(transform.position, -Vector3.up, out hit)){
+if(hit.collider != null){
+objectHitByRay = hit.collider.gameObject;
+}
+}
+
+
         contactState = ContactState.FLATGROUND;
         sideGrabbed = MovementDirection.NEUTRAL;
 
@@ -299,38 +309,21 @@ public class RigidBodyController : MonoBehaviour
 
         if (contactState == ContactState.FLATGROUND)
         {
-            if (direction < 0)
-            {
-                MoveFlatHorizontal(-1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
-            }
-            else
-            {
-                MoveFlatHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
-            }
+             MoveFlatHorizontal(Mathf.Sign(direction), landSpeedUpForce, landBreakForce, maxWalkSpeed);
         }
 
         if (contactState == ContactState.STEEPSLOPE)
         {
-            if (direction < 0)
-            {
-                MoveSteepHorizontal(-1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
-            }
-            else
-            {
-                MoveSteepHorizontal(1, landSpeedUpForce, landBreakForce, maxWalkSpeed);
-            }
+            MoveSteepHorizontal(Mathf.Sign(direction), landSpeedUpForce, landBreakForce, maxWalkSpeed);
+        }
+
+        if(contactState == ContactState.WALLGRAB){
+            MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
         }
 
         if (contactState == ContactState.AIRBORNE)
         {
-            if (direction < 0)
-            {
-                MoveArialHorizontal(-1, airSpeedUpForce, airBreakForce, maxAirSpeed);
-            }
-            else
-            {
-                MoveArialHorizontal(1, airSpeedUpForce, airBreakForce, maxAirSpeed);
-            }
+             MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
         }
     }
 
