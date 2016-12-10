@@ -123,11 +123,13 @@ public class RigidBodyController : MonoBehaviour
         {
             contactState = ContactState.STEEPSLOPE;
         }
-        else if (false)
-        { //ledge grabs not currently implemented
+        //If the sides detect a collision but there is nothing above and to the side of the character,
+        //then it is on a ledge. 
+        else if (collisions.left && !collisions.topLeft)
+        {
             contactState = ContactState.LEDGEGRAB;
         }
-        else if (false)
+        else if (collisions.right && !collisions.topRight)
         {
             contactState = ContactState.LEDGEGRAB;
         }
@@ -166,6 +168,7 @@ public class RigidBodyController : MonoBehaviour
         RaycastDown();
         RaycastLeft();
         RaycastRight();
+        RaycastTopSidways();
     }
 
     //Cast rays down to see if near ground for purposes of jumping, air vs land control, and friction.
@@ -237,6 +240,28 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
+    //Send rays out sideways from the top left corner and the top right corner.
+    //The state will be set to on a ledge if the middle/sides detect a ledge but the top doesn't.
+    void RaycastTopSidways(){
+        float rayLength = 0.05f;
+
+        //Cast the ray from slightly above the character
+        Vector3 rayOrigin = raycastOrigins.topLeft + new Vector3 (0, 0.1f, 0);
+        RaycastHit hit;
+        bool isHit = Physics.Raycast(rayOrigin, -body.transform.right, out hit, rayLength, collisionMask);
+        Debug.DrawRay(rayOrigin, -body.transform.right * rayLength, Color.red);
+
+        if(isHit)
+            collisions.topLeft = true;
+
+
+        rayOrigin = raycastOrigins.topRight + new Vector3 (0, 0.1f, 0);
+        isHit = Physics.Raycast(rayOrigin, body.transform.right, out hit, rayLength, collisionMask);
+        Debug.DrawRay(rayOrigin, body.transform.right * rayLength, Color.red);
+
+        if(isHit)
+            collisions.topRight = true;
+    }
 
     //If in a position to grab or slide down a wall, apply a small force towards the wall
     void ApplyWallHugForce()
@@ -548,7 +573,7 @@ public class RigidBodyController : MonoBehaviour
     {
         public bool above, below;
         public bool left, right;
-        public bool leftLedge, rightLedge;
+        public bool topLeft, topRight;
         public Vector3 surfaceNormal;
         public float groundSlopeAngle;
         public float leftSurfaceAngle;
@@ -558,7 +583,7 @@ public class RigidBodyController : MonoBehaviour
         {
             above = below = false;
             left = right = false;
-            leftLedge = rightLedge = false;
+            topLeft = topRight = false;
 
             surfaceNormal = new Vector3(0f, 0f, 0f);
             groundSlopeAngle = 0f;
