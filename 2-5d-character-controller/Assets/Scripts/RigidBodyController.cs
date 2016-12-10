@@ -305,7 +305,7 @@ public class RigidBodyController : MonoBehaviour
                 physCollider.material = physicMaterials[2];
             }
         }
-        //If FLATGROUND and the slope is steep, a directional button is pressed, or ski is pressed, set to low friction
+        //If FLATGROUND and a directional command is given, or a slide command is given, set to low friction
         if (contactState == ContactState.FLATGROUND)
         {
             //And player is FLATGROUND
@@ -318,6 +318,13 @@ public class RigidBodyController : MonoBehaviour
         //If on a steep slope, set the material slippery
         if (contactState == ContactState.STEEPSLOPE)
         {
+            physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
+        }
+
+        //If the collider is airborne, make frictionless. Prevents juddering
+        //when head touching the underside of a surface, and allows movement
+        //if ground has not been detected (eg, if standing on peak)
+        if (contactState == ContactState.AIRBORNE){
             physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
         }
     }
