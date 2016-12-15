@@ -659,4 +659,15 @@ public class RigidBodyController : MonoBehaviour
         Gizmos.DrawSphere(raycastOrigins.topLeft, 0.01f);
         Gizmos.DrawSphere(raycastOrigins.topRight, 0.01f);
     }
+
+    public ContactState GetContactState(){
+        return this.contactState;
+    }
+    public float GetVerticalSpeed(){
+        return VerticalSpeed();
+    }
+
+    public float GetHorizontalSpeed(){
+        return HorizontalSpeed();
+    }
 }
