@@ -1,21 +1,36 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TransitionController : MonoBehaviour {
+public class SpriteStateController : MonoBehaviour {
 	public RigidBodyController bodyController;
 	Animator animator;
+	SpriteRenderer spriteRenderer;
+
+	float changeDirectionCutoff = 0.5f;
+
 	// Use this for initialization
 	void Start () {
 		animator = GetComponent<Animator>();
+		spriteRenderer = GetComponent<SpriteRenderer>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		//Only care about absolute speed for distinguishing between idle and running
 		animator.SetFloat("AbsoluteHorizontalSpeed", Mathf.Abs(bodyController.GetHorizontalSpeed()));
-
+		
 		//Care about sign for vertical speed to distinguish rising and falling.
-		animator.SetFloat("VerticalSpeed", bodyController.GetHorizontalSpeed());
+		animator.SetFloat("VerticalSpeed", bodyController.GetVerticalSpeed());
+
+		//Care about sign for horizontal speed for flipping sprite
+		if (bodyController.GetHorizontalSpeed() < -changeDirectionCutoff){
+			spriteRenderer.flipX = true;
+		}
+		//Care about sign for horizontal speed for flipping sprite
+		if (bodyController.GetHorizontalSpeed() > changeDirectionCutoff){
+			spriteRenderer.flipX = false;
+		}
+
 		//States
 		//0 ground/steep
 		//1 airborn
