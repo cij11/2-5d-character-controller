@@ -8,6 +8,13 @@ public class SpriteStateController : MonoBehaviour {
 
 	float changeDirectionCutoff = 0.5f;
 
+	//Set unity StateChange attribute to true if stqte changes, otherwise false.
+	//This will allow gating/triggering of state change from the 'any state' bucket
+	//in the animator.
+	int currentAnimationState = 0;
+	int previousAnimationState = 0;
+	bool hasAnimationStateChanged = false;
+
 	// Use this for initialization
 	void Start () {
 		animator = GetComponent<Animator>();
@@ -31,25 +38,38 @@ public class SpriteStateController : MonoBehaviour {
 			spriteRenderer.flipX = false;
 		}
 
+		previousAnimationState = currentAnimationState;
+
 		//States
 		//0 ground/steep
 		//1 airborn
 		//2 wall grab
 		//3 ledge grab
 		if (bodyController.GetContactState() == ContactState.FLATGROUND){
-			animator.SetInteger("State", 0);
+			currentAnimationState = 0;
 		}
 		if (bodyController.GetContactState() == ContactState.STEEPSLOPE){
-			animator.SetInteger("State", 0);
+			currentAnimationState = 0;
 		}
 		if (bodyController.GetContactState() == ContactState.AIRBORNE){
-			animator.SetInteger("State", 1);
+			currentAnimationState = 1;
 		}
 		if (bodyController.GetContactState() == ContactState.WALLGRAB){
-			animator.SetInteger("State", 2);
+			currentAnimationState = 2;
 		}
 		if (bodyController.GetContactState() == ContactState.LEDGEGRAB){
-			animator.SetInteger("State", 3);
+			currentAnimationState = 3;
+			
+		}
+	
+		//Use this if rigging so all transitions come from any state
+		//to prevent repeated triggering.
+		if (previousAnimationState != currentAnimationState){
+			animator.SetInteger("State", currentAnimationState);
+			hasAnimationStateChanged = true;
+		}
+		else{
+			hasAnimationStateChanged = false;
 		}
 	}
 }

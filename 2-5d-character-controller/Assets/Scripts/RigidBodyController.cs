@@ -77,9 +77,6 @@ public class RigidBodyController : MonoBehaviour
         //Replace. Make idle material by default, then change to other materials as action dictates.
         AssignPhysicMaterial();
 
-        print("Left wall angle: " + collisions.leftSurfaceAngle);
-        print("Right wall angle: " + collisions.rightSurfaceAngle);
-
         collisions.Reset();
         Raycasts();
 
