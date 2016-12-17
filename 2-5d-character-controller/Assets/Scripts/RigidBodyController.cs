@@ -243,10 +243,10 @@ public class RigidBodyController : MonoBehaviour
     //Send rays out sideways from the top left corner and the top right corner.
     //The state will be set to on a ledge if the middle/sides detect a ledge but the top doesn't.
     void RaycastTopSidways(){
-        float rayLength = 0.05f;
+        float rayLength = 0.1f;
 
         //Cast the ray from slightly above the character
-        Vector3 rayOrigin = raycastOrigins.topLeft + new Vector3 (0, 0.1f, 0);
+        Vector3 rayOrigin = raycastOrigins.topLeft + body.transform.up * 0.05f;
         RaycastHit hit;
         bool isHit = Physics.Raycast(rayOrigin, -body.transform.right, out hit, rayLength, collisionMask);
         Debug.DrawRay(rayOrigin, -body.transform.right * rayLength, Color.red);
@@ -255,7 +255,7 @@ public class RigidBodyController : MonoBehaviour
             collisions.topLeft = true;
 
 
-        rayOrigin = raycastOrigins.topRight + new Vector3 (0, 0.1f, 0);
+        rayOrigin = raycastOrigins.topRight + body.transform.up * 0.05f;
         isHit = Physics.Raycast(rayOrigin, body.transform.right, out hit, rayLength, collisionMask);
         Debug.DrawRay(rayOrigin, body.transform.right * rayLength, Color.red);
 
