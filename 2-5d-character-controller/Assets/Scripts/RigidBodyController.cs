@@ -32,6 +32,9 @@ public class RigidBodyController : MonoBehaviour
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
     float skinWidth = 0.01f;
+    float detectionRayLengthGround = 0.3f;
+    float detectionRayLengthSides = 0.1f;
+    float detectionRayLengthTop = 0.2f;
     int verticalRayCount = 8;
     int horizontalRayCount = 3;
     float verticalRaySpacing;
@@ -66,7 +69,7 @@ public class RigidBodyController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         OrientToGravityFocus();
         DetermineContactState();
@@ -174,7 +177,7 @@ public class RigidBodyController : MonoBehaviour
     //Cast rays down to see if near ground for purposes of jumping, air vs land control, and friction.
     void RaycastDown()
     {
-        float rayLength = skinWidth * 10f;
+        float rayLength = detectionRayLengthGround;
 
         for (int i = 0; i < verticalRayCount; i++)
         {
@@ -196,7 +199,7 @@ public class RigidBodyController : MonoBehaviour
 
     void RaycastLeft()
     {
-        float rayLength = skinWidth * 10f;
+        float rayLength = detectionRayLengthSides;
 
         for (int i = 0; i < horizontalRayCount; i++)
         {
@@ -219,7 +222,7 @@ public class RigidBodyController : MonoBehaviour
 
     void RaycastRight()
     {
-        float rayLength = skinWidth * 10f;
+        float rayLength = detectionRayLengthSides;
 
         for (int i = 0; i < horizontalRayCount; i++)
         {
@@ -243,7 +246,7 @@ public class RigidBodyController : MonoBehaviour
     //Send rays out sideways from the top left corner and the top right corner.
     //The state will be set to on a ledge if the middle/sides detect a ledge but the top doesn't.
     void RaycastTopSidways(){
-        float rayLength = skinWidth * 20f;
+        float rayLength = detectionRayLengthTop; //cast longer rays to be sure blank space above character.
 
         //Cast the ray from slightly above the character
         Vector3 rayOrigin = raycastOrigins.topLeft + body.transform.up * 0.05f;
@@ -578,10 +581,10 @@ public class RigidBodyController : MonoBehaviour
         float xoffset = (width / 2f) - skinWidth;
         float yoffset = (height / 2f) - skinWidth;
         float zpos = transform.position.z;
-        raycastOrigins.bottomLeft = body.transform.position + body.transform.rotation * new Vector3(-xoffset, -yoffset, zpos);
-        raycastOrigins.bottomRight = body.transform.position + body.transform.rotation * new Vector3(xoffset, -yoffset, zpos);
-        raycastOrigins.topLeft = body.transform.position + body.transform.rotation * new Vector3(-xoffset, yoffset, zpos);
-        raycastOrigins.topRight = body.transform.position + body.transform.rotation * new Vector3(xoffset, yoffset, zpos);
+        raycastOrigins.bottomLeft = physCollider.transform.position + physCollider.transform.rotation * new Vector3(-xoffset, -yoffset, zpos);
+        raycastOrigins.bottomRight = physCollider.transform.position + physCollider.transform.rotation * new Vector3(xoffset, -yoffset, zpos);
+        raycastOrigins.topLeft = physCollider.transform.position + physCollider.transform.rotation * new Vector3(-xoffset, yoffset, zpos);
+        raycastOrigins.topRight = physCollider.transform.position + physCollider.transform.rotation * new Vector3(xoffset, yoffset, zpos);
     }
 
     public struct CollisionInfo
