@@ -11,8 +11,8 @@ public class RigidBodyController : MonoBehaviour
     public Vector3 gravityFocus = new Vector3(0, 0, 0);
     Rigidbody body;
     Collider physCollider;
-    float width = 1f;
-    float height = 1f;
+    float width = 0.6f;
+    float height = 0.9f;
 
     //Speed the character walks at when left or right held
     float maxWalkSpeed = 12;
