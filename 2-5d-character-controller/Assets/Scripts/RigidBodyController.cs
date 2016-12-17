@@ -31,7 +31,7 @@ public class RigidBodyController : MonoBehaviour
 
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
-    float skinWidth = 0.005f;
+    float skinWidth = 0.01f;
     int verticalRayCount = 8;
     int horizontalRayCount = 3;
     float verticalRaySpacing;
@@ -174,7 +174,7 @@ public class RigidBodyController : MonoBehaviour
     //Cast rays down to see if near ground for purposes of jumping, air vs land control, and friction.
     void RaycastDown()
     {
-        float rayLength = 0.05f;
+        float rayLength = skinWidth * 10f;
 
         for (int i = 0; i < verticalRayCount; i++)
         {
@@ -196,7 +196,7 @@ public class RigidBodyController : MonoBehaviour
 
     void RaycastLeft()
     {
-        float rayLength = 0.05f;
+        float rayLength = skinWidth * 10f;
 
         for (int i = 0; i < horizontalRayCount; i++)
         {
@@ -219,7 +219,7 @@ public class RigidBodyController : MonoBehaviour
 
     void RaycastRight()
     {
-        float rayLength = 0.05f;
+        float rayLength = skinWidth * 10f;
 
         for (int i = 0; i < horizontalRayCount; i++)
         {
@@ -243,7 +243,7 @@ public class RigidBodyController : MonoBehaviour
     //Send rays out sideways from the top left corner and the top right corner.
     //The state will be set to on a ledge if the middle/sides detect a ledge but the top doesn't.
     void RaycastTopSidways(){
-        float rayLength = 0.1f;
+        float rayLength = skinWidth * 20f;
 
         //Cast the ray from slightly above the character
         Vector3 rayOrigin = raycastOrigins.topLeft + body.transform.up * 0.05f;
