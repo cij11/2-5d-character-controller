@@ -7,6 +7,7 @@ public class SpriteStateController : MonoBehaviour {
 	SpriteRenderer spriteRenderer;
 
 	float changeDirectionCutoff = 0.5f;
+	bool xFlip = false;
 
 	//Set unity StateChange attribute to true if stqte changes, otherwise false.
 	//This will allow gating/triggering of state change from the 'any state' bucket
@@ -31,13 +32,14 @@ public class SpriteStateController : MonoBehaviour {
 
 		//Care about sign for horizontal speed for flipping sprite
 		if (bodyController.GetHorizontalSpeed() < -changeDirectionCutoff){
-			spriteRenderer.flipX = true;
+			xFlip = true;
 		}
 		//Care about sign for horizontal speed for flipping sprite
 		if (bodyController.GetHorizontalSpeed() > changeDirectionCutoff){
-			spriteRenderer.flipX = false;
+			xFlip = false;
 		}
 		
+		spriteRenderer.flipX = xFlip;
 
 
 		previousAnimationState = currentAnimationState;
@@ -68,9 +70,11 @@ public class SpriteStateController : MonoBehaviour {
 					//If grabbing a side, flip sprite appropriately
 		if(bodyController.GetSideGrabbed() == MovementDirection.LEFT){
 			spriteRenderer.flipX = true;
+			xFlip = true;
 		}
 		else{
 spriteRenderer.flipX = false;
+xFlip = false;
 		}
 		}
 	
@@ -83,5 +87,9 @@ spriteRenderer.flipX = false;
 		else{
 			hasAnimationStateChanged = false;
 		}
+	}
+
+	public bool getXFlip(){
+		return xFlip;
 	}
 }
