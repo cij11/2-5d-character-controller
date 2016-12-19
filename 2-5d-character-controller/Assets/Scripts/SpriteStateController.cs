@@ -29,8 +29,6 @@ public class SpriteStateController : MonoBehaviour {
 		//Care about sign for vertical speed to distinguish rising and falling.
 		animator.SetFloat("VerticalSpeed", bodyController.GetVerticalSpeed());
 
-		//Don't flip sprite it wallgrabbing
-		if(currentAnimationState != 3 && currentAnimationState != 2){
 		//Care about sign for horizontal speed for flipping sprite
 		if (bodyController.GetHorizontalSpeed() < -changeDirectionCutoff){
 			spriteRenderer.flipX = true;
@@ -39,7 +37,8 @@ public class SpriteStateController : MonoBehaviour {
 		if (bodyController.GetHorizontalSpeed() > changeDirectionCutoff){
 			spriteRenderer.flipX = false;
 		}
-		}
+		
+
 
 		previousAnimationState = currentAnimationState;
 
@@ -63,6 +62,16 @@ public class SpriteStateController : MonoBehaviour {
 		if (bodyController.GetContactState() == ContactState.LEDGEGRAB){
 			currentAnimationState = 3;
 			
+		}
+
+		if(currentAnimationState == 2 || currentAnimationState == 3){
+					//If grabbing a side, flip sprite appropriately
+		if(bodyController.GetSideGrabbed() == MovementDirection.LEFT){
+			spriteRenderer.flipX = true;
+		}
+		else{
+spriteRenderer.flipX = false;
+		}
 		}
 	
 		//Use this if rigging so all transitions come from any state

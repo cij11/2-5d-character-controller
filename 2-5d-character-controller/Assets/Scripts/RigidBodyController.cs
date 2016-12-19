@@ -42,7 +42,7 @@ public class RigidBodyController : MonoBehaviour
     public LayerMask collisionMask;
     //Standing on a slope above this is steep - character will not rest on the slope, and will jump away
     float steepSlopeAngle = 60f;
-    float minWallGrabAngle = 85f;
+    float minWallGrabAngle = 80f;
 
     //Store state variables and timers - eg, double jump used, time since touched wall
     StateInfo stateInfo;
@@ -114,9 +114,12 @@ public class RigidBodyController : MonoBehaviour
             {
                 contactState = ContactState.FLATGROUND;
             }
-            else
+            else if(collisions.groundSlopeAngle < minWallGrabAngle)
             {
                 contactState = ContactState.STEEPSLOPE;
+            }
+            else{
+                contactState = ContactState.WALLGRAB;
             }
         }
         //If there is a collision on the side but the slope is not vertical enough, the character is also on a steep slope.
@@ -669,5 +672,9 @@ public class RigidBodyController : MonoBehaviour
 
     public float GetHorizontalSpeed(){
         return HorizontalSpeed();
+    }
+
+    public MovementDirection GetSideGrabbed(){
+        return sideGrabbed;
     }
 }
