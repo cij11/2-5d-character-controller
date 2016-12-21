@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class ReticuleController : MonoBehaviour {
+public class AimingController : MonoBehaviour {
 
 	float horizontal;
 	float vertical;
+
+	Vector3 aimingVector;
+	bool isHoldingFire;
 
 	//Default aiming will align with the direction the sprite is facing.
 	public SpriteStateController characterSprite;
@@ -46,20 +49,14 @@ public class ReticuleController : MonoBehaviour {
 			}
 		}
 
-		SetTargetPosition();
-		SetTargetOpacity();
+		aimingVector = new Vector3(horizontal, vertical, 0f);
+		isHoldingFire = Input.GetButton("Fire1");
 	}
 
-	void SetTargetPosition(){
-		target.transform.localPosition = new Vector3(horizontal, vertical, 0f);
+	public Vector3 GetAimingVector(){
+		return aimingVector;
 	}
-	void SetTargetOpacity(){
-		//Only render reticule if fire held
-		if(Input.GetAxis("Fire1") > 0){
-			target.gameObject.active= true;
-		}
-		else{
-			target.gameObject.active = false;
-		}
+	public bool GetIsHoldingFire(){
+		return isHoldingFire;
 	}
 }
