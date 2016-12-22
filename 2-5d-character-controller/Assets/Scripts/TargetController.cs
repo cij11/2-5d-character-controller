@@ -14,7 +14,7 @@ public class TargetController : MonoBehaviour {
 		//If not present, set null.
 		//Implement default behaviour for null commponent, and log.
 
-		aimingController = this.transform.parent.Find("Aiming").GetComponent<AimingController>();
+		aimingController = this.transform.parent.Find("ActionControllers").GetComponent<AimingController>();
 		targetSprite = GetComponent<SpriteRenderer>();
 
 	}
