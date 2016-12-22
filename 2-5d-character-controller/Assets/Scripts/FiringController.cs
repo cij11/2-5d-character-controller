@@ -16,11 +16,8 @@ public class FiringController : MonoBehaviour {
 	
 	}
 
-	void RegisterActiveWieldable(){
-		GameObject wieldableGO = this.transform.parent.FindChild("Wieldable").gameObject;
-		if(wieldableGO!= null){
-			activeWieldable = wieldableGO.GetComponent<Wieldable>();
-		}
+	public void RegisterWieldable(Wieldable wieldable){
+		activeWieldable = wieldable;
 	}
 
 	public void InitiateFire(){
@@ -32,10 +29,6 @@ public class FiringController : MonoBehaviour {
 	}
 
 	public void ReleaseFire(){
-		if(activeWieldable == null){
-			RegisterActiveWieldable();
-		}
-		
 		if(activeWieldable != null){
 			activeWieldable.Fire();
 		}

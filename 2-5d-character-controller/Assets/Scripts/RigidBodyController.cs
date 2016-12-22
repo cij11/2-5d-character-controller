@@ -155,7 +155,6 @@ public class RigidBodyController : MonoBehaviour
         {
             contactState = ContactState.AIRBORNE;
         }
-        print(contactState.ToString());
     }
 
     float VerticalSpeed()
