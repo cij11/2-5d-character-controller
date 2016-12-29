@@ -1,13 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Wieldable : MonoBehaviour {
+public abstract class Wieldable : MonoBehaviour {
 
 	public GameObject projectileGO;
-
-	AimingController aimingController;
-
-	float muzzleSpeed = 20f;
+	protected AimingController aimingController;
 
 	// Use this for initialization
 	void Start () {
@@ -19,9 +16,5 @@ public class Wieldable : MonoBehaviour {
 
 	}
 
-	public void Fire(){
-			Vector3 aimingVector = aimingController.GetAimingVector();
-			GameObject newProjectile = (GameObject)Instantiate(projectileGO, this.transform.position + aimingVector, Quaternion.identity);
-			newProjectile.GetComponent<Rigidbody>().velocity = aimingVector  * muzzleSpeed;
-	}
+	public abstract void Fire();
 }
