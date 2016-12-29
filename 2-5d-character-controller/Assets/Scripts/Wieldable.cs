@@ -2,8 +2,7 @@
 using System.Collections;
 
 public abstract class Wieldable : MonoBehaviour {
-
-	public GameObject projectileGO;
+	
 	protected AimingController aimingController;
 
 	// Use this for initialization
