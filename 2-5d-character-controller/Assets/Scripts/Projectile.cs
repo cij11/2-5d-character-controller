@@ -3,7 +3,7 @@ using System.Collections;
 
 public abstract class Projectile : MonoBehaviour {
 
-	protected GameObject firingCharacter;
+	protected GameObject firingWeapon;
 	protected Vector3 launchVector;
 	protected float maxLifespan = 1f;
 	float age;
@@ -14,7 +14,7 @@ public abstract class Projectile : MonoBehaviour {
 	}
 
 	public void LoadLaunchParameters(GameObject firedBy, Vector3 launchedAt){
-		firingCharacter = firedBy;
+		firingWeapon = firedBy;
 		launchVector = launchedAt;
 	}
 
