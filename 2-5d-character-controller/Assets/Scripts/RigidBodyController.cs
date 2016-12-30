@@ -315,10 +315,6 @@ public class RigidBodyController : MonoBehaviour
             MoveSteepHorizontal(Mathf.Sign(direction), landSpeedUpForce, landBreakForce, maxWalkSpeed);
         }
 
-        if(contactState == ContactState.WALLGRAB){
-            MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
-        }
-
         if (contactState == ContactState.AIRBORNE)
         {
              MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);

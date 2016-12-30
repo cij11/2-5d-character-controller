@@ -26,8 +26,6 @@ public class PlayerInput : MonoBehaviour {
 		Movement();
 		Aiming();
 		Firing();
-
-
 	}
 
 	void Movement(){
@@ -55,25 +53,7 @@ public class PlayerInput : MonoBehaviour {
 	}
 
 	void Aiming(){
-		if(Input.GetAxis("Horizontal") < 0){
-			aimingController.SetHorizontal(-1);
-		}
-		else if(Input.GetAxis("Horizontal") > 0){
-			aimingController.SetHorizontal(1);
-		}
-		else{
-			aimingController.SetHorizontal(0);
-		}
 
-		if(Input.GetAxis("Vertical") < 0){
-			aimingController.SetVertical(-1);
-		}
-		else if(Input.GetAxis("Vertical") > 0){
-			aimingController.SetVertical(1);
-		}
-		else{
-			aimingController.SetVertical(0);
-		}
 	}
 
 	void Firing(){
