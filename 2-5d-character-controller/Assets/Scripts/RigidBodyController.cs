@@ -24,9 +24,9 @@ public class RigidBodyController : MonoBehaviour
     float airSpeedUpForce = 600f;
     float airBreakForce = 1500f;
 
-    float maxTargettingModeSpeed = 0.1f;
-    float targettingSpeedUpForce = 1500f;
-    float targettingSpeedBreakForce = 1500f;
+    float maxTargettingModeSpeed = 0.01f;
+    float targettingSpeedUpForce = 100f;
+    float targettingSpeedBreakForce = 100;
 
     float gravityForce = 900f;
 
@@ -110,7 +110,7 @@ public class RigidBodyController : MonoBehaviour
         if(backgroundGrabJoint != null){
             contactState = ContactState.BACKGROUNDGRAB;
         }
-        //If there is a collision below, the character is either FLATGROUND or on a steep slope
+        //If there is a collision below, the character is either FLATGROUND, a steep slope, or a slanted wall
         else if (collisions.below)
         {
             stateInfo.remainingDoubleJumps = maxDoubleJumps;
@@ -130,18 +130,6 @@ public class RigidBodyController : MonoBehaviour
         else if ((collisions.left && collisions.leftSurfaceAngle < minWallGrabAngle) || (collisions.right && collisions.rightSurfaceAngle < minWallGrabAngle))
         {
             contactState = ContactState.STEEPSLOPE;
-        }
-        //If the sides detect a collision but there is nothing above and to the side of the character,
-        //then it is on a ledge. 
-        else if (stateInfo.leftWallContactTimer < wallJumpTimeWindow && !collisions.topLeft)
-        {
-            contactState = ContactState.LEDGEGRAB;
-            sideGrabbed = MovementDirection.LEFT;
-        }
-        else if (stateInfo.rightWallContactTimer < wallJumpTimeWindow && !collisions.topRight)
-        {
-            contactState = ContactState.LEDGEGRAB;
-            sideGrabbed = MovementDirection.RIGHT;
         }
         //If the character was in contact with a steep surface beside it within a few milliseconds, it counts as
         //grabbing the wall
@@ -177,7 +165,6 @@ public class RigidBodyController : MonoBehaviour
         RaycastDown();
         RaycastLeft();
         RaycastRight();
-        RaycastTopSidways();
     }
 
     //Cast rays down to see if near ground for purposes of jumping, air vs land control, and friction.
@@ -249,33 +236,10 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
-    //Send rays out sideways from the top left corner and the top right corner.
-    //The state will be set to on a ledge if the middle/sides detect a ledge but the top doesn't.
-    void RaycastTopSidways(){
-        float rayLength = detectionRayLengthTop; //cast longer rays to be sure blank space above character.
-
-        //Cast the ray from slightly above the character
-        Vector3 rayOrigin = raycastOrigins.topLeft + body.transform.up * 0.05f;
-        RaycastHit hit;
-        bool isHit = Physics.Raycast(rayOrigin, -body.transform.right, out hit, rayLength, collisionMask);
-        Debug.DrawRay(rayOrigin, -body.transform.right * rayLength, Color.red);
-
-        if(isHit)
-            collisions.topLeft = true;
-
-
-        rayOrigin = raycastOrigins.topRight + body.transform.up * 0.05f;
-        isHit = Physics.Raycast(rayOrigin, body.transform.right, out hit, rayLength, collisionMask);
-        Debug.DrawRay(rayOrigin, body.transform.right * rayLength, Color.red);
-
-        if(isHit)
-            collisions.topRight = true;
-    }
-
     //If in a position to grab or slide down a wall, apply a small force towards the wall
     void ApplyWallHugForce()
     {
-        if (contactState == ContactState.WALLGRAB || contactState == ContactState.LEDGEGRAB)
+        if (contactState == ContactState.WALLGRAB)
         {
             if (collisions.left)
             {
@@ -298,7 +262,7 @@ public class RigidBodyController : MonoBehaviour
         physCollider.material = physicMaterials[(int)PhysicMatTypes.IDLE_STANDING];
 
         //If grabbing adjacent to a wall set high static friction, unless holding down
-        if (contactState == ContactState.WALLGRAB || contactState == ContactState.LEDGEGRAB)
+        if (contactState == ContactState.WALLGRAB)
         {
             if (stateInfo.isSlideCommandGiven)
             {
@@ -351,7 +315,7 @@ public class RigidBodyController : MonoBehaviour
             MoveSteepHorizontal(Mathf.Sign(direction), landSpeedUpForce, landBreakForce, maxWalkSpeed);
         }
 
-        if(contactState == ContactState.WALLGRAB || contactState == ContactState.LEDGEGRAB){
+        if(contactState == ContactState.WALLGRAB){
             MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
         }
 
@@ -410,14 +374,7 @@ public class RigidBodyController : MonoBehaviour
                 WallJump(-1);
             }
         }
-        else if (contactState == ContactState.LEDGEGRAB){
-            if (sideGrabbed == MovementDirection.LEFT){
-                LedgeJump(1);
-            }
-            else{
-                LedgeJump(-1);
-            }
-        }
+
         //Even if we can't ground jump or wall jump, we might be able to double jump
         else if (stateInfo.remainingDoubleJumps > 0)
         {
