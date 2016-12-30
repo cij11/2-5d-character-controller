@@ -24,6 +24,10 @@ public class RigidBodyController : MonoBehaviour
     float airSpeedUpForce = 600f;
     float airBreakForce = 1500f;
 
+    float maxTargettingModeSpeed = 0.1f;
+    float targettingSpeedUpForce = 1500f;
+    float targettingSpeedBreakForce = 1500f;
+
     float gravityForce = 900f;
 
     float jumpSpeed = 10f;
@@ -54,7 +58,7 @@ public class RigidBodyController : MonoBehaviour
     int maxDoubleJumps = 2;
 
     float jetpackForce = 1200f;
-    float parachuteFallSpeed = 1f;
+    float parachuteFallSpeed = 0.2f;
     float paracuteDeceleration = 1.5f;
     public PhysicMaterial[] physicMaterials;
     public FixedJoint backgroundGrabJoint;
@@ -354,6 +358,20 @@ public class RigidBodyController : MonoBehaviour
         if (contactState == ContactState.AIRBORNE)
         {
              MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
+        }
+    }
+    public void FaceDirectionCommand(float direction)
+    {
+        if (Mathf.Sign(direction) != Mathf.Sign(HorizontalSpeed()))
+        {
+            if (contactState == ContactState.FLATGROUND || contactState == ContactState.STEEPSLOPE)
+            {
+                MoveFlatHorizontal(Mathf.Sign(direction), targettingSpeedUpForce, targettingSpeedBreakForce, maxTargettingModeSpeed);
+            }
+            if (contactState == ContactState.AIRBORNE)
+            {
+                MoveArialHorizontal(Mathf.Sign(direction), targettingSpeedUpForce, targettingSpeedBreakForce, maxTargettingModeSpeed);
+            }
         }
     }
 

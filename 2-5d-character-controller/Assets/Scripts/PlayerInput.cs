@@ -43,8 +43,14 @@ public class PlayerInput : MonoBehaviour {
 		if(Input.GetAxis("Vertical") > 0){
 			movementController.MoveVertical(1);
 		}
-		if(Input.GetKeyDown("space")){
+		if(Input.GetButtonDown("Jump")){
 			movementController.Jump();
+		}
+		if(Input.GetButtonDown("Fire1")){
+			movementController.StartTargetting();
+		}
+		if(Input.GetButtonUp("Fire1")){
+			movementController.StopTargetting();
 		}
 	}
 
