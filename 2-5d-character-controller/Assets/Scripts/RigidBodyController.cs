@@ -4,8 +4,6 @@ using System.Collections;
 public class RigidBodyController : MonoBehaviour
 {
     ContactState contactState = ContactState.FLATGROUND;
-    MovementDirection verticalDirection = MovementDirection.NEUTRAL;
-    MovementDirection horizontalDirection = MovementDirection.NEUTRAL;
     MovementDirection sideGrabbed = MovementDirection.NEUTRAL;
 
     public Vector3 gravityFocus = new Vector3(0, 0, 0);
