@@ -10,8 +10,7 @@ public class AimingController : MonoBehaviour
 	float verticalInput;
 
     Vector3 aimingVector;
-    bool isHoldingFire;
-	bool initiateAiming;
+    bool isAiming;
 
     //Default aiming will align with the direction the sprite is facing.
     public SpriteStateController characterSprite;
@@ -23,28 +22,36 @@ public class AimingController : MonoBehaviour
         verticalStored = 0f;
 		horizontalInput = 0f;
 		verticalInput = 0f;
+		isAiming = false;
 
     }
 
     // Update is called once per frame
     void Update()
     {
-        DefaultAimingToStraightForwardWhenFiringStarted();
 		MatchAimingToControlsIfFireAndDirectionHeld();
 		aimingVector = new Vector3(horizontalStored, verticalStored, 0f);
     }
 
-    void DefaultAimingToStraightForwardWhenFiringStarted()
+	public void StartTargetting(){
+		isAiming = true;
+		DefaultAimingStraightIfNoDirectionHeld();
+	}
+
+    void DefaultAimingStraightIfNoDirectionHeld()
     {
-        if (Input.GetButtonDown("Fire1"))
+
+        if (Mathf.Abs(horizontalInput) < 0.001f && Mathf.Abs(verticalInput) < 0.001f)
         {
-            if (Mathf.Abs(horizontalInput) < 0.001f && Mathf.Abs(verticalInput) < 0.001f)
-            {
-                SetHorizontalToSpriteDirection();
-                verticalStored = 0f;
-            }
+            SetHorizontalToSpriteDirection();
+            verticalStored = 0f;
         }
+
     }
+
+	public void StopTargetting(){
+		isAiming = false;
+	}
     void SetHorizontalToSpriteDirection()
     {
         if (characterSprite.getXFlip())
@@ -58,8 +65,7 @@ public class AimingController : MonoBehaviour
     }
 
 	void MatchAimingToControlsIfFireAndDirectionHeld(){
-		isHoldingFire = Input.GetButton("Fire1");
-		if (isHoldingFire && ((Mathf.Abs(horizontalInput) > 0.001f) || (Mathf.Abs(verticalInput) > 0.001f) )){
+		if (isAiming && ((Mathf.Abs(horizontalInput) > 0.001f) || (Mathf.Abs(verticalInput) > 0.001f) )){
 			horizontalStored = horizontalInput;
 			verticalStored = verticalInput;
 		}
@@ -69,9 +75,9 @@ public class AimingController : MonoBehaviour
     {
         return aimingVector;
     }
-    public bool GetIsHoldingFire()
+    public bool GetIsAiming()
     {
-        return isHoldingFire;
+        return isAiming;
     }
 
 	public void SetHorizontalInput(float hor){

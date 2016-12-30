@@ -29,13 +29,11 @@ public class TargetController : MonoBehaviour {
 	void QueryAimingController(){
 		if (aimingController != null){
 			displacementFromBody = aimingController.GetAimingVector();
-			isVisible = aimingController.GetIsHoldingFire();
+			isVisible = aimingController.GetIsAiming();
 		}
 		else{
 			displacementFromBody = defaultDisplacement;
 		}
-
-		isVisible = aimingController.GetIsHoldingFire();
 	}
 
 	void PositionTargettingReticule(){

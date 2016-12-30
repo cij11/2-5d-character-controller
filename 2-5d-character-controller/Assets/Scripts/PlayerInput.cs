@@ -69,7 +69,12 @@ public class PlayerInput : MonoBehaviour {
 			aimingController.SetVerticalInput(0f);
 		}
 
-		
+		if(Input.GetButtonDown("Fire1")){
+			aimingController.StartTargetting();
+		}
+		if(Input.GetButtonUp("Fire1")){
+			aimingController.StopTargetting();
+		}
 	}
 
 	void Firing(){
