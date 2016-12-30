@@ -21,6 +21,8 @@ public class AimingController : MonoBehaviour
     {
         horizontalStored = 0f;
         verticalStored = 0f;
+		horizontalInput = 0f;
+		verticalInput = 0f;
 
     }
 
@@ -36,7 +38,7 @@ public class AimingController : MonoBehaviour
     {
         if (Input.GetButtonDown("Fire1"))
         {
-            if (Mathf.Abs(Input.GetAxis("Horizontal")) < 0.001f && Mathf.Abs(Input.GetAxis("Vertical")) < 0.001f)
+            if (Mathf.Abs(horizontalInput) < 0.001f && Mathf.Abs(verticalInput) < 0.001f)
             {
                 SetHorizontalToSpriteDirection();
                 verticalStored = 0f;
@@ -57,19 +59,9 @@ public class AimingController : MonoBehaviour
 
 	void MatchAimingToControlsIfFireAndDirectionHeld(){
 		isHoldingFire = Input.GetButton("Fire1");
-		if (isHoldingFire && ((Mathf.Abs(Input.GetAxis("Horizontal")) > 0.001f) || (Mathf.Abs(Input.GetAxis("Vertical")) > 0.001f) )){
-			if (Mathf.Abs(Input.GetAxis("Horizontal")) > 0.001f){
-				horizontalStored = Mathf.Sign(Input.GetAxis("Horizontal"));
-			}
-			else{
-				horizontalStored = 0f;
-			}
-			if ( Mathf.Abs(Input.GetAxis("Vertical")) > 0.001f){
-				verticalStored = Mathf.Sign(Input.GetAxis("Vertical"));
-			}
-			else{
-				verticalStored = 0f;
-			}
+		if (isHoldingFire && ((Mathf.Abs(horizontalInput) > 0.001f) || (Mathf.Abs(verticalInput) > 0.001f) )){
+			horizontalStored = horizontalInput;
+			verticalStored = verticalInput;
 		}
 	}
 
@@ -86,6 +78,6 @@ public class AimingController : MonoBehaviour
 		horizontalInput = hor;
 	}
 		public void SetVerticalInput(float vert){
-		verticalInput = hor;
+		verticalInput = vert;
 	}
 }

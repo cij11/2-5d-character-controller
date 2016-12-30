@@ -7,6 +7,8 @@ public class PlayerInput : MonoBehaviour {
 	AimingController aimingController;
 	FiringController firingController;
 
+	float epsilon = 0.001f;
+
 
 	// Use this for initialization
 	void Start () {
@@ -53,7 +55,21 @@ public class PlayerInput : MonoBehaviour {
 	}
 
 	void Aiming(){
+		if(Mathf.Abs(Input.GetAxis("Horizontal")) > epsilon){
+			aimingController.SetHorizontalInput(Mathf.Sign(Input.GetAxis("Horizontal")));
+		}
+		else {
+			aimingController.SetHorizontalInput(0f);
+		}
 
+		if(Mathf.Abs(Input.GetAxis("Vertical")) > epsilon){
+			aimingController.SetVerticalInput(Mathf.Sign(Input.GetAxis("Vertical")));
+		}
+		else {
+			aimingController.SetVerticalInput(0f);
+		}
+
+		
 	}
 
 	void Firing(){
