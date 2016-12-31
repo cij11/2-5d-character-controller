@@ -36,7 +36,6 @@ public class RigidBodyController : MonoBehaviour
     float skinWidth = 0.01f;
     float detectionRayLengthGround = 0.3f;
     float detectionRayLengthSides = 0.1f;
-    float detectionRayLengthTop = 0.2f;
     int verticalRayCount = 8;
     int horizontalRayCount = 3;
     float verticalRaySpacing;
@@ -122,6 +121,12 @@ public class RigidBodyController : MonoBehaviour
             }
             else{
                 contactState = ContactState.WALLGRAB;
+                if (stateInfo.leftWallContactTimer < wallJumpTimeWindow){
+                    sideGrabbed = MovementDirection.LEFT;
+                }
+                else{
+                    sideGrabbed = MovementDirection.RIGHT;
+                }
             }
         }
         //If there is a collision on the side but the slope is not vertical enough, the character is also on a steep slope.
