@@ -10,8 +10,15 @@ public class RangedProjectile : Projectile {
 	}
 
 	public override void Launch(){
-		this.GetComponent<Rigidbody>().velocity = launchVector  * muzzleSpeed;
+		LaunchRanged();
 	}
 
+	void LaunchRanged(){
+		this.transform.SetParent(firingWeapon.transform);
+		this.transform.localPosition = launchVector;
 
+		Vector3 velocityVector = this.transform.position - firingWeapon.transform.position;
+		this.transform.SetParent(null);
+		this.GetComponent<Rigidbody>().velocity = velocityVector  * muzzleSpeed;
+	}
 }

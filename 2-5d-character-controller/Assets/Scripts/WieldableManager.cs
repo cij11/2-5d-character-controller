@@ -34,6 +34,7 @@ public class WieldableManager : MonoBehaviour {
 		currentWieldable = Instantiate(toWeild, this.transform.position, Quaternion.identity) as Wieldable;
 		currentWieldable.name = toWeild.name;
 		currentWieldable.transform.parent = this.transform.parent;
+		currentWieldable.transform.rotation = this.transform.parent.rotation;
 		RegisterWieldableWithFiringController();
 	}
 
