@@ -44,7 +44,7 @@ public class PlayerInput : MonoBehaviour {
 			movementController.MoveVertical(1);
 		}
 		if(Input.GetButtonDown("Jump")){
-			movementController.Jump();
+			movementController.Jump(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 		}
 		if(Input.GetButtonDown("Fire1")){
 			movementController.StartTargetting();

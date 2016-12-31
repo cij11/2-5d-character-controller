@@ -29,7 +29,9 @@ public class RigidBodyController : MonoBehaviour
     float gravityForce = 900f;
 
     float jumpSpeed = 10f;
-    float ledgeJumpClearanceSpeed = 0.4f;
+    float wallJumpClearanceSpeed = 3f;
+
+    float releaseSpeed = 2f;
 
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
@@ -339,7 +341,7 @@ public class RigidBodyController : MonoBehaviour
     }
 
     //Determine what type of jump is appropriate when jump pressed, and apply
-    public void JumpCommand()
+    public void JumpCommand(float hor, float vert)
     {
         //Detect ground and add upwards component to velocity if standing.
         //If terrain is too steep, walljump instead
@@ -366,11 +368,15 @@ public class RigidBodyController : MonoBehaviour
 
         }
         else if (contactState == ContactState.WALLGRAB){
-            if (sideGrabbed == MovementDirection.LEFT){
-                WallJump(1);
+            float propelDirection = (sideGrabbed == MovementDirection.LEFT) ? 1f : -1f;
+            if(vert < 0){
+                ReleaseWall(propelDirection);
+            //If pressing up and NOT pressing horizontally away from the wall
+            }else if (vert > 0 && (hor == 0 || Mathf.Sign(hor) != Mathf.Sign(propelDirection))){
+                WallJumpUp(propelDirection);
             }
             else{
-                WallJump(-1);
+                WallJump(propelDirection);
             }
         }
 
@@ -400,6 +406,9 @@ public class RigidBodyController : MonoBehaviour
         }
     }
 
+    void ReleaseWall(float direction){
+        body.velocity = body.transform.right * direction * releaseSpeed;
+    }
     void WallJump(float direction)
     {
         //Cancel all existing velocity, and set equal to a 45 degree jump in the given direction
@@ -407,9 +416,9 @@ public class RigidBodyController : MonoBehaviour
     }
 
     //If on a ledge, jump up, and slightly away from the wall.
-    void LedgeJump(float direction)
+    void WallJumpUp(float direction)
     {
-        body.velocity = body.transform.up * jumpSpeed + body.transform.right * direction * ledgeJumpClearanceSpeed;
+        body.velocity = body.transform.up * jumpSpeed + body.transform.right * direction * wallJumpClearanceSpeed;
     }
 
     void DoubleJump()
