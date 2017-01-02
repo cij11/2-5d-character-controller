@@ -8,8 +8,8 @@ public class CharacterMovementActuator : MonoBehaviour
     Rigidbody body;
     Collider physCollider;
     CharacterContactSensor contactSensor;
-	CharacterIntegrator integrator;
-    
+    CharacterIntegrator integrator;
+
     float width = 0.6f;
     float height = 0.9f;
 
@@ -31,20 +31,23 @@ public class CharacterMovementActuator : MonoBehaviour
 
     float jumpSpeed = 10f;
     float wallJumpClearanceSpeed = 3f;
-	bool isSlideCommandGiven = false;
+    bool isSlideCommandGiven = false;
     float releaseSpeed = 2f;
 
+    float wallSlideCounterForce = 20f;
 
     //Time in seconds that a wall jump can still occur after releasing the wall
     float wallJumpTimeWindow = 0.1f;
     int maxDoubleJumps = 2;
-	int remainingDoubleJumps = 2;
+    int remainingDoubleJumps = 2;
 
-	float wallHugForce = 100f;
+    float wallHugForce = 200f;
 
     float jetpackForce = 1200f;
     float parachuteFallSpeed = 0.2f;
     float paracuteDeceleration = 1.5f;
+    float terminalArialSpeed = -50f;
+    float terminalWallSlideSpeed = -5f;
     public PhysicMaterial[] physicMaterials;
     public FixedJoint backgroundGrabJoint;
 
@@ -54,8 +57,8 @@ public class CharacterMovementActuator : MonoBehaviour
     void Start()
     {
         body = GetComponent<Rigidbody>();
-		integrator = GetComponent<CharacterIntegrator> ();
-		contactSensor = GetComponent<CharacterContactSensor> ();
+        integrator = GetComponent<CharacterIntegrator>();
+        contactSensor = GetComponent<CharacterContactSensor>();
         physCollider = GetComponent<BoxCollider>();
     }
 
@@ -67,11 +70,12 @@ public class CharacterMovementActuator : MonoBehaviour
 
         ApplyGravity();
         ApplyWallHugForce();
+        LimitWallSlideSpeed();
 
         //Replace. Make idle material by default, then change to other materials as action dictates.
         AssignPhysicMaterial();
         isMoveHorizontalCommandGiven = false;
-		isSlideCommandGiven = false;
+        isSlideCommandGiven = false;
     }
 
     void OrientToGravityFocus()
@@ -98,9 +102,6 @@ public class CharacterMovementActuator : MonoBehaviour
         return Vector3.Dot(body.velocity, body.transform.right);
     }
 
-
-
-
     //If in a position to grab or slide down a wall, apply a small force towards the wall
     void ApplyWallHugForce()
     {
@@ -108,6 +109,12 @@ public class CharacterMovementActuator : MonoBehaviour
         {
             body.AddForce(-contactSensor.GetGrabbedWallNormal() * wallHugForce * Time.deltaTime);
         }
+    }
+
+    void LimitWallSlideSpeed()
+    {
+        //Negate gravity
+
     }
 
     //Assign physic material to idle, unless on a steep slope, a wall, or input given
@@ -118,9 +125,9 @@ public class CharacterMovementActuator : MonoBehaviour
         physCollider.material = physicMaterials[(int)PhysicMatTypes.IDLE_STANDING];
 
         //If grabbing adjacent to a wall set high static friction, unless holding down
-		if (contactSensor.GetContactState() == ContactState.WALLGRAB)
+        if (contactSensor.GetContactState() == ContactState.WALLGRAB)
         {
-			if (isSlideCommandGiven)
+            if (isSlideCommandGiven)
             {
                 //If down is held, set the material to be smoother
                 physCollider.material = physicMaterials[(int)PhysicMatTypes.LOW_KINETIC_NO_STATIC];
@@ -132,7 +139,7 @@ public class CharacterMovementActuator : MonoBehaviour
             }
         }
         //If FLATGROUND and a directional command is given, or a slide command is given, set to low friction
-		if (contactSensor.GetContactState() == ContactState.FLATGROUND)
+        if (contactSensor.GetContactState() == ContactState.FLATGROUND)
         {
             //And player is FLATGROUND
             if (isMoveHorizontalCommandGiven || isSlideCommandGiven)
@@ -142,7 +149,7 @@ public class CharacterMovementActuator : MonoBehaviour
             }
         }
         //If on a steep slope, set the material slippery
-		if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
+        if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
         {
             physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
         }
@@ -150,7 +157,7 @@ public class CharacterMovementActuator : MonoBehaviour
         //If the collider is airborne, make frictionless. Prevents juddering
         //when head touching the underside of a surface, and allows movement
         //if ground has not been detected (eg, if standing on peak)
-		if (contactSensor.GetContactState() == ContactState.AIRBORNE)
+        if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
             physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
         }
@@ -162,17 +169,17 @@ public class CharacterMovementActuator : MonoBehaviour
         //physicMaterial resetting to idle in AssignPhysicMaterial method.
         isMoveHorizontalCommandGiven = true;
 
-		if (contactSensor.GetContactState() == ContactState.FLATGROUND)
+        if (contactSensor.GetContactState() == ContactState.FLATGROUND)
         {
             MoveFlatHorizontal(Mathf.Sign(direction), landSpeedUpForce, landBreakForce, maxWalkSpeed);
         }
 
-		if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
+        if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
         {
             MoveSteepHorizontal(Mathf.Sign(direction), landSpeedUpForce, landBreakForce, maxWalkSpeed);
         }
 
-		if (contactSensor.GetContactState() == ContactState.AIRBORNE)
+        if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
             MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
         }
@@ -181,11 +188,11 @@ public class CharacterMovementActuator : MonoBehaviour
     {
         if (Mathf.Sign(direction) != Mathf.Sign(HorizontalSpeed()))
         {
-			if (contactSensor.GetContactState() == ContactState.FLATGROUND || contactSensor.GetContactState() == ContactState.STEEPSLOPE)
+            if (contactSensor.GetContactState() == ContactState.FLATGROUND || contactSensor.GetContactState() == ContactState.STEEPSLOPE)
             {
                 MoveFlatHorizontal(Mathf.Sign(direction), targettingSpeedUpForce, targettingSpeedBreakForce, maxTargettingModeSpeed);
             }
-			if (contactSensor.GetContactState() == ContactState.AIRBORNE)
+            if (contactSensor.GetContactState() == ContactState.AIRBORNE)
             {
                 MoveArialHorizontal(Mathf.Sign(direction), targettingSpeedUpForce, targettingSpeedBreakForce, maxTargettingModeSpeed);
             }
@@ -198,16 +205,16 @@ public class CharacterMovementActuator : MonoBehaviour
         //Detect ground and add upwards component to velocity if standing.
         //If terrain is too steep, walljump instead
         //Only allow jumping if standing on or adjacent to something
-		if (contactSensor.GetContactState() == ContactState.FLATGROUND)
+        if (contactSensor.GetContactState() == ContactState.FLATGROUND)
         {
             GroundJump();
         }
-		else if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
+        else if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
         {
             //TODO Jump 45 degrees, away from the slope
             //if uphill is top right
             //walljump left
-			if (contactSensor.GetUphillDirection() > 0)
+            if (contactSensor.GetUphillDirection() > 0)
             {
                 WallJump(-1);
             }
@@ -219,9 +226,9 @@ public class CharacterMovementActuator : MonoBehaviour
             }
 
         }
-		else if (contactSensor.GetContactState() == ContactState.WALLGRAB)
+        else if (contactSensor.GetContactState() == ContactState.WALLGRAB)
         {
-			float propelDirection = (contactSensor.GetSideGrabbed() == MovementDirection.LEFT) ? 1f : -1f;
+            float propelDirection = (contactSensor.GetSideGrabbed() == MovementDirection.LEFT) ? 1f : -1f;
             if (vert < 0)
             {
                 ReleaseWall(propelDirection);
@@ -283,7 +290,7 @@ public class CharacterMovementActuator : MonoBehaviour
         //Get the current speed in the desired direction
         float currentSpeedInDesiredDirection = Vector3.Dot(body.velocity, direction * body.transform.right);
         //The vector we will apply walk forces to
-		Vector3 horizontalVector = CalculatePerpendicular(contactSensor.GetGroundNormal());
+        Vector3 horizontalVector = CalculatePerpendicular(contactSensor.GetGroundNormal());
 
         //dot product of desired and current velocity will be negative if walking the wrong way
         if (Mathf.Sign(currentSpeedInDesiredDirection) < 0)
@@ -342,7 +349,7 @@ public class CharacterMovementActuator : MonoBehaviour
             body.AddForce(horizontalVector * direction * speedUpForce * Time.deltaTime);
         }
     }
-		
+
     public void JetpackCommand()
     {
         body.AddForce(body.transform.up * jetpackForce * Time.deltaTime);
@@ -380,7 +387,21 @@ public class CharacterMovementActuator : MonoBehaviour
 
     void ApplyGravity()
     {
-        body.AddForce(-this.transform.up * gravityForce * Time.deltaTime);
+        float verticalSpeed = GetVerticalSpeed();
+        if (contactSensor.GetContactState() != ContactState.WALLGRAB)
+        {
+            if (verticalSpeed > terminalArialSpeed)
+            {
+                body.AddForce(-this.transform.up * gravityForce * Time.deltaTime);
+            }
+        }
+        else
+        {
+            if (verticalSpeed > terminalWallSlideSpeed)
+            {
+                body.AddForce(-this.transform.up * gravityForce * Time.deltaTime);
+            }
+        }
     }
 
     //Use the dot product to find the scalar projection of the current velocity
