@@ -134,7 +134,7 @@ public class CharacterContactSensor : MonoBehaviour
             if (isHit)
             {
                 collisions.below = true;
-                collisions.surfaceNormal = hit.normal;
+                collisions.groundNormal = hit.normal;
                 collisions.groundSlopeAngle = Vector3.Angle(hit.normal, body.transform.up);
             }
         }
@@ -157,6 +157,7 @@ public class CharacterContactSensor : MonoBehaviour
             {
                 collisions.left = true;
                 collisions.leftSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
+                collisions.leftWallNormal = hit.normal;
                 if (collisions.leftSurfaceAngle > minWallGrabAngle)
                     integrator.ZeroLeftWallContactTimer();
             }
@@ -180,6 +181,7 @@ public class CharacterContactSensor : MonoBehaviour
             {
                 collisions.right = true;
                 collisions.rightSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
+                collisions.rightWallNormal = hit.normal;
                 if (collisions.rightSurfaceAngle > minWallGrabAngle)
                     integrator.ZeroRightWallContactTimer();
             }
@@ -189,7 +191,7 @@ public class CharacterContactSensor : MonoBehaviour
         //Return -1 for left being uphill, 1 for right being uphill
     float UphillDirection()
     {
-        float surfaceRightProjection = Vector3.Dot(collisions.surfaceNormal, body.transform.right);
+        float surfaceRightProjection = Vector3.Dot(collisions.groundNormal, body.transform.right);
         //Surface normal points in the opposite direction to uphill
         return -Mathf.Sign(surfaceRightProjection);
     }
@@ -212,7 +214,9 @@ public class CharacterContactSensor : MonoBehaviour
         public bool above, below;
         public bool left, right;
         public bool topLeft, topRight;
-        public Vector3 surfaceNormal;
+        public Vector3 groundNormal;
+        public Vector3 leftWallNormal;
+        public Vector3 rightWallNormal;
         public float groundSlopeAngle;
         public float leftSurfaceAngle;
         public float rightSurfaceAngle;
@@ -223,7 +227,9 @@ public class CharacterContactSensor : MonoBehaviour
             left = right = false;
             topLeft = topRight = false;
 
-            surfaceNormal = new Vector3(0f, 0f, 0f);
+            groundNormal = new Vector3(0f, 0f, 0f);
+            leftWallNormal = new Vector3(0f, 0f, 0f);
+            rightWallNormal = new Vector3(0f, 0f, 0f);
             groundSlopeAngle = 0f;
             leftSurfaceAngle = 0f;
             rightSurfaceAngle = 0f;
@@ -258,8 +264,6 @@ public class CharacterContactSensor : MonoBehaviour
     {
         return this.contactState;
     }
-
-
     public MovementDirection GetSideGrabbed()
     {
         return sideGrabbed;
@@ -269,7 +273,23 @@ public class CharacterContactSensor : MonoBehaviour
 		return UphillDirection ();
 	}
 
-	public Vector3 GetGroundSurfaceNormal(){
-		return collisions.surfaceNormal;
+	public Vector3 GetGroundNormal(){
+		return collisions.groundNormal;
 	}
+
+    public Vector3 GetLeftWallNormal(){
+        return collisions.leftWallNormal;
+    }
+    public Vector3 GetRightWallNormal(){
+        return collisions.rightWallNormal;
+    }
+
+    public Vector3 GetGrabbedWallNormal(){
+        if (collisions.left){
+            return collisions.leftWallNormal;
+        }
+        else{
+            return collisions.rightWallNormal;
+        }
+    }
 }

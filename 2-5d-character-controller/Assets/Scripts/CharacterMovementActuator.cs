@@ -40,7 +40,7 @@ public class CharacterMovementActuator : MonoBehaviour
     int maxDoubleJumps = 2;
 	int remainingDoubleJumps = 2;
 
-	float wallHugForce = 1f;
+	float wallHugForce = 10f;
 
     float jetpackForce = 1200f;
     float parachuteFallSpeed = 0.2f;
@@ -106,16 +106,7 @@ public class CharacterMovementActuator : MonoBehaviour
     {
         if (contactSensor.GetContactState() == ContactState.WALLGRAB)
         {
-			if (contactSensor.GetSideGrabbed() == MovementDirection.LEFT)
-            {
-                //adjacent to left wall, so apply wall hug force, and reset timer for that side
-                body.AddForce(-body.transform.right * wallHugForce * Time.deltaTime);
-            }
-            else
-            {
-                //Likewise for the right wall
-                body.AddForce(body.transform.right * wallHugForce * Time.deltaTime);
-            }
+            body.AddForce(-contactSensor.GetGrabbedWallNormal() * wallHugForce * Time.deltaTime);
         }
     }
 
@@ -292,7 +283,7 @@ public class CharacterMovementActuator : MonoBehaviour
         //Get the current speed in the desired direction
         float currentSpeedInDesiredDirection = Vector3.Dot(body.velocity, direction * body.transform.right);
         //The vector we will apply walk forces to
-		Vector3 horizontalVector = CalculatePerpendicular(contactSensor.GetGroundSurfaceNormal());
+		Vector3 horizontalVector = CalculatePerpendicular(contactSensor.GetGroundNormal());
 
         //dot product of desired and current velocity will be negative if walking the wrong way
         if (Mathf.Sign(currentSpeedInDesiredDirection) < 0)
