@@ -40,7 +40,7 @@ public class CharacterMovementActuator : MonoBehaviour
     int maxDoubleJumps = 2;
 	int remainingDoubleJumps = 2;
 
-	float wallHugForce = 10f;
+	float wallHugForce = 100f;
 
     float jetpackForce = 1200f;
     float parachuteFallSpeed = 0.2f;
