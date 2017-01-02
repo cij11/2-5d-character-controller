@@ -12,7 +12,8 @@ public class AimingController : MonoBehaviour
     Vector3 aimingVector;
     bool isAiming;
 
-    public RigidBodyController rigidBodyController;
+    public CharacterMovementActuator characterMovement;
+    public CharacterContactSensor characterContact;
     bool isWallGrabbing;
     MovementDirection wallSide;
 
@@ -30,7 +31,7 @@ public class AimingController : MonoBehaviour
         isWallGrabbing = false;
         wallSide = MovementDirection.NEUTRAL;
 
-        rigidBodyController = this.transform.parent.GetComponent<RigidBodyController>() as RigidBodyController;
+        characterContact = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
 
     }
 
@@ -44,9 +45,9 @@ public class AimingController : MonoBehaviour
 
     void CheckCharacterWallGrabbing()
     {
-        if (rigidBodyController != null)
+        if (characterContact != null)
         {
-            if (rigidBodyController.GetContactState() == ContactState.WALLGRAB)
+            if (characterContact.GetContactState() == ContactState.WALLGRAB)
             {
                 isWallGrabbing = true;
             }
@@ -57,7 +58,7 @@ public class AimingController : MonoBehaviour
         }
         if (isWallGrabbing)
         {
-            wallSide = rigidBodyController.GetSideGrabbed();
+            wallSide = characterContact.GetSideGrabbed();
         }
         else
         {

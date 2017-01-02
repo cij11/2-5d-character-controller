@@ -3,7 +3,7 @@ using System.Collections;
 
 public class PlayerInput : MonoBehaviour {
 	
-	MovementController movementController;
+	CharacterIntegrator characterIntegrator;
 	AimingController aimingController;
 	FiringController firingController;
 
@@ -18,7 +18,7 @@ public class PlayerInput : MonoBehaviour {
 	//Look for the 
 	void RegisterControllers(){
 		GameObject actionControllers = this.transform.parent.FindChild("ActionControllers").gameObject;
-		movementController = actionControllers.GetComponent<MovementController>();
+		characterIntegrator = this.transform.parent.GetComponent<CharacterIntegrator>();
 		aimingController = actionControllers.GetComponent<AimingController>();
 		firingController = actionControllers.GetComponent<FiringController>();
 	}
@@ -32,25 +32,25 @@ public class PlayerInput : MonoBehaviour {
 
 	void Movement(){
 		if(Input.GetAxis("Horizontal") < 0){
-			movementController.MoveHorizontal(-1);
+			characterIntegrator.MoveHorizontal(-1);
 		}
 		if(Input.GetAxis("Horizontal") > 0){
-			movementController.MoveHorizontal(1);
+			characterIntegrator.MoveHorizontal(1);
 		}
 		if(Input.GetAxis("Vertical") < 0){
-			movementController.MoveVertical(-1);
+			characterIntegrator.MoveVertical(-1);
 		}
 		if(Input.GetAxis("Vertical") > 0){
-			movementController.MoveVertical(1);
+			characterIntegrator.MoveVertical(1);
 		}
 		if(Input.GetButtonDown("Jump")){
-			movementController.Jump(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+			characterIntegrator.Jump(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 		}
 		if(Input.GetButtonDown("Fire1")){
-			movementController.StartTargetting();
+			characterIntegrator.StartTargetting();
 		}
 		if(Input.GetButtonUp("Fire1")){
-			movementController.StopTargetting();
+			characterIntegrator.StopTargetting();
 		}
 	}
 

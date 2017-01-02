@@ -3,7 +3,8 @@ using System.Collections;
 
 public class SpriteStateController : MonoBehaviour
 {
-    public RigidBodyController bodyController;
+    CharacterMovementActuator characterMovement;
+    CharacterContactSensor characterContacts;
     Animator animator;
     SpriteRenderer spriteRenderer;
 
@@ -22,24 +23,27 @@ public class SpriteStateController : MonoBehaviour
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        characterMovement = this.transform.parent.GetComponent<CharacterMovementActuator>() as CharacterMovementActuator;
+        characterContacts = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
+
     }
 
     // Update is called once per frame
     void Update()
     {
         //Only care about absolute speed for distinguishing between idle and running
-        animator.SetFloat("AbsoluteHorizontalSpeed", Mathf.Abs(bodyController.GetHorizontalSpeed()));
+        animator.SetFloat("AbsoluteHorizontalSpeed", Mathf.Abs(characterMovement.GetHorizontalSpeed()));
 
         //Care about sign for vertical speed to distinguish rising and falling.
-        animator.SetFloat("VerticalSpeed", bodyController.GetVerticalSpeed());
+        animator.SetFloat("VerticalSpeed", characterMovement.GetVerticalSpeed());
 
         //Care about sign for horizontal speed for flipping sprite
-        if (bodyController.GetHorizontalSpeed() < -changeDirectionCutoff)
+        if (characterMovement.GetHorizontalSpeed() < -changeDirectionCutoff)
         {
             xFlip = true;
         }
         //Care about sign for horizontal speed for flipping sprite
-        if (bodyController.GetHorizontalSpeed() > changeDirectionCutoff)
+        if (characterMovement.GetHorizontalSpeed() > changeDirectionCutoff)
         {
             xFlip = false;
         }
@@ -54,19 +58,19 @@ public class SpriteStateController : MonoBehaviour
         //1 airborn
         //2 wall grab
         //3 ledge grab
-        if (bodyController.GetContactState() == ContactState.FLATGROUND)
+        if (characterContacts.GetContactState() == ContactState.FLATGROUND)
         {
             currentAnimationState = 0;
         }
-        if (bodyController.GetContactState() == ContactState.STEEPSLOPE)
+        if (characterContacts.GetContactState() == ContactState.STEEPSLOPE)
         {
             currentAnimationState = 0;
         }
-        if (bodyController.GetContactState() == ContactState.AIRBORNE)
+        if (characterContacts.GetContactState() == ContactState.AIRBORNE)
         {
             currentAnimationState = 1;
         }
-        if (bodyController.GetContactState() == ContactState.WALLGRAB)
+        if (characterContacts.GetContactState() == ContactState.WALLGRAB)
         {
             currentAnimationState = 2;
         }
@@ -74,7 +78,7 @@ public class SpriteStateController : MonoBehaviour
         if (currentAnimationState == 2)
         {
             //If grabbing a side, flip sprite appropriately
-            if (bodyController.GetSideGrabbed() == MovementDirection.LEFT)
+            if (characterContacts.GetSideGrabbed() == MovementDirection.LEFT)
             {
                 spriteRenderer.flipX = true;
                 xFlip = true;
