@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MeleeProjectile : Projectile {
 	
-	float reachRange = 2f;
+	float reachRange = 1.5f;
 	// Update is called once per frame
 	void Update () {
 		IncreaseAge();

@@ -41,6 +41,7 @@ public class AimingController : MonoBehaviour
         CheckCharacterWallGrabbing();
         MatchAimingToControlsIfFireAndDirectionHeld();
         aimingVector = new Vector3(horizontalStored, verticalStored, 0f);
+        aimingVector.Normalize();
     }
 
     void CheckCharacterWallGrabbing()
