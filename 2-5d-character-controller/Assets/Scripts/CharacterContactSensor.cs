@@ -17,8 +17,8 @@ public class CharacterContactSensor : MonoBehaviour
     float skinWidth = 0.01f;
     float detectionRayLengthGround = 0.3f;
     float detectionRayLengthSides = 0.1f;
-    int verticalRayCount = 8;
-    int horizontalRayCount = 3;
+    int verticalRayCount = 4;
+    int horizontalRayCount = 2;
     float verticalRaySpacing;
     float horizontalRaySpacing;
     public LayerMask collisionMask;
