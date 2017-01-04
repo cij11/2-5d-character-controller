@@ -8,7 +8,7 @@ public class SpriteStateController : MonoBehaviour
     Animator animator;
     SpriteRenderer spriteRenderer;
 
-    float changeDirectionCutoff = 0.001f;
+    float changeDirectionCutoff = 1f;
     bool xFlip = false;
 
     //Set unity StateChange attribute to true if stqte changes, otherwise false.

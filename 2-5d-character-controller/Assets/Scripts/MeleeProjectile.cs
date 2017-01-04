@@ -23,4 +23,11 @@ public class MeleeProjectile : Projectile {
 		Vector3 weaponToProjectile = this.transform.position - firingWeapon.transform.position;
 		this.transform.rotation = Quaternion.FromToRotation(this.transform.right, weaponToProjectile) * transform.rotation;
 	}
+
+	void OnTriggerEnter(Collider other) {
+		CharacterHealth characterHealth = other.GetComponent<CharacterHealth>() as CharacterHealth;
+		if (characterHealth != null){
+			characterHealth.TakeDamage(40);
+		}
+    }
 }
