@@ -12,7 +12,6 @@ public class AimingController : MonoBehaviour
     Vector3 aimingVector;
     bool isAiming;
 
-    public CharacterMovementActuator characterMovement;
     public CharacterContactSensor characterContact;
     bool isWallGrabbing;
     MovementDirection wallSide;
@@ -127,6 +126,11 @@ public class AimingController : MonoBehaviour
     {
         return aimingVector;
     }
+
+    public Vector3 GetAimingVectorWorldSpace(){
+        return characterContact.gameObject.transform.rotation * aimingVector;
+    }
+
     public bool GetIsAiming()
     {
         return isAiming;

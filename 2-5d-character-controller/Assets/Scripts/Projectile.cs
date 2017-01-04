@@ -7,6 +7,9 @@ public abstract class Projectile : MonoBehaviour {
 	protected Character firingCharacter;
 	protected Vector3 launchVector;
 	protected float maxLifespan = 1f;
+
+	protected int damage = 40;
+	protected float knockbackSpeed = 30f;
 	float age;
 
 	// Use this for initialization
@@ -29,7 +32,15 @@ public abstract class Projectile : MonoBehaviour {
 		}
 	}
 
-	void DestroyProjectile(){
+	protected void DestroyProjectile(){
 		Destroy(this.gameObject);
+	}
+
+	protected void ApplyKnockback(CharacterCorpus knockedBackCorpus){
+		knockedBackCorpus.TakeKnockback(launchVector, knockbackSpeed);
+	}
+
+	protected void ApplyDamage(CharacterCorpus damagedCharacter){
+		damagedCharacter.TakeDamage(damage);
 	}
 }

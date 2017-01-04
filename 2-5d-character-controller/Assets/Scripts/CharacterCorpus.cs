@@ -1,14 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CharacterHealth : MonoBehaviour {
+public class CharacterCorpus : MonoBehaviour {
 
 	int startingHealth = 100;
 	int health;
 
-	// Use this for initialization
+	Rigidbody body;
+
 	void Start () {
 		health = startingHealth;
+		body = GetComponent<Rigidbody>() as Rigidbody;
 	}
 
 	public void TakeDamage(int damage){
@@ -16,5 +18,9 @@ public class CharacterHealth : MonoBehaviour {
 		if (health <= 0){
 			Destroy(this.gameObject);
 		}
+	}
+
+	public void TakeKnockback(Vector3 knockbackVector, float knockbackSpeed){
+		body.velocity = knockbackVector * knockbackSpeed;
 	}
 }

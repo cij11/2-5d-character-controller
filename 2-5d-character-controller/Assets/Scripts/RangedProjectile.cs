@@ -30,9 +30,9 @@ public class RangedProjectile : Projectile {
 	}
 
 	void OnTriggerEnter(Collider other) {
-		CharacterHealth characterHealth = other.GetComponent<CharacterHealth>() as CharacterHealth;
-		if (characterHealth != null){
-			characterHealth.TakeDamage(40);
+		CharacterCorpus corpus = other.GetComponent<CharacterCorpus>() as CharacterCorpus;
+		if (corpus != null){
+			corpus.TakeDamage(40);
 		}
 
 		Destroy(this.gameObject);

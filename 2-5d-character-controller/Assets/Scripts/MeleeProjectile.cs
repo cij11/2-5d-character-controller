@@ -25,11 +25,12 @@ public class MeleeProjectile : Projectile {
 	}
 
 	void OnTriggerEnter(Collider other) {
-		CharacterHealth characterHealth = other.GetComponent<CharacterHealth>() as CharacterHealth;
-		if (characterHealth != null){
+		CharacterCorpus corpus = other.GetComponent<CharacterCorpus>() as CharacterCorpus;
+		if (corpus != null){
 			Character otherCharacter = other.gameObject.GetComponent<Character>() as Character;
 			if(!otherCharacter.Equals(firingCharacter)){
-				characterHealth.TakeDamage(40);
+				corpus.TakeDamage(damage);
+				corpus.TakeKnockback(launchVector, knockbackSpeed);
 			}
 		}
     }
