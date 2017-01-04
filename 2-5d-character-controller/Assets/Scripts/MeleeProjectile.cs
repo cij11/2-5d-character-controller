@@ -15,7 +15,7 @@ public class MeleeProjectile : Projectile {
 
 	void LaunchMelee(){
 		this.transform.SetParent(firingWeapon.transform);
-		this.transform.localPosition = launchVector * reachRange;
+		this.transform.position = this.transform.parent.position +  worldLaunchVector * reachRange;
 		AlignToLauncher();
 	}
 
@@ -30,7 +30,7 @@ public class MeleeProjectile : Projectile {
 			Character otherCharacter = other.gameObject.GetComponent<Character>() as Character;
 			if(!otherCharacter.Equals(firingCharacter)){
 				corpus.TakeDamage(damage);
-				corpus.TakeKnockback(launchVector, knockbackSpeed);
+				corpus.TakeKnockback(worldLaunchVector, knockbackSpeed);
 			}
 		}
     }

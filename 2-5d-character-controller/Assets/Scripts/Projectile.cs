@@ -5,7 +5,8 @@ public abstract class Projectile : MonoBehaviour {
 
 	protected Weapon firingWeapon;
 	protected Character firingCharacter;
-	protected Vector3 launchVector;
+	protected Vector3 worldLaunchVector;
+
 	protected float maxLifespan = 1f;
 
 	protected int damage = 40;
@@ -17,10 +18,10 @@ public abstract class Projectile : MonoBehaviour {
 		age = 0f;
 	}
 
-	public void LoadLaunchParameters(Weapon firingWeapon, Character firingCharacter, Vector3 launchedAt){
+	public void LoadLaunchParameters(Weapon firingWeapon, Character firingCharacter, Vector3 worldLaunch){
 		this.firingWeapon = firingWeapon;
 		this.firingCharacter = firingCharacter;
-		launchVector = launchedAt;
+		worldLaunchVector = worldLaunch;
 	}
 
 	public abstract void Launch();
@@ -37,7 +38,7 @@ public abstract class Projectile : MonoBehaviour {
 	}
 
 	protected void ApplyKnockback(CharacterCorpus knockedBackCorpus){
-		knockedBackCorpus.TakeKnockback(launchVector, knockbackSpeed);
+		knockedBackCorpus.TakeKnockback(worldLaunchVector, knockbackSpeed);
 	}
 
 	protected void ApplyDamage(CharacterCorpus damagedCharacter){
