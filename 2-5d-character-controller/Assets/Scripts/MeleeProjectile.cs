@@ -3,7 +3,7 @@ using System.Collections;
 
 public class MeleeProjectile : Projectile {
 	
-	float reachRange = 1.5f;
+	float reachRange = 0.7f;
 	// Update is called once per frame
 	void Update () {
 		IncreaseAge();
@@ -27,7 +27,10 @@ public class MeleeProjectile : Projectile {
 	void OnTriggerEnter(Collider other) {
 		CharacterHealth characterHealth = other.GetComponent<CharacterHealth>() as CharacterHealth;
 		if (characterHealth != null){
-			characterHealth.TakeDamage(40);
+			Character otherCharacter = other.gameObject.GetComponent<Character>() as Character;
+			if(!otherCharacter.Equals(firingCharacter)){
+				characterHealth.TakeDamage(40);
+			}
 		}
     }
 }

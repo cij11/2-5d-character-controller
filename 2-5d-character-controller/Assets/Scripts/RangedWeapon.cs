@@ -14,7 +14,7 @@ public class RangedWeapon : Weapon {
 	public override void Fire(){
 		Vector3 aimingVector = aimingController.GetAimingVector();
 		GameObject newProjectile = (GameObject)Instantiate(launchableGO, this.transform.position + aimingVector, Quaternion.identity);
-		newProjectile.GetComponent<RangedProjectile>().LoadLaunchParameters(this.gameObject, aimingVector);
+		newProjectile.GetComponent<RangedProjectile>().LoadLaunchParameters(this, this.character, aimingVector);
 		newProjectile.GetComponent<RangedProjectile>().Launch();
 	}
 }
