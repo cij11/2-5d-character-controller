@@ -26,6 +26,9 @@ public abstract class Weapon : MonoBehaviour {
 	}
 
 	protected abstract void LoadWeaponParameters();
+	protected void SetCooldown(float newCooldown){
+		cooldownPeriod = newCooldown;
+	}
 	
 	//FireCommand only does anything if the weapon is not already winding up, firing, or on cooldown.
 	//The weapon does not fire immediately. The FireCommand just starts the firing cycle.

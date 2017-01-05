@@ -7,7 +7,7 @@ public class RangedWeapon : Weapon {
 
 	// Use this for initialization
 	protected override void LoadWeaponParameters(){
-		cooldownPeriod = 0.0f;
+		SetCooldown(0.0f);
 	}
 	protected override void Fire(){
 		Vector3 worldAimingVector = aimingController.GetAimingVectorWorldSpace();
