@@ -21,6 +21,8 @@ public class CharacterContactSensor : MonoBehaviour
     int horizontalRayCount = 2;
     float verticalRaySpacing;
     float horizontalRaySpacing;
+    public int updatePeriod = 1;
+    int updateTimer;
     public LayerMask collisionMask;
     //Standing on a slope above this is steep - character will not rest on the slope, and will jump away
     float steepSlopeAngle = 60f;
@@ -34,6 +36,7 @@ public class CharacterContactSensor : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        updateTimer = Random.Range(0, updatePeriod);
         body = GetComponent<Rigidbody>();
         physCollider = GetComponent<Collider>();
         integrator = GetComponent<CharacterIntegrator>();
@@ -42,10 +45,17 @@ public class CharacterContactSensor : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        DetermineContactState();
+        updateTimer++;
+        if(updateTimer == updatePeriod){
+            updateTimer = 0;
+            DoFixedUpdate();
+        }
+    }
 
+    void DoFixedUpdate(){
+        DetermineContactState();
         collisions.Reset();
         Raycasts();
     }
