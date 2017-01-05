@@ -4,20 +4,10 @@ using System.Collections;
 //Firing controller passes on button up commands, to avoid polling and lag on state changes.
 public class FiringController : MonoBehaviour {
 
-	Wieldable activeWieldable;
+	Weapon activeWeapon;
 
-	// Use this for initialization
-	void Start () {
-
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
-	public void RegisterWieldable(Wieldable wieldable){
-		activeWieldable = wieldable;
+	public void RegisterWeapon(Weapon Weapon){
+		activeWeapon = Weapon;
 	}
 
 	public void InitiateFire(){
@@ -29,8 +19,8 @@ public class FiringController : MonoBehaviour {
 	}
 
 	public void ReleaseFire(){
-		if(activeWieldable != null){
-			activeWieldable.Fire();
+		if(activeWeapon != null){
+			activeWeapon.FireCommand();
 		}
 	}
 }
