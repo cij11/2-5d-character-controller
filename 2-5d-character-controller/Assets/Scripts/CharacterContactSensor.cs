@@ -48,13 +48,15 @@ public class CharacterContactSensor : MonoBehaviour
     void FixedUpdate()
     {
         updateTimer++;
-        if(updateTimer == updatePeriod){
+        if (updateTimer == updatePeriod)
+        {
             updateTimer = 0;
             DoFixedUpdate();
         }
     }
 
-    void DoFixedUpdate(){
+    void DoFixedUpdate()
+    {
         DetermineContactState();
         collisions.Reset();
         Raycasts();
@@ -72,7 +74,6 @@ public class CharacterContactSensor : MonoBehaviour
         //If there is a collision below, the character is either FLATGROUND, a steep slope, or a slanted wall
         else if (collisions.below)
         {
-            integrator.ZeroGroundContactTimer();
             if (collisions.groundSlopeAngle < steepSlopeAngle)
             {
                 contactState = ContactState.FLATGROUND;
@@ -168,8 +169,6 @@ public class CharacterContactSensor : MonoBehaviour
                 collisions.left = true;
                 collisions.leftSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
                 collisions.leftWallNormal = hit.normal;
-                if (collisions.leftSurfaceAngle > minWallGrabAngle)
-                    integrator.ZeroLeftWallContactTimer();
             }
         }
     }
@@ -192,13 +191,11 @@ public class CharacterContactSensor : MonoBehaviour
                 collisions.right = true;
                 collisions.rightSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
                 collisions.rightWallNormal = hit.normal;
-                if (collisions.rightSurfaceAngle > minWallGrabAngle)
-                    integrator.ZeroRightWallContactTimer();
             }
         }
     }
 
-        //Return -1 for left being uphill, 1 for right being uphill
+    //Return -1 for left being uphill, 1 for right being uphill
     float UphillDirection()
     {
         float surfaceRightProjection = Vector3.Dot(collisions.groundNormal, body.transform.right);
@@ -230,7 +227,7 @@ public class CharacterContactSensor : MonoBehaviour
         public float groundSlopeAngle;
         public float leftSurfaceAngle;
         public float rightSurfaceAngle;
-	
+
         public void Reset()
         {
             above = below = false;
@@ -279,27 +276,42 @@ public class CharacterContactSensor : MonoBehaviour
         return sideGrabbed;
     }
 
-	public float GetUphillDirection(){
-		return UphillDirection ();
-	}
+    public float GetUphillDirection()
+    {
+        return UphillDirection();
+    }
 
-	public Vector3 GetGroundNormal(){
-		return collisions.groundNormal;
-	}
+    public Vector3 GetGroundNormal()
+    {
+        return collisions.groundNormal;
+    }
 
-    public Vector3 GetLeftWallNormal(){
+    public Vector3 GetLeftWallNormal()
+    {
         return collisions.leftWallNormal;
     }
-    public Vector3 GetRightWallNormal(){
+    public Vector3 GetRightWallNormal()
+    {
         return collisions.rightWallNormal;
     }
 
-    public Vector3 GetGrabbedWallNormal(){
-        if (collisions.left){
+    public Vector3 GetGrabbedWallNormal()
+    {
+        if (collisions.left)
+        {
             return collisions.leftWallNormal;
         }
-        else{
+        else
+        {
             return collisions.rightWallNormal;
         }
+    }
+
+    public bool GetIsInContactWithTerrain()
+    {
+        if (contactState == ContactState.FLATGROUND) return true;
+        if (contactState == ContactState.STEEPSLOPE) return true;
+        if (contactState == ContactState.WALLGRAB) return true;
+        return false;
     }
 }

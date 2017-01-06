@@ -4,46 +4,136 @@ using System.Collections;
 public class CharacterIntegrator : MonoBehaviour
 {
 
-    public CharacterMovementActuator characterMovementActuator;
+    CharacterMovementActuator movementActuator;
+    CharacterContactSensor contactSensor;
     bool isTargetting;
 
-    StateInfo stateInfo;
+    float jumpAfterFallingGracePeriod = 0.1f;
+    float fallingTimer = 0f;
+    int maxDoubleJumps = 1;
+    int remainingDoubleJumps = 0;
+
     // Use this for initialization
     void Start()
     {
-        stateInfo = new StateInfo();
+        movementActuator = GetComponent<CharacterMovementActuator>() as CharacterMovementActuator;
+        contactSensor = GetComponent<CharacterContactSensor>() as CharacterContactSensor;
     }
 
     // Update is called once per frame
     void Update()
     {
+        UpdateArialJumpingTrackers();
         if (isTargetting)
         {
-			characterMovementActuator.ParachuteCommand();
+            movementActuator.ParachuteCommand();
         }
+    }
+
+    void UpdateArialJumpingTrackers()
+    {
+        if (contactSensor.GetIsInContactWithTerrain())
+        {
+            fallingTimer = jumpAfterFallingGracePeriod;
+            remainingDoubleJumps = maxDoubleJumps;
+        }
+        if (fallingTimer > 0) fallingTimer -= Time.deltaTime;
     }
 
     public void MoveHorizontal(float direction)
     {
         if (!isTargetting)
-			characterMovementActuator.MoveHorizontalCommand(direction);
+            movementActuator.MoveHorizontalCommand(direction);
         else
-			characterMovementActuator.FaceDirectionCommand(direction);
+            movementActuator.FaceDirectionCommand(direction);
     }
     public void MoveVertical(float direction)
     {
 
     }
-    
+
     public void Grab()
     {
 
     }
 
+    //Determine what type of jump is appropriate when jump pressed, and apply
     public void Jump(float hor, float vert)
     {
-		characterMovementActuator.JumpCommand(hor, vert);
+        //Detect ground and add upwards component to velocity if standing.
+        //If terrain is too steep, walljump instead
+        //Only allow jumping if standing on or adjacent to something
+        if (contactSensor.GetContactState() == ContactState.FLATGROUND)
+        {
+            movementActuator.GroundJump();
+        }
+        else if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
+        {
+            JumpAwayFromSlope();
+        }
+        else if (contactSensor.GetContactState() == ContactState.WALLGRAB)
+        {
+            WallJumpUpDownOrAway(hor, vert);
+        }
+        else if (contactSensor.GetContactState() == ContactState.AIRBORNE)
+        {
+            AttemptAirborneJump();
+        }
+        //If jump has been pressed, count as leaving the ground to prevent
+        //being able to immediately take a second jump in the air is if grounded.
+        ZeroFallingGraceTimer();
     }
+
+    private void JumpAwayFromSlope()
+    {
+        //if uphill is top right
+        //walljump left
+        if (contactSensor.GetUphillDirection() > 0)
+        {
+            movementActuator.WallJump(-1);
+        }
+        else //walljump right
+        {
+            movementActuator.WallJump(1);
+        }
+    }
+
+    private void WallJumpUpDownOrAway(float hor, float vert)
+    {
+        float propelDirection = (contactSensor.GetSideGrabbed() == MovementDirection.LEFT) ? 1f : -1f;
+        if (vert < 0)
+        {
+            movementActuator.ReleaseWall(propelDirection);
+            //If pressing up and NOT pressing horizontally away from the wall
+        }
+        else if (vert > 0 && (hor == 0 || Mathf.Sign(hor) != Mathf.Sign(propelDirection)))
+        {
+            movementActuator.WallJumpUp(propelDirection);
+        }
+        else
+        {
+            movementActuator.WallJump(propelDirection);
+        }
+    }
+
+    private void AttemptAirborneJump()
+    {
+        //Have some leeway on attempting a jump after having already fallen
+        if (fallingTimer > 0)
+        {
+            movementActuator.GroundJump();
+        }
+        else if (remainingDoubleJumps > 0)
+        {
+            remainingDoubleJumps--;
+            movementActuator.DoubleJump();
+        }
+    }
+
+    private void ZeroFallingGraceTimer(){
+        fallingTimer = -1f;
+    }
+
     public void StartTargetting()
     {
         isTargetting = true;
@@ -52,41 +142,4 @@ public class CharacterIntegrator : MonoBehaviour
     {
         isTargetting = false;
     }
-
-        public struct StateInfo
-    {
-        public float leftWallContactTimer;
-        public float rightWallContactTimer;
-        public float groundContactTimer;
-        public int remainingDoubleJumps;
-
-        public void Update()
-        {
-            leftWallContactTimer += Time.deltaTime;
-            if (leftWallContactTimer > 10f)
-            {
-                leftWallContactTimer = 10f;
-            }
-            rightWallContactTimer += Time.deltaTime;
-            if (rightWallContactTimer > 10f)
-            {
-                rightWallContactTimer = 10f;
-            }
-            groundContactTimer += Time.deltaTime;
-            if(groundContactTimer > 10f){
-                groundContactTimer = 10f;
-            }
-        }
-    }
-
-    public void ZeroRightWallContactTimer(){
-        stateInfo.rightWallContactTimer = 0f;
-    }
-    public void ZeroLeftWallContactTimer(){
-        stateInfo.rightWallContactTimer = 0f;
-    }
-    public void ZeroGroundContactTimer(){
-        stateInfo.groundContactTimer = 0f;
-    }
-
 }

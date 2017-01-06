@@ -199,56 +199,9 @@ public class CharacterMovementActuator : MonoBehaviour
         }
     }
 
-    //Determine what type of jump is appropriate when jump pressed, and apply
-    public void JumpCommand(float hor, float vert)
-    {
-        //Detect ground and add upwards component to velocity if standing.
-        //If terrain is too steep, walljump instead
-        //Only allow jumping if standing on or adjacent to something
-        if (contactSensor.GetContactState() == ContactState.FLATGROUND)
-        {
-            GroundJump();
-        }
-        else if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
-        {
-            //TODO Jump 45 degrees, away from the slope
-            //if uphill is top right
-            //walljump left
-            if (contactSensor.GetUphillDirection() > 0)
-            {
-                WallJump(-1);
-            }
-            else
-            {
-                //else if uphill is top left
-                //walljump right
-                WallJump(1);
-            }
-
-        }
-        else if (contactSensor.GetContactState() == ContactState.WALLGRAB)
-        {
-            float propelDirection = (contactSensor.GetSideGrabbed() == MovementDirection.LEFT) ? 1f : -1f;
-            if (vert < 0)
-            {
-                ReleaseWall(propelDirection);
-                //If pressing up and NOT pressing horizontally away from the wall
-            }
-            else if (vert > 0 && (hor == 0 || Mathf.Sign(hor) != Mathf.Sign(propelDirection)))
-            {
-                WallJumpUp(propelDirection);
-            }
-            else
-            {
-                WallJump(propelDirection);
-            }
-        }
-    }
-
-
     //If the current vertical speed is < the jump velocity, cancel any existing
     //vertical speed and set to jump velocity
-    void GroundJump()
+    public void GroundJump()
     {
         //Projection of our velocity directed up (if +ve,) or down (if -ve)
         float verticalSpeed = Vector3.Dot(body.velocity, body.transform.up);
@@ -262,23 +215,23 @@ public class CharacterMovementActuator : MonoBehaviour
         }
     }
 
-    void ReleaseWall(float direction)
+    public void ReleaseWall(float direction)
     {
         body.velocity = body.transform.right * direction * releaseSpeed;
     }
-    void WallJump(float direction)
+    public void WallJump(float direction)
     {
         //Cancel all existing velocity, and set equal to a 45 degree jump in the given direction
         body.velocity = body.transform.up * jumpSpeed + body.transform.right * direction * jumpSpeed;
     }
 
     //If on a ledge, jump up, and slightly away from the wall.
-    void WallJumpUp(float direction)
+    public void WallJumpUp(float direction)
     {
         body.velocity = body.transform.up * jumpSpeed + body.transform.right * direction * wallJumpClearanceSpeed;
     }
 
-    void DoubleJump()
+    public void DoubleJump()
     {
         //Same as ground jump for now. Later, give option to change direction on double jump
         GroundJump();
