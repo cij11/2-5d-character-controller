@@ -33,6 +33,9 @@ public class CharacterContactSensor : MonoBehaviour
 
     CharacterIntegrator integrator;
 
+    float cliffLookSidewaysDistance = 1f;
+    float cliffLookDownDistance = 1f;
+
     // Use this for initialization
     void Start()
     {
@@ -125,6 +128,7 @@ public class CharacterContactSensor : MonoBehaviour
         RaycastDown();
         RaycastLeft();
         RaycastRight();
+        RaycastCliffs();
     }
 
 
@@ -195,6 +199,23 @@ public class CharacterContactSensor : MonoBehaviour
         }
     }
 
+    void RaycastCliffs(){
+        Color debugRayColor = Color.red;
+        //Check for cliff on left
+        Vector3 rayOrigin = raycastOrigins.bottomLeft - body.transform.right * cliffLookSidewaysDistance + body.transform.up * 0.5f;
+        RaycastHit hit;
+        //There is a cliff to the left if there is NOT ground to the left
+        collisions.leftCliff = !Physics.Raycast(rayOrigin, -body.transform.up, out hit, cliffLookDownDistance, collisionMask);
+        debugRayColor = collisions.leftCliff ? Color.yellow : Color.red;
+        Debug.DrawRay(rayOrigin, -body.transform.up * cliffLookDownDistance, debugRayColor);
+
+        //Check for cliff on right
+        rayOrigin = raycastOrigins.bottomRight + body.transform.right * cliffLookSidewaysDistance  + body.transform.up * 0.5f;
+        collisions.rightCliff = !Physics.Raycast(rayOrigin, -body.transform.up, out hit, cliffLookDownDistance, collisionMask);
+        debugRayColor = collisions.rightCliff ? Color.yellow : Color.red;
+        Debug.DrawRay(rayOrigin, -body.transform.up * cliffLookDownDistance, debugRayColor);
+    }
+
     //Return -1 for left being uphill, 1 for right being uphill
     float UphillDirection()
     {
@@ -220,7 +241,7 @@ public class CharacterContactSensor : MonoBehaviour
     {
         public bool above, below;
         public bool left, right;
-        public bool topLeft, topRight;
+        public bool leftCliff, rightCliff;
         public Vector3 groundNormal;
         public Vector3 leftWallNormal;
         public Vector3 rightWallNormal;
@@ -232,7 +253,7 @@ public class CharacterContactSensor : MonoBehaviour
         {
             above = below = false;
             left = right = false;
-            topLeft = topRight = false;
+            leftCliff = rightCliff = false;
 
             groundNormal = new Vector3(0f, 0f, 0f);
             leftWallNormal = new Vector3(0f, 0f, 0f);
@@ -313,5 +334,25 @@ public class CharacterContactSensor : MonoBehaviour
         if (contactState == ContactState.STEEPSLOPE) return true;
         if (contactState == ContactState.WALLGRAB) return true;
         return false;
+    }
+
+    public bool GetLeftCliff(){
+        return collisions.leftCliff;
+    }
+
+    public bool GetRightCliff(){
+        return collisions.rightCliff;
+    }
+    public bool GetAnyCliff(){
+        return collisions.leftCliff || collisions.rightCliff;
+    }
+
+    public float GetCliffDirection(){
+        if (collisions.leftCliff){
+            return -1f;
+        }
+        else{
+            return 1f;
+        }
     }
 }

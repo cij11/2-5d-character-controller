@@ -57,6 +57,9 @@ public class CharacterIntegrator : MonoBehaviour
         if (!isTargetting)
             movementActuator.MoveHorizontalCommand(direction);
     }
+    public void SetWalkingSpeed(float newSpeed){
+        movementActuator.SetWalkingSpeed(newSpeed);
+    }
     public void MoveVertical(float direction)
     {
 

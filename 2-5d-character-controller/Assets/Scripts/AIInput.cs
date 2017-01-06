@@ -7,8 +7,10 @@ public class AIInput : MonoBehaviour
     CharacterIntegrator characterIntegrator;
     AimingController aimingController;
     FiringController firingController;
+    CharacterContactSensor contactSensor;
 
     float epsilon = 0.001f;
+    float desiredMovementDirection = -1f;
 
 
     // Use this for initialization
@@ -17,31 +19,44 @@ public class AIInput : MonoBehaviour
         RegisterControllers();
     }
 
-    //Look for the 
     void RegisterControllers()
     {
         GameObject actionControllers = this.transform.parent.FindChild("ActionControllers").gameObject;
         characterIntegrator = this.transform.parent.GetComponent<CharacterIntegrator>();
         aimingController = actionControllers.GetComponent<AimingController>();
         firingController = actionControllers.GetComponent<FiringController>();
+        contactSensor = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
     }
 
     // Update is called once per frame
     void Update()
     {
+        characterIntegrator.SetWalkingSpeed(4f); //This might be better as a public, or a loaded by the character integrator, or saved in a 'Specs' file that movement has access to.
+        ChangeDirectionIfFindCliff();
         Movement();
         Aiming();
         Firing();
     }
 
+    void ChangeDirectionIfFindCliff(){
+        if (contactSensor.GetContactState() == ContactState.FLATGROUND){
+            if(contactSensor.GetLeftCliff()){
+                desiredMovementDirection = 1f;
+            }
+            else if (contactSensor.GetRightCliff()){
+                desiredMovementDirection = -1f;
+            }
+        }
+    }
+
     void Movement()
     {
-        characterIntegrator.MoveHorizontal(-1);
+        characterIntegrator.MoveHorizontal(desiredMovementDirection);
     }
 
     void Aiming()
     {
-        aimingController.SetHorizontalInput(-1f);
+        aimingController.SetHorizontalInput(desiredMovementDirection);
     }
 
     void Firing()

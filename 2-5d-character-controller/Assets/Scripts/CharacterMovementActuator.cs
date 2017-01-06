@@ -353,4 +353,8 @@ public class CharacterMovementActuator : MonoBehaviour
     {
         return HorizontalSpeed();
     }
+
+    public void SetWalkingSpeed(float newSpeed){
+        maxWalkSpeed = newSpeed;
+    }
 }
