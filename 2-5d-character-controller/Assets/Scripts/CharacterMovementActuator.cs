@@ -10,9 +10,6 @@ public class CharacterMovementActuator : MonoBehaviour
     CharacterContactSensor contactSensor;
     CharacterIntegrator integrator;
 
-    float width = 0.6f;
-    float height = 0.9f;
-
     //Speed the character walks at when left or right held
     float maxWalkSpeed = 12;
     //Time to attain walk velocity from stationary.
@@ -23,23 +20,12 @@ public class CharacterMovementActuator : MonoBehaviour
     float airSpeedUpForce = 600f;
     float airBreakForce = 1500f;
 
-    float maxTargettingModeSpeed = 0.01f;
-    float targettingSpeedUpForce = 100f;
-    float targettingSpeedBreakForce = 100;
-
     float gravityForce = 900f;
 
     float jumpSpeed = 10f;
     float wallJumpClearanceSpeed = 3f;
     bool isSlideCommandGiven = false;
     float releaseSpeed = 2f;
-
-    float wallSlideCounterForce = 20f;
-
-    //Time in seconds that a wall jump can still occur after releasing the wall
-    float wallJumpTimeWindow = 0.1f;
-    int maxDoubleJumps = 2;
-    int remainingDoubleJumps = 2;
 
     float wallHugForce = 200f;
 
@@ -182,20 +168,6 @@ public class CharacterMovementActuator : MonoBehaviour
         if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
             MoveArialHorizontal(Mathf.Sign(direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
-        }
-    }
-    public void FaceDirectionCommand(float direction)
-    {
-        if (Mathf.Sign(direction) != Mathf.Sign(HorizontalSpeed()))
-        {
-            if (contactSensor.GetContactState() == ContactState.FLATGROUND || contactSensor.GetContactState() == ContactState.STEEPSLOPE)
-            {
-                MoveFlatHorizontal(Mathf.Sign(direction), targettingSpeedUpForce, targettingSpeedBreakForce, maxTargettingModeSpeed);
-            }
-            if (contactSensor.GetContactState() == ContactState.AIRBORNE)
-            {
-                MoveArialHorizontal(Mathf.Sign(direction), targettingSpeedUpForce, targettingSpeedBreakForce, maxTargettingModeSpeed);
-            }
         }
     }
 
@@ -383,5 +355,4 @@ public class CharacterMovementActuator : MonoBehaviour
     {
         return HorizontalSpeed();
     }
-
 }

@@ -44,8 +44,6 @@ public class CharacterIntegrator : MonoBehaviour
     {
         if (!isTargetting)
             movementActuator.MoveHorizontalCommand(direction);
-        else
-            movementActuator.FaceDirectionCommand(direction);
     }
     public void MoveVertical(float direction)
     {
