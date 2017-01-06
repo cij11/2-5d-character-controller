@@ -33,22 +33,33 @@ public class SpriteStateController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SetAnimatorSpeeds();
+        SetSpriteFlip();
+        SetAnimatorState();
+    }
+
+    void SetAnimatorSpeeds()
+    {
         //Only care about absolute speed for distinguishing between idle and running
         animator.SetFloat("AbsoluteHorizontalSpeed", Mathf.Abs(characterMovement.GetHorizontalSpeed()));
-
         //Care about sign for vertical speed to distinguish rising and falling.
         animator.SetFloat("VerticalSpeed", characterMovement.GetVerticalSpeed());
+    }
 
+    void SetSpriteFlip()
+    {
         xFlip = aimingController.GetFacingDirection() < 0 ? true : false;
         spriteRenderer.flipX = xFlip;
+    }
 
+    void SetAnimatorState()
+    {
         previousAnimationState = currentAnimationState;
 
         //States
         //0 ground/steep
         //1 airborn
         //2 wall grab
-        //3 ledge grab
         if (characterContacts.GetContactState() == ContactState.FLATGROUND)
         {
             currentAnimationState = 0;
@@ -64,21 +75,6 @@ public class SpriteStateController : MonoBehaviour
         if (characterContacts.GetContactState() == ContactState.WALLGRAB)
         {
             currentAnimationState = 2;
-        }
-
-        if (currentAnimationState == 2)
-        {
-            //If grabbing a side, flip sprite appropriately
-            if (characterContacts.GetSideGrabbed() == MovementDirection.LEFT)
-            {
-                spriteRenderer.flipX = true;
-                xFlip = true;
-            }
-            else
-            {
-                spriteRenderer.flipX = false;
-                xFlip = false;
-            }
         }
 
         //Use this if rigging so all transitions come from any state
