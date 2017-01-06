@@ -7,6 +7,7 @@ public class CharacterIntegrator : MonoBehaviour
     CharacterMovementActuator movementActuator;
     CharacterContactSensor contactSensor;
     bool isTargetting;
+    bool hugsWalls = true;
 
     float jumpAfterFallingGracePeriod = 0.1f;
     float fallingTimer = 0f;
@@ -24,6 +25,9 @@ public class CharacterIntegrator : MonoBehaviour
     void Update()
     {
         UpdateArialJumpingTrackers();
+        
+        HugWallIfAdjacentAndGripsWalls();
+
         if (isTargetting)
         {
             movementActuator.ParachuteCommand();
@@ -38,6 +42,14 @@ public class CharacterIntegrator : MonoBehaviour
             remainingDoubleJumps = maxDoubleJumps;
         }
         if (fallingTimer > 0) fallingTimer -= Time.deltaTime;
+    }
+
+    void HugWallIfAdjacentAndGripsWalls()
+    {
+        if (hugsWalls && contactSensor.GetContactState() == ContactState.WALLGRAB)
+        {
+            movementActuator.ApplyWallHugForce();
+        }
     }
 
     public void MoveHorizontal(float direction)

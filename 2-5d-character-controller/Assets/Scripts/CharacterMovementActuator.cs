@@ -55,7 +55,6 @@ public class CharacterMovementActuator : MonoBehaviour
 
 
         ApplyGravity();
-        ApplyWallHugForce();
         LimitWallSlideSpeed();
 
         //Replace. Make idle material by default, then change to other materials as action dictates.
@@ -89,7 +88,7 @@ public class CharacterMovementActuator : MonoBehaviour
     }
 
     //If in a position to grab or slide down a wall, apply a small force towards the wall
-    void ApplyWallHugForce()
+    public void ApplyWallHugForce()
     {
         if (contactSensor.GetContactState() == ContactState.WALLGRAB)
         {
@@ -100,7 +99,6 @@ public class CharacterMovementActuator : MonoBehaviour
     void LimitWallSlideSpeed()
     {
         //Negate gravity
-
     }
 
     //Assign physic material to idle, unless on a steep slope, a wall, or input given
