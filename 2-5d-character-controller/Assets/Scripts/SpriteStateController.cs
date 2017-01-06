@@ -5,6 +5,8 @@ public class SpriteStateController : MonoBehaviour
 {
     CharacterMovementActuator characterMovement;
     CharacterContactSensor characterContacts;
+    AimingController aimingController;
+
     Animator animator;
     SpriteRenderer spriteRenderer;
 
@@ -25,7 +27,7 @@ public class SpriteStateController : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         characterMovement = this.transform.parent.GetComponent<CharacterMovementActuator>() as CharacterMovementActuator;
         characterContacts = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
-
+        aimingController = this.transform.parent.FindChild("ActionControllers").GetComponent<AimingController>() as AimingController;
     }
 
     // Update is called once per frame
@@ -37,19 +39,8 @@ public class SpriteStateController : MonoBehaviour
         //Care about sign for vertical speed to distinguish rising and falling.
         animator.SetFloat("VerticalSpeed", characterMovement.GetVerticalSpeed());
 
-        //Care about sign for horizontal speed for flipping sprite
-        if (characterMovement.GetHorizontalSpeed() < -changeDirectionCutoff)
-        {
-            xFlip = true;
-        }
-        //Care about sign for horizontal speed for flipping sprite
-        if (characterMovement.GetHorizontalSpeed() > changeDirectionCutoff)
-        {
-            xFlip = false;
-        }
-
+        xFlip = aimingController.GetFacingDirection() < 0 ? true : false;
         spriteRenderer.flipX = xFlip;
-
 
         previousAnimationState = currentAnimationState;
 
@@ -101,10 +92,5 @@ public class SpriteStateController : MonoBehaviour
         {
             hasAnimationStateChanged = false;
         }
-    }
-
-    public bool getXFlip()
-    {
-        return xFlip;
     }
 }

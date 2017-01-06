@@ -8,6 +8,7 @@ public class AimingController : MonoBehaviour
     float verticalStored;
     float horizontalInput;
     float verticalInput;
+    float facingDirection = 1f;
 
     Vector3 aimingVector;
     bool isAiming;
@@ -38,6 +39,7 @@ public class AimingController : MonoBehaviour
     void Update()
     {
         CheckCharacterWallGrabbing();
+        DetermineFacingDirection();
         MatchAimingToControlsIfFireAndDirectionHeld();
         aimingVector = new Vector3(horizontalStored, verticalStored, 0f);
         aimingVector.Normalize();
@@ -66,6 +68,28 @@ public class AimingController : MonoBehaviour
         }
     }
 
+    void DetermineFacingDirection()
+    {
+        //Wall grabbing takes precedence. Must face away from wall if wall grabbing
+        if (isWallGrabbing)
+        {
+            //Face right if grabbing left wall, otherwise face left.
+            facingDirection = (wallSide == MovementDirection.LEFT) ? 1f : -1f;
+        }
+        else
+        {
+            //Else update to change direction if a direciton is pressed
+            if (horizontalInput < 0)
+            {
+                facingDirection = -1f;
+            }
+            if (horizontalInput > 0)
+            {
+                facingDirection = 1f;
+            }
+        }
+    }
+
     public void StartTargetting()
     {
         isAiming = true;
@@ -74,16 +98,10 @@ public class AimingController : MonoBehaviour
 
     void DefaultAiming()
     {
+        //If no input is pressed, set the aiming direction to the current facing direction.
         if (Mathf.Abs(horizontalInput) < 0.001f && Mathf.Abs(verticalInput) < 0.001f)
         {
-            if (isWallGrabbing)
-            {
-                SetHorizontalAwayFromWall();
-            }
-            else
-            {
-                SetHorizontalToSpriteDirection();
-            }
+            horizontalStored = facingDirection;
 			verticalStored = 0f;
         }
     }
@@ -92,26 +110,6 @@ public class AimingController : MonoBehaviour
     {
         isAiming = false;
     }
-    void SetHorizontalToSpriteDirection()
-    {
-        if (characterSprite.getXFlip())
-        {
-            horizontalStored = -1.0f;
-        }
-        else
-        {
-            horizontalStored = 1.0f;
-        }
-    }
-
-	void SetHorizontalAwayFromWall(){
-		if(wallSide == MovementDirection.LEFT){
-			horizontalStored = 1f;
-		}
-		else{
-			horizontalStored = -1f;
-		}
-	}
 
     void MatchAimingToControlsIfFireAndDirectionHeld()
     {
@@ -143,5 +141,9 @@ public class AimingController : MonoBehaviour
     public void SetVerticalInput(float vert)
     {
         verticalInput = vert;
+    }
+
+    public float GetFacingDirection(){
+        return facingDirection;
     }
 }
