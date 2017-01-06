@@ -14,7 +14,7 @@ public class CharacterContactSensor : MonoBehaviour
 
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
-    float skinWidth = 0.01f;
+    float skinWidth = 0.05f;
     float detectionRayLengthGround = 0.3f;
     float detectionRayLengthSides = 0.1f;
     int verticalRayCount = 4;
