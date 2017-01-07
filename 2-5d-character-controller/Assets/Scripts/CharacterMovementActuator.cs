@@ -35,7 +35,6 @@ public class CharacterMovementActuator : MonoBehaviour
     float terminalArialSpeed = -50f;
     float terminalWallSlideSpeed = -5f;
     public PhysicMaterial[] physicMaterials;
-    public FixedJoint backgroundGrabJoint;
 
     bool isMoveHorizontalCommandGiven = false;
 
@@ -43,7 +42,6 @@ public class CharacterMovementActuator : MonoBehaviour
     void Start()
     {
         body = GetComponent<Rigidbody>();
-        integrator = GetComponent<CharacterIntegrator>();
         contactSensor = GetComponent<CharacterContactSensor>();
         physCollider = GetComponent<BoxCollider>();
     }
@@ -290,21 +288,6 @@ public class CharacterMovementActuator : MonoBehaviour
                 //Apply a force counter to gravity
                 body.AddForce(body.transform.up * gravityForce * paracuteDeceleration * Time.deltaTime);
             }
-        }
-    }
-
-    public void GrabBackgroundCommand()
-    {
-        gameObject.AddComponent<FixedJoint>();
-        backgroundGrabJoint = GetComponent<FixedJoint>();
-    }
-
-    public void ReleaseBackgroundCommand()
-    {
-        if (backgroundGrabJoint != null)
-        {
-            Destroy(backgroundGrabJoint);
-            backgroundGrabJoint = null;
         }
     }
 

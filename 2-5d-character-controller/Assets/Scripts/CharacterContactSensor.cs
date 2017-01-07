@@ -8,7 +8,6 @@ public class CharacterContactSensor : MonoBehaviour
     MovementDirection sideGrabbed = MovementDirection.NEUTRAL;
     Rigidbody body;
     Collider physCollider;
-    public FixedJoint backgroundGrabJoint;
     float width = 0.6f;
     float height = 0.9f;
 
@@ -30,8 +29,6 @@ public class CharacterContactSensor : MonoBehaviour
     //Force that will be applied to keep character sticking to a wall if grabbing or sliding down it
     float wallHugForce = 200f;
 
-    CharacterIntegrator integrator;
-
     UpdateTimer updateTimer;
     public int updatePeriod = 1;
 
@@ -41,7 +38,6 @@ public class CharacterContactSensor : MonoBehaviour
         updateTimer = new UpdateTimer(updatePeriod);
         body = GetComponent<Rigidbody>();
         physCollider = GetComponent<Collider>();
-        integrator = GetComponent<CharacterIntegrator>();
         UpdateRaycastOrigins();
         CalculateRaySpacing();
     }
@@ -67,12 +63,8 @@ public class CharacterContactSensor : MonoBehaviour
         contactState = ContactState.FLATGROUND;
         sideGrabbed = MovementDirection.NEUTRAL;
 
-        if (backgroundGrabJoint != null)
-        {
-            contactState = ContactState.BACKGROUNDGRAB;
-        }
         //If there is a collision below, the character is either FLATGROUND, a steep slope, or a slanted wall
-        else if (collisions.below)
+        if (collisions.below)
         {
             if (collisions.groundSlopeAngle < steepSlopeAngle)
             {
