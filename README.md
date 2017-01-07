@@ -12,9 +12,9 @@ Modular, hierarchical design:
 Arbitrary down/gravity axis to allow circular/planet type levels, wall/ceiling walking. Set gravityFocus to (0, -1000000, 0) in the inspector to have a conventional 'down' direction.
 Supports climb and descend slopes, rest on shallow slopes, wall grab/wall slide, wall jump, jetpack, parachute.
 
-Using CharacterContactSensor
+Using CharacterContactSensor:  
 Attach CharacterContactSensor to a rigidbody. To make the script more efficient, give a layer to the terrain gameobjects (Eg, 'Obstacle'). In the inspector, set the Collision Mask of CharacterContactSensor to 'Obstacle.
 Make sure that UpdateTimer.cs is in the project folder.
     
-Using CharacterMovementActuator
+Using CharacterMovementActuator:  
 After attaching CharacterContactSensor to a rigidbody, attach CharacterMovementActuator to that same rigidbody. In the inspector, set the size of the PhysicMaterial array to 4. Set the four slots to CharGroundIdle, CharZeroFriction, CharWallGrab, and CharWallSlide, in that order.
