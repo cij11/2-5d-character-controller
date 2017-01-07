@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerVirtualInput : VirtualInput {
+public class PlayerAbstractInput : AbstractInput {
 	public override void UpdateInput(){
 		HorizontalInput();
 		VerticalInput();

@@ -8,7 +8,7 @@ public class InputDispatcher : MonoBehaviour {
 	FiringController firingController;
 	WeaponManager weaponManager;
 
-	VirtualInput virtualInput;
+	AbstractInput abstractInput;
 
 	// Use this for initialization
 	void Start () {
@@ -23,73 +23,73 @@ public class InputDispatcher : MonoBehaviour {
 		weaponManager = actionControllers.GetComponent<WeaponManager>();
 	}
 
-	public void SetControllingVirtualInput(VirtualInput controllingInput){
-		virtualInput = controllingInput;
+	public void SetControllingAbstractInput(AbstractInput controllingInput){
+		abstractInput = controllingInput;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		UpdateVirtualInput();
+		UpdateAbstractInput();
 		Movement();
 		Aiming();
 		Firing();
 		WeaponChanging();
 	}
 
-	void UpdateVirtualInput(){
-		virtualInput.UpdateInput();
+	void UpdateAbstractInput(){
+		abstractInput.UpdateInput();
 	}
 
 	void Movement(){
-		if(virtualInput.GetHorAxis() < 0){
+		if(abstractInput.GetHorAxis() < 0){
 			characterIntegrator.MoveHorizontal(-1);
 		}
-		if(virtualInput.GetHorAxis() > 0){
+		if(abstractInput.GetHorAxis() > 0){
 			characterIntegrator.MoveHorizontal(1);
 		}
-		if(virtualInput.GetVertAxis() < 0){
+		if(abstractInput.GetVertAxis() < 0){
 			characterIntegrator.MoveVertical(-1);
 		}
-		if(virtualInput.GetVertAxis() > 0){
+		if(abstractInput.GetVertAxis() > 0){
 			characterIntegrator.MoveVertical(1);
 		}
-		if(virtualInput.GetJumpDown()){
-			characterIntegrator.Jump(virtualInput.GetHorAxis(), virtualInput.GetVertAxis());
+		if(abstractInput.GetJumpDown()){
+			characterIntegrator.Jump(abstractInput.GetHorAxis(), abstractInput.GetVertAxis());
 		}
-		if(virtualInput.GetFireDown()){
+		if(abstractInput.GetFireDown()){
 			characterIntegrator.StartTargetting();
 		}
-		if(virtualInput.GetFireUp()){
+		if(abstractInput.GetFireUp()){
 			characterIntegrator.StopTargetting();
 		}
 	}
 
 	void Aiming(){
-		aimingController.SetHorizontalInput(virtualInput.GetHorAxis());
-		aimingController.SetVerticalInput(virtualInput.GetVertAxis());
+		aimingController.SetHorizontalInput(abstractInput.GetHorAxis());
+		aimingController.SetVerticalInput(abstractInput.GetVertAxis());
 
-		if(virtualInput.GetFireDown()){
+		if(abstractInput.GetFireDown()){
 			aimingController.StartTargetting();
 		}
-		if(virtualInput.GetFireUp()){
+		if(abstractInput.GetFireUp()){
 			aimingController.StopTargetting();
 		}
 	}
 
 	void Firing(){
-		if(virtualInput.GetFireDown()){
+		if(abstractInput.GetFireDown()){
 			firingController.InitiateFire();
 		}
-		if(virtualInput.GetFire()){
+		if(abstractInput.GetFire()){
 			firingController.SustainFire();
 		}
-		if(virtualInput.GetFireUp()){
+		if(abstractInput.GetFireUp()){
 			firingController.ReleaseFire();
 		}
 	}
 
 	void WeaponChanging(){
-		if(virtualInput.GetSwapDown()){
+		if(abstractInput.GetSwapDown()){
 			weaponManager.CycleWieldable();
 		}
 	}

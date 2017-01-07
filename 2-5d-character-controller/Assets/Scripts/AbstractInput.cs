@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public abstract class VirtualInput : MonoBehaviour{
+public abstract class AbstractInput : MonoBehaviour{
 	protected float horAxis;
 	protected float vertAxis;
 	protected bool jumpDown;
@@ -11,13 +11,15 @@ public abstract class VirtualInput : MonoBehaviour{
 	protected bool fire;
 	protected bool fireUp;
 	protected bool swapDown;
+	protected bool swap;
+	protected bool swapUp;
 
 	void Start(){
 		TakeControlOfCharacter();
 	}
 
 	public void TakeControlOfCharacter(){
-		this.transform.parent.FindChild("ActionControllers").gameObject.GetComponent<InputDispatcher>().SetControllingVirtualInput(this);
+		this.transform.parent.FindChild("ActionControllers").gameObject.GetComponent<InputDispatcher>().SetControllingAbstractInput(this);
 	}
 	//To use a virtual controller, must call UpdateInput() prior To
 	//getting any axis/button states.
@@ -48,5 +50,11 @@ public abstract class VirtualInput : MonoBehaviour{
 	}
 	public bool GetSwapDown(){
 		return swapDown;
+	}
+	public bool GetSwap(){
+		return swap;
+	}
+	public bool GetSwapUp(){
+		return swapUp;
 	}
 }
