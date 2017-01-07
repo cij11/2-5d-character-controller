@@ -32,7 +32,7 @@ public class AI : MonoBehaviour {
 				virtualController.TapFire();
 			break;
 			case 4:
-				virtualController.PushSwap();
+				virtualController.TapJump();
 			break;
 
 			case 5:

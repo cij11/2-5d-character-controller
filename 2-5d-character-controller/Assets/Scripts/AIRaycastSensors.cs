@@ -17,7 +17,7 @@ public class AIRaycastSensors : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        body = GetComponent<Rigidbody>() as Rigidbody;
+        body = this.transform.parent.GetComponent<Rigidbody>() as Rigidbody;
 		updateTimer = new UpdateTimer(5);
     }
 

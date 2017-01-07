@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class RadusObjectSensor : MonoBehaviour
+public class AIRadiusObjectSensor : MonoBehaviour
 {
 
     float sensorRadius = 10f;
@@ -14,7 +14,7 @@ public class RadusObjectSensor : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        body = GetComponent<Rigidbody>() as Rigidbody;
+        body = this.transform.parent.transform.GetComponent<Rigidbody>() as Rigidbody;
         updateTimer = new UpdateTimer(10);
         hitColliders = new Collider[0];
     }
