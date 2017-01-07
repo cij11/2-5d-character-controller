@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PlayerInputDispatcher : MonoBehaviour {
+public class InputDispatcher : MonoBehaviour {
 	
 	CharacterIntegrator characterIntegrator;
 	AimingController aimingController;
@@ -13,16 +13,18 @@ public class PlayerInputDispatcher : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		RegisterControllers();
-		virtualInput = new PlayerVirtualInput();
 	}
 
-	//Look for the 
 	void RegisterControllers(){
 		GameObject actionControllers = this.transform.parent.FindChild("ActionControllers").gameObject;
 		characterIntegrator = this.transform.parent.GetComponent<CharacterIntegrator>();
 		aimingController = actionControllers.GetComponent<AimingController>();
 		firingController = actionControllers.GetComponent<FiringController>();
 		weaponManager = actionControllers.GetComponent<WeaponManager>();
+	}
+
+	public void SetControllingVirtualInput(VirtualInput controllingInput){
+		virtualInput = controllingInput;
 	}
 	
 	// Update is called once per frame

@@ -33,11 +33,12 @@ public class CharacterContactSensor : MonoBehaviour
     CharacterIntegrator integrator;
 
     UpdateTimer updateTimer;
+    public int updatePeriod = 1;
 
     // Use this for initialization
     void Start()
     {
-        updateTimer = new UpdateTimer(5);
+        updateTimer = new UpdateTimer(updatePeriod);
         body = GetComponent<Rigidbody>();
         physCollider = GetComponent<Collider>();
         integrator = GetComponent<CharacterIntegrator>();
