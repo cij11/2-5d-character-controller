@@ -18,25 +18,25 @@ public class AI : MonoBehaviour {
 		}
 		switch (action){
 			case 0:
-				virtualController.PushJump();
+				virtualController.TapFire();
 			break;
 
 			case 1:
-				virtualController.ReleaseJump();
+				virtualController.PushSwap();
 			break;
 			case 2:
-				virtualController.PushJump();
+				virtualController.ReleaseSwap();
 			break;
 
 			case 3:
-				virtualController.ReleaseJump();
+				virtualController.TapFire();
 			break;
 			case 4:
-				virtualController.PushFire();
+				virtualController.PushSwap();
 			break;
 
 			case 5:
-				virtualController.ReleaseFire();
+				virtualController.TapFire();
 			break;
 			default:
 				virtualController.PushHorizAxis(-1f);
