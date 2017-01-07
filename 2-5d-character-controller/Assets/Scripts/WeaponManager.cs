@@ -13,15 +13,8 @@ public class WeaponManager : MonoBehaviour {
 		firingController = this.transform.parent.FindChild("ActionControllers").GetComponent<FiringController>();
 		EquipWeapon(weapons[0]);
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		if(Input.GetButtonDown("Fire2")){
-			CycleWieldable();
-		}
-	}
 
-	void CycleWieldable(){
+	public void CycleWieldable(){
 		equipedSlotNumber += 1;
 		if (equipedSlotNumber > weapons.Length - 1){
 			equipedSlotNumber = 0;

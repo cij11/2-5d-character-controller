@@ -13,12 +13,9 @@ public class AimingController : MonoBehaviour
     Vector3 aimingVector;
     bool isAiming;
 
-    public CharacterContactSensor characterContact;
+    CharacterContactSensor characterContact;
     bool isWallGrabbing;
     MovementDirection wallSide;
-
-    //Default aiming will align with the direction the sprite is facing.
-    public SpriteStateController characterSprite;
 
     // Use this for initialization
     void Start()
@@ -32,7 +29,6 @@ public class AimingController : MonoBehaviour
         wallSide = MovementDirection.NEUTRAL;
 
         characterContact = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
-
     }
 
     // Update is called once per frame
