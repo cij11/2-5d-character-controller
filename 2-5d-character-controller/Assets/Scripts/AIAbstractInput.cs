@@ -23,15 +23,33 @@ public class AIAbstractInput : AbstractInput {
 	}
 
 	void Buttons(){
-		bool currentJump = virtualController.GetJump();
-		bool currentFire = virtualController.GetFire();
-		bool currentSwap = virtualController.GetSwap();
+		if(virtualController.ExtractJumpTap()){
+			TapButton(jump, out jumpDown, out jump, out jumpUp);
+		}
+		else{
+			DifferentiateButton(virtualController.GetJump(), jump, out jumpDown, out jump, out jumpUp);
+		}
 
-		DifferentiateButton(currentJump, jump, out jumpDown, out jump, out jumpUp);
-		DifferentiateButton(currentFire, fire, out fireDown, out fire, out fireUp);
-		DifferentiateButton(currentSwap, swap, out swapDown, out swap, out swapUp);
+		if(virtualController.ExtractFireTap()){
+			TapButton(fire, out fireDown, out fire, out fireUp);
+		}
+		else{
+			DifferentiateButton(virtualController.GetFire(), fire, out fireDown, out fire, out fireUp);
+		}
+
+		if(virtualController.ExtractSwapTap()){
+			TapButton(swap, out swapDown, out swap, out swapUp);
+		}
+		else{
+			DifferentiateButton(virtualController.GetSwap(), swap, out swapDown, out swap, out swapUp);
+		}
 	}
 
+	void TapButton(bool oldButton, out bool buttonDown, out bool button, out bool buttonUp){
+		buttonDown = !oldButton ? true : false;
+		button = false;
+		buttonUp = true;
+	}
 	void DifferentiateButton(bool currentButton, bool oldButton, out bool buttonDown, out bool button, out bool buttonUp){
 		if (currentButton == true && oldButton == false) buttonDown = true;
 		else buttonDown = false;

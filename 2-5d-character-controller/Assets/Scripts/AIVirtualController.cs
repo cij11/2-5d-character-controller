@@ -8,6 +8,10 @@ public class AIVirtualController : MonoBehaviour {
 	bool jump;
 	bool fire;
 	bool swap;
+
+	bool jumpTapped;
+	bool fireTapped;
+	bool swapTapped;
 	// Use this for initialization
 	void Start () {
 		horAxis = 0f;
@@ -15,6 +19,9 @@ public class AIVirtualController : MonoBehaviour {
 		jump = false;
 		fire = false;
 		swap = false;
+		jumpTapped = false;
+		fireTapped = false;
+		jumpTapped = false;
 	}
 
 
@@ -43,6 +50,22 @@ public class AIVirtualController : MonoBehaviour {
 	public void ReleaseSwap(){
 		swap = false;
 	}
+
+	//Tapping a button triggers a button down and a button up event this frame, and 
+	//leaves the button in a button up state.
+	public void TapJump(){
+		jumpTapped = true;
+		jump = false;
+	}
+	public void TapFire(){
+		fireTapped = true;
+		fire = false;
+	}
+	public void TapSwap(){
+		swapTapped = true;
+		swap = false;
+	}
+
 	public float GetHorAxis(){
 		return horAxis;
 	}
@@ -57,5 +80,29 @@ public class AIVirtualController : MonoBehaviour {
 	}
 	public bool GetSwap(){
 		return swap;
+	}
+
+	public bool ExtractJumpTap(){
+		if(jumpTapped){
+			jumpTapped = false;
+			return true;
+		}
+		else return false;
+	}
+
+	public bool ExtractFireTap(){
+		if(fireTapped){
+			fireTapped = false;
+			return true;
+		}
+		else return false;
+	}
+
+	public bool ExtractSwapTap(){
+		if(swapTapped){
+			swapTapped = false;
+			return true;
+		}
+		else return false;
 	}
 }
