@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class CharacterIntegrator : MonoBehaviour
+public class MovementController : MonoBehaviour
 {
 
     CharacterMovementActuator movementActuator;
@@ -17,8 +17,8 @@ public class CharacterIntegrator : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        movementActuator = GetComponent<CharacterMovementActuator>() as CharacterMovementActuator;
-        contactSensor = GetComponent<CharacterContactSensor>() as CharacterContactSensor;
+        movementActuator = this.GetComponentInParent<CharacterMovementActuator>() as CharacterMovementActuator;
+        contactSensor = this.GetComponentInParent<CharacterContactSensor>() as CharacterContactSensor;
     }
 
     // Update is called once per frame
@@ -52,6 +52,7 @@ public class CharacterIntegrator : MonoBehaviour
         }
     }
 
+    //Paramaters - Direction. -1f = left. 1f = right. 0f = nil.
     public void MoveHorizontal(float direction)
     {
         if (!isTargetting)

@@ -3,7 +3,7 @@ using System.Collections;
 
 public class InputDispatcher : MonoBehaviour {
 	
-	CharacterIntegrator characterIntegrator;
+	MovementController movementController;
 	AimingController aimingController;
 	FiringController firingController;
 	WeaponManager weaponManager;
@@ -17,7 +17,7 @@ public class InputDispatcher : MonoBehaviour {
 
 	void RegisterControllers(){
 		GameObject actionControllers = this.transform.parent.FindChild("ActionControllers").gameObject;
-		characterIntegrator = this.transform.parent.GetComponent<CharacterIntegrator>();
+		movementController = actionControllers.GetComponent<MovementController>();
 		aimingController = actionControllers.GetComponent<AimingController>();
 		firingController = actionControllers.GetComponent<FiringController>();
 		weaponManager = actionControllers.GetComponent<WeaponManager>();
@@ -42,25 +42,25 @@ public class InputDispatcher : MonoBehaviour {
 
 	void Movement(){
 		if(abstractInput.GetHorAxis() < 0){
-			characterIntegrator.MoveHorizontal(-1);
+			movementController.MoveHorizontal(-1);
 		}
 		if(abstractInput.GetHorAxis() > 0){
-			characterIntegrator.MoveHorizontal(1);
+			movementController.MoveHorizontal(1);
 		}
 		if(abstractInput.GetVertAxis() < 0){
-			characterIntegrator.MoveVertical(-1);
+			movementController.MoveVertical(-1);
 		}
 		if(abstractInput.GetVertAxis() > 0){
-			characterIntegrator.MoveVertical(1);
+			movementController.MoveVertical(1);
 		}
 		if(abstractInput.GetJumpDown()){
-			characterIntegrator.Jump(abstractInput.GetHorAxis(), abstractInput.GetVertAxis());
+			movementController.Jump(abstractInput.GetHorAxis(), abstractInput.GetVertAxis());
 		}
 		if(abstractInput.GetFireDown()){
-			characterIntegrator.StartTargetting();
+			movementController.StartTargetting();
 		}
 		if(abstractInput.GetFireUp()){
-			characterIntegrator.StopTargetting();
+			movementController.StopTargetting();
 		}
 	}
 

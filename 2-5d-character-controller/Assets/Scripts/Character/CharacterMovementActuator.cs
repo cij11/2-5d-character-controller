@@ -8,7 +8,6 @@ public class CharacterMovementActuator : MonoBehaviour
     Rigidbody body;
     Collider physCollider;
     CharacterContactSensor contactSensor;
-    CharacterIntegrator integrator;
 
     //Speed the character walks at when left or right held
     float maxWalkSpeed = 12;
@@ -50,7 +49,6 @@ public class CharacterMovementActuator : MonoBehaviour
     void FixedUpdate()
     {
         OrientToGravityFocus();
-
 
         ApplyGravity();
         LimitWallSlideSpeed();

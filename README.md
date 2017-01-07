@@ -6,7 +6,7 @@ Rigidbody based, for easy interaction with physics components. Does not use 2d e
 Modular, hierarchical design:  
     Getting terrain info with CharacterContactSensor: Attaching CharacterContactSensor to a RigidBody lets that rigidbody use raycasts to determine if its standing on flat or steep terrain, adjacent to a wall, or airbourne. Requires included UpdateTimer class.  
     Arcade physics with CharacterMovementActuator: Once a rigidbody has a CharacterContactSensor, attach CharacterMovementActuator to apply arcade style control to the rigidbody. Requires included Physic Materials to be set in the unity inspector.  
-    A scheme to convert player input into character controls via CharacterIntegrator.  
+    A scheme to convert player input into character controls via MovementController. The MovementController class gives an example of how to tie contact state and the actuator together. Depending on the current ContactState of the character (taken from CharacterContactSensor) it will then send the appropriate motor command to CharacterMovementActuator.
     Controllers for movement, aiming, firing, and weapon selection.  
     Virtual Joystick takes input from the player or AI.  
 Arbitrary down/gravity axis to allow circular/planet type levels, wall/ceiling walking. Set gravityFocus to (0, -1000000, 0) in the inspector to have a conventional 'down' direction.  
@@ -18,3 +18,6 @@ Make sure that UpdateTimer.cs is in the project folder.
     
 Using CharacterMovementActuator:  
 After attaching CharacterContactSensor to a rigidbody, attach CharacterMovementActuator to that same rigidbody. In the inspector, set the size of the PhysicMaterial array to 4. Set the four slots to CharGroundIdle, CharZeroFriction, CharWallGrab, and CharWallSlide, in that order.
+
+Using MovementController:  
+Create a GameObject called 'ActionControllers', and make it a child of the rigidbody. Add the component 'MovementController' to the ActionControllers GameObject. Call the public methods of MovementController to pilot the character.
