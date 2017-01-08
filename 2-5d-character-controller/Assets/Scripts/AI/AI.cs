@@ -75,7 +75,7 @@ public class AI : MonoBehaviour {
 	}
 
 	void ReleaseFireAtObject(GameObject target){
-		FireAtPoint(target.transform.position);
+		ReleaseFireAtPoint(target.transform.position);
 	}
 	
 	void ReleaseFireAtPoint(Vector3 point){
