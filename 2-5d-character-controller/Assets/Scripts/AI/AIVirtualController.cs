@@ -25,7 +25,7 @@ public class AIVirtualController : MonoBehaviour {
 	}
 
 
-	public void PushHorizAxis(float direction){
+	public void PushHorAxis(float direction){
 		horAxis = direction;
 	}
 	public void PushVertAxis(float direction){

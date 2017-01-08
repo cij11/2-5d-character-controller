@@ -9,7 +9,7 @@ public abstract class Projectile : MonoBehaviour {
 
 	protected float maxLifespan = 1f;
 
-	protected int damage = 40;
+	protected int damage = 4;
 	protected float knockbackSpeed = 30f;
 	float age;
 
