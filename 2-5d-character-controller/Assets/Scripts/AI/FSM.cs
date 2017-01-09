@@ -34,26 +34,34 @@ public class FSM : MonoBehaviour
     //loading from XML.
     private void LoadStates()
     {
-        FSMState state1 = new FSMState("run_right");
-        state1.AddAction(Action.MOVERIGHT);
-        state1.AddTransition(Condition.TARGET_IN_HORIZONTAL_OCTANTS, 2, "target_player");
-        state1.AddTransition(Condition.CLIFF_RIGHT, 0, "run_left");
+        FSMState state1 = new FSMState("run_right", Action.MOVERIGHT);
+        FSMTransition trans1 = new FSMTransition("aim_target");
+        trans1.AddExpression(Condition.TARGET_IN_OCTANT_BELOW, 2, true);
+        state1.AddTransition(trans1);
+        FSMTransition trans2 = new FSMTransition("run_left");
+        trans2.AddExpression(Condition.CLIFF_RIGHT, 0, true);
+        state1.AddTransition(trans2);
         states.Add(state1.GetName(), state1);
 
-        FSMState state2 = new FSMState("run_left");
-        state2.AddAction(Action.MOVELEFT);
-        state2.AddTransition(Condition.TARGET_IN_HORIZONTAL_OCTANTS, 2, "target_player");
-        state2.AddTransition(Condition.CLIFF_LEFT, 0, "run_right");
+        FSMState state2 = new FSMState("run_left", Action.MOVELEFT);
+        FSMTransition trans3 = new FSMTransition("aim_target");
+        trans3.AddExpression(Condition.TARGET_IN_OCTANT_BELOW, 2, true);
+        state2.AddTransition(trans3);
+        FSMTransition trans4 = new FSMTransition("run_right");
+        trans4.AddExpression(Condition.CLIFF_LEFT, 0, true);
+        state2.AddTransition(trans4);
         states.Add(state2.GetName(), state2);
 
-        FSMState state3 = new FSMState("target_player");
-        state3.AddAction(Action.AIMTARGET);
-        state3.AddTransition(Condition.TIMER, 5, "shoot_player");
+        FSMState state3 = new FSMState("aim_target", Action.AIMTARGET);
+        FSMTransition trans5 = new FSMTransition("shoot_target");
+        trans5.AddExpression(Condition.TIMER, 2, true);
+        state3.AddTransition(trans5);
         states.Add(state3.GetName(), state3);
 
-        FSMState state4 = new FSMState("shoot_player");
-        state4.AddAction(Action.RELEASEFIRETARGET);
-        state4.AddTransition(Condition.TIMER, 0.1f, "run_right");
+        FSMState state4 = new FSMState("shoot_target", Action.RELEASEFIRETARGET);
+        FSMTransition trans6 = new FSMTransition("run_right");
+        trans6.AddExpression(Condition.TIMER, 0.1f, true);
+        state4.AddTransition(trans6);
         states.Add(state4.GetName(), state4);
     }
 
@@ -73,22 +81,34 @@ public class FSM : MonoBehaviour
     private void EvaluateTransitions()
     {
         List<FSMTransition> transitions = activeState.GetTransitions();
-        bool conditionTruth = false;
+        bool transitionTruth = false;
         string nextState = null;
         foreach (FSMTransition transition in transitions)
         {
-            conditionTruth = TestCondition(transition.GetCondition(), transition.GetParam());
-            if (conditionTruth)
-            {
+            print("Testing transition " + transition.ToString());
+            transitionTruth = TestTransition(transition);
+            if(transitionTruth){
                 nextState = transition.GetState();
                 break;
             }
         }
 
-        if (conditionTruth)
+        if (transitionTruth)
         {
             ChangeToState(nextState);
         }
+    }
+
+    //A transition is true if all of its expressions evaluate to true.
+    //eg, if all of the expression have their conditions evaluate to the same bool as their truth value.
+    private bool TestTransition(FSMTransition transition){
+        foreach(FSMExpression expression in transition.GetExpressions())
+        {
+            print("Testing expression " + expression.condition.ToString());
+            bool conditionTruth = TestCondition(expression.condition, expression.param);
+            if(conditionTruth != expression.trueIfConditionTrue) return false;
+        }
+        return true;
     }
 
     private bool TestCondition(Condition condition, float param)

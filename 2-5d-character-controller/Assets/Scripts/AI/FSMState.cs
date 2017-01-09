@@ -8,16 +8,14 @@ public class FSMState{
     Action action;
     List<FSMTransition> transitions;
 
-    public FSMState(string newName){
+    public FSMState(string newName, Action maction){
         name = newName;
+        action = maction;
         transitions = new List<FSMTransition>();
     }
 
-    public void AddAction(Action maction){
-        action = maction;
-    }
-    public void AddTransition(Condition condition, float param, string nextState){
-        transitions.Add(new FSMTransition(condition, param, nextState));
+    public void AddTransition(FSMTransition transition){
+        transitions.Add(transition);
     }
 
     public void ExectuteState(){

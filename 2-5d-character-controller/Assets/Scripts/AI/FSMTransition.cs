@@ -1,25 +1,33 @@
 using UnityEngine;
-
+using System.Collections.Generic;
 
 public class FSMTransition{
-    private Condition condition;
-    private bool truth;
-    private float param;
     private string state;
+    private List<FSMExpression> expressions;
 
-    public FSMTransition(Condition con, float cparam, string nstate){
-        condition = con;
-        param = cparam;
-        state = nstate;
-        this.truth = truth;
+
+    public FSMTransition(string state){
+        this.state = state;
+        expressions = new List<FSMExpression>();
     }
 
-    public Condition GetCondition(){
-        return condition;
+    public void AddExpression(FSMExpression expression){
+        expressions.Add(expression);
     }
-    public float GetParam(){
-        return param;
+
+    //Add a new expression by supplying the constructor parameters for it
+    public void AddExpression(Condition ncondition, float nparam, bool ntruth){
+        FSMExpression newExp = new FSMExpression();
+        newExp.condition = ncondition;
+        newExp.param = nparam;
+        newExp.trueIfConditionTrue = ntruth;
+        expressions.Add(newExp);
     }
+
+    public List<FSMExpression> GetExpressions(){
+        return expressions;
+    }
+
     public string GetState(){
         return state;
     }
