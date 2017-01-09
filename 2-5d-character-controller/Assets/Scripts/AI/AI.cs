@@ -10,25 +10,51 @@ public class AI : MonoBehaviour {
 	GameObject objectGoal;
 	Transform parentTransform;
 
+	FSM brainFSM;
+
 	// Use this for initialization
 	void Start () {
 		virtualController = GetComponent<AIVirtualController>() as AIVirtualController;
 		parentTransform = this.transform.parent;
 		updateTimer = new UpdateTimer(60);
 		objectGoal = GameObject.FindGameObjectWithTag("Player");
+		brainFSM = new FSM();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if(updateTimer.TryUpdateThisTick()){
-			action++;
-			if (action > 1) action = 0;
-		}
-		if (action == 0){
-			AimAtObject(objectGoal);
-		}
-		else{
-			ReleaseFireAtObject(objectGoal);
+		brainFSM.Update();
+		MotorAction action = brainFSM.GetAction();
+		print(action.ToString());
+		PerformAction(action);
+	}
+
+	void PerformAction(MotorAction action){
+		switch (action){
+			case MotorAction.IDLE:
+			{
+				ResetController();
+				break;
+			}
+			case MotorAction.MOVELEFT:{
+				MoveTowardsDirection(-1f);
+				break;
+			}
+			case MotorAction.MOVERIGHT:{
+				MoveTowardsDirection(1f);
+				break;
+			}
+			case MotorAction.AIMTARGET:{
+				AimAtObject(objectGoal);
+				break;
+			}
+			case MotorAction.RELEASEFIRETARGET:{
+				ReleaseFireAtObject(objectGoal);
+				break;
+			}
+			default:
+				ResetController();
+				break;
 		}
 	}
 
@@ -41,6 +67,14 @@ public class AI : MonoBehaviour {
 
 	void MoveTowardsObject(GameObject target){
 		MoveTowardsPoint(target.transform.position);
+	}
+
+	void MoveTowardsDirection(float dir){
+		if (dir < 0){
+			virtualController.PushHorAxis(-1f);
+		}
+		else
+			virtualController.PushHorAxis(1f);
 	}
 
 	void AimAtObject(GameObject target){
