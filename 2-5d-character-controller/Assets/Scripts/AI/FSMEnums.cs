@@ -1,4 +1,4 @@
-public enum MotorAction{
+public enum Action{
     IDLE, 
     MOVELEFT, MOVERIGHT, 
     MOVEHORIZONTALTOWARDSTARGET, MOVETOWARDSTARGET, MOVEAWAYFROMTARGET, MOVEBEHINDTARGET,
@@ -8,5 +8,7 @@ public enum MotorAction{
 
 public enum Condition{
     TIMER,
-    ONEFRAME
+    ONEFRAME,
+    TARGETINRADIUS, TARGETOUTSIDERADIUS, 
+    CLIFFADJACENT
 };

@@ -1,55 +1,38 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class AI : MonoBehaviour {
-	UpdateTimer updateTimer;
-	int action = 0;
+public class AIMotorActions : MonoBehaviour {
 	AIVirtualController virtualController;
-	Vector3 movementGoal;
-	Vector3 aimingGoal;
-	GameObject objectGoal;
 	Transform parentTransform;
-
-	FSM brainFSM;
+	GameObject targetObject;
 
 	// Use this for initialization
 	void Start () {
 		virtualController = GetComponent<AIVirtualController>() as AIVirtualController;
 		parentTransform = this.transform.parent;
-		updateTimer = new UpdateTimer(60);
-		objectGoal = GameObject.FindGameObjectWithTag("Player");
-		brainFSM = new FSM();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		brainFSM.Update();
-		MotorAction action = brainFSM.GetAction();
-		print(action.ToString());
-		PerformAction(action);
 	}
 
-	void PerformAction(MotorAction action){
+	public void PerformAction(Action action){
 		switch (action){
-			case MotorAction.IDLE:
+			case Action.IDLE:
 			{
 				ResetController();
 				break;
 			}
-			case MotorAction.MOVELEFT:{
+			case Action.MOVELEFT:{
 				MoveTowardsDirection(-1f);
 				break;
 			}
-			case MotorAction.MOVERIGHT:{
+			case Action.MOVERIGHT:{
 				MoveTowardsDirection(1f);
 				break;
 			}
-			case MotorAction.AIMTARGET:{
-				AimAtObject(objectGoal);
+			case Action.AIMTARGET:{
+				AimAtObject(targetObject);
 				break;
 			}
-			case MotorAction.RELEASEFIRETARGET:{
-				ReleaseFireAtObject(objectGoal);
+			case Action.RELEASEFIRETARGET:{
+				ReleaseFireAtObject(targetObject);
 				break;
 			}
 			default:
@@ -133,4 +116,9 @@ public class AI : MonoBehaviour {
 		Vector3 vectorToPoint = point - this.transform.parent.position;
 		return Mathf.Sign(Vector3.Dot(vectorToPoint, this.transform.parent.up));
 	}
+
+	
+    public void SetTarget(GameObject target){
+        targetObject = target;
+    }
 }

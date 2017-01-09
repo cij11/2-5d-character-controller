@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class FSMState{
     
     string name;
-    MotorAction action;
+    Action action;
     List<FSMTransition> transitions;
 
     public FSMState(string newName){
@@ -13,7 +13,7 @@ public class FSMState{
         transitions = new List<FSMTransition>();
     }
 
-    public void AddAction(MotorAction maction){
+    public void AddAction(Action maction){
         action = maction;
     }
     public void AddTransition(Condition condition, float param, string nextState){
@@ -31,7 +31,7 @@ public class FSMState{
     public List<FSMTransition> GetTransitions(){
         return transitions;
     }
-    public MotorAction GetAction(){
+    public Action GetAction(){
         return action;
     }
 }

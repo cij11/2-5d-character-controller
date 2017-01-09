@@ -1,20 +1,27 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class FSM
+//Single responsibility: Change internal state in response to transitions evaluating to true.
+public class FSM : MonoBehaviour
 {
     private FSMState activeState;
     private Dictionary<string, FSMState> states;
 
+    //Decision making information.
     private float timer;
     private float maxTime = 315360000; //Limit states to ten years duration.
+    private GameObject targetObject;
+    private AIMotorActions motorActions;
+    private Transform parentTransform;
 
-    public FSM()
-    {
+    void Start(){
         timer = 0f;
         states = new Dictionary<string, FSMState>();
         LoadStates();
         activeState = GetState("idle");
+
+        motorActions = GetComponent<AIMotorActions>() as AIMotorActions;
+        parentTransform = this.transform.parent;
     }
 
     //Data driven approach, so that hard coding can be replaced with
@@ -22,30 +29,32 @@ public class FSM
     private void LoadStates()
     {
         FSMState state1 = new FSMState("idle");
-        state1.AddAction(MotorAction.IDLE);
+        state1.AddAction(Action.IDLE);
         state1.AddTransition(Condition.TIMER, 2, "run_left");
         states.Add(state1.GetName(), state1);
 
         FSMState state2 = new FSMState("run_left");
-        state2.AddAction(MotorAction.MOVELEFT);
-        state2.AddTransition(Condition.TIMER, 5, "target_player");
+        state2.AddAction(Action.MOVELEFT);
+        state2.AddTransition(Condition.TARGETINRADIUS, 5, "target_player");
         states.Add(state2.GetName(), state2);
 
         FSMState state3 = new FSMState("target_player");
-        state3.AddAction(MotorAction.AIMTARGET);
+        state3.AddAction(Action.AIMTARGET);
         state3.AddTransition(Condition.TIMER, 5, "shoot_player");
         states.Add(state3.GetName(), state3);
 
         FSMState state4 = new FSMState("shoot_player");
-        state4.AddAction(MotorAction.RELEASEFIRETARGET);
+        state4.AddAction(Action.RELEASEFIRETARGET);
         state4.AddTransition(Condition.TIMER, 0.1f, "idle");
         states.Add(state4.GetName(), state4);
     }
 
-    public void Update()
+    void Update()
     {
         UpdateTimer();
         EvaluateTransitions();
+        print(GetAction().ToString());
+		motorActions.PerformAction (GetAction ());
     }
 
     private void UpdateTimer()
@@ -84,6 +93,12 @@ public class FSM
                     if (timer > param) return true;
                     break;
                 }
+            case Condition.TARGETINRADIUS:
+            {
+               // return true;
+                if(Vector3.Magnitude(targetObject.transform.position - parentTransform.position) < param) return true;
+                break;
+            }
         }
         return false;
     }
@@ -107,7 +122,11 @@ public class FSM
         }
     }
 
-    public MotorAction GetAction(){
+    public Action GetAction(){
         return activeState.GetAction();
+    }
+
+    public void SetTarget(GameObject target){
+        targetObject = target;
     }
 }
