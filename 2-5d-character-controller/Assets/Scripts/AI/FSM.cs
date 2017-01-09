@@ -11,6 +11,7 @@ public class FSM : MonoBehaviour
     private float timer;
     private float maxTime = 315360000; //Limit states to ten years duration.
     private GameObject targetObject;
+    private AIRaycastSensors raycastSensors;
     private AIMotorActions motorActions;
     private Transform parentTransform;
 
@@ -18,9 +19,10 @@ public class FSM : MonoBehaviour
         timer = 0f;
         states = new Dictionary<string, FSMState>();
         LoadStates();
-        activeState = GetState("idle");
+        activeState = GetState("run_right");
 
         motorActions = GetComponent<AIMotorActions>() as AIMotorActions;
+        raycastSensors = GetComponent<AIRaycastSensors>() as AIRaycastSensors;
         parentTransform = this.transform.parent;
     }
 
@@ -28,14 +30,16 @@ public class FSM : MonoBehaviour
     //loading from XML.
     private void LoadStates()
     {
-        FSMState state1 = new FSMState("idle");
-        state1.AddAction(Action.IDLE);
-        state1.AddTransition(Condition.TIMER, 2, "run_left");
+        FSMState state1 = new FSMState("run_right");
+        state1.AddAction(Action.MOVERIGHT);
+        state1.AddTransition(Condition.TARGETINRADIUS, 2, "target_player");
+        state1.AddTransition(Condition.CLIFFRIGHT, 0, "run_left");
         states.Add(state1.GetName(), state1);
 
         FSMState state2 = new FSMState("run_left");
         state2.AddAction(Action.MOVELEFT);
-        state2.AddTransition(Condition.TARGETINRADIUS, 5, "target_player");
+        state2.AddTransition(Condition.TARGETINRADIUS, 2, "target_player");
+        state2.AddTransition(Condition.CLIFFLEFT, 0, "run_right");
         states.Add(state2.GetName(), state2);
 
         FSMState state3 = new FSMState("target_player");
@@ -45,7 +49,7 @@ public class FSM : MonoBehaviour
 
         FSMState state4 = new FSMState("shoot_player");
         state4.AddAction(Action.RELEASEFIRETARGET);
-        state4.AddTransition(Condition.TIMER, 0.1f, "idle");
+        state4.AddTransition(Condition.TIMER, 0.1f, "run_right");
         states.Add(state4.GetName(), state4);
     }
 
@@ -97,6 +101,16 @@ public class FSM : MonoBehaviour
             {
                // return true;
                 if(Vector3.Magnitude(targetObject.transform.position - parentTransform.position) < param) return true;
+                break;
+            }
+            case Condition.CLIFFLEFT:
+            {
+                if(raycastSensors.GetLeftCliff()) return true;
+                break;
+            }
+            case Condition.CLIFFRIGHT:
+            {
+                if(raycastSensors.GetRightCliff()) return true;
                 break;
             }
         }

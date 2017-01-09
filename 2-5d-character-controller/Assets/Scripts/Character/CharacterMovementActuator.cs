@@ -10,7 +10,7 @@ public class CharacterMovementActuator : MonoBehaviour
     CharacterContactSensor contactSensor;
 
     //Speed the character walks at when left or right held
-    float maxWalkSpeed = 12;
+    float maxWalkSpeed = 4;
     //Time to attain walk velocity from stationary.
     float landSpeedUpForce = 1500f;
     float landBreakForce = 5000f;
