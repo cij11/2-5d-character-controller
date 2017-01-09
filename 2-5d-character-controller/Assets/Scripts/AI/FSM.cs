@@ -32,14 +32,14 @@ public class FSM : MonoBehaviour
     {
         FSMState state1 = new FSMState("run_right");
         state1.AddAction(Action.MOVERIGHT);
-        state1.AddTransition(Condition.TARGETINRADIUS, 2, "target_player");
-        state1.AddTransition(Condition.CLIFFRIGHT, 0, "run_left");
+        state1.AddTransition(Condition.TARGET_IN_RADIUS, 2, "target_player");
+        state1.AddTransition(Condition.CLIFF_RIGHT, 0, "run_left");
         states.Add(state1.GetName(), state1);
 
         FSMState state2 = new FSMState("run_left");
         state2.AddAction(Action.MOVELEFT);
-        state2.AddTransition(Condition.TARGETINRADIUS, 2, "target_player");
-        state2.AddTransition(Condition.CLIFFLEFT, 0, "run_right");
+        state2.AddTransition(Condition.TARGET_IN_LOS, 2, "target_player");
+        state2.AddTransition(Condition.CLIFF_LEFT, 0, "run_right");
         states.Add(state2.GetName(), state2);
 
         FSMState state3 = new FSMState("target_player");
@@ -57,7 +57,6 @@ public class FSM : MonoBehaviour
     {
         UpdateTimer();
         EvaluateTransitions();
-        print(GetAction().ToString());
 		motorActions.PerformAction (GetAction ());
     }
 
@@ -97,18 +96,27 @@ public class FSM : MonoBehaviour
                     if (timer > param) return true;
                     break;
                 }
-            case Condition.TARGETINRADIUS:
+            case Condition.TARGET_IN_RADIUS:
             {
-               // return true;
                 if(Vector3.Magnitude(targetObject.transform.position - parentTransform.position) < param) return true;
                 break;
             }
-            case Condition.CLIFFLEFT:
+            case Condition.TARGET_OUTSIDE_RADIUS:
+            {
+                if(Vector3.Magnitude(targetObject.transform.position - parentTransform.position) > param) return true;
+                break;
+            }
+            case Condition.TARGET_IN_LOS:
+            {
+                if (raycastSensors.IsGameobjectInLOS(targetObject)) return true;
+                break;
+            }
+            case Condition.CLIFF_LEFT:
             {
                 if(raycastSensors.GetLeftCliff()) return true;
                 break;
             }
-            case Condition.CLIFFRIGHT:
+            case Condition.CLIFF_RIGHT:
             {
                 if(raycastSensors.GetRightCliff()) return true;
                 break;
