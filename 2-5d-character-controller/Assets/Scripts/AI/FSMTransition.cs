@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class FSMTransition{
     private Condition condition;
+    private bool truth;
     private float param;
     private string state;
 
@@ -10,6 +11,7 @@ public class FSMTransition{
         condition = con;
         param = cparam;
         state = nstate;
+        this.truth = truth;
     }
 
     public Condition GetCondition(){

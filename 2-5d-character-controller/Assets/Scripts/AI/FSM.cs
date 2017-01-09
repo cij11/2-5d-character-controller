@@ -11,6 +11,10 @@ public class FSM : MonoBehaviour
     private float timer;
     private float maxTime = 315360000; //Limit states to ten years duration.
     private GameObject targetObject;
+    
+    //Horizontal and vertical directions pointing to the closest octant to the target
+    float horOctant;
+    float vertOctant;
     private AIRaycastSensors raycastSensors;
     private AIMotorActions motorActions;
     private Transform parentTransform;
@@ -32,13 +36,13 @@ public class FSM : MonoBehaviour
     {
         FSMState state1 = new FSMState("run_right");
         state1.AddAction(Action.MOVERIGHT);
-        state1.AddTransition(Condition.TARGET_IN_RADIUS, 2, "target_player");
+        state1.AddTransition(Condition.TARGET_IN_HORIZONTAL_OCTANTS, 2, "target_player");
         state1.AddTransition(Condition.CLIFF_RIGHT, 0, "run_left");
         states.Add(state1.GetName(), state1);
 
         FSMState state2 = new FSMState("run_left");
         state2.AddAction(Action.MOVELEFT);
-        state2.AddTransition(Condition.TARGET_IN_LOS, 2, "target_player");
+        state2.AddTransition(Condition.TARGET_IN_HORIZONTAL_OCTANTS, 2, "target_player");
         state2.AddTransition(Condition.CLIFF_LEFT, 0, "run_right");
         states.Add(state2.GetName(), state2);
 
@@ -111,6 +115,24 @@ public class FSM : MonoBehaviour
                 if (raycastSensors.IsGameobjectInLOS(targetObject)) return true;
                 break;
             }
+            case Condition.TARGET_IN_OCTANT_BELOW:
+            {
+                FindTargetOctant();
+                if(horOctant == 0f && vertOctant <0) return true;
+                break;
+            }
+            case Condition.TARGET_IN_OCTANT_ABOVE:
+            {
+                FindTargetOctant();
+                if(horOctant == 0f && vertOctant >0) return true;
+                break;
+            }
+            case Condition.TARGET_IN_HORIZONTAL_OCTANTS:
+            {
+                FindTargetOctant();
+                if(horOctant != 0f && vertOctant == 0) return true;
+                break;
+            }
             case Condition.CLIFF_LEFT:
             {
                 if(raycastSensors.GetLeftCliff()) return true;
@@ -123,6 +145,11 @@ public class FSM : MonoBehaviour
             }
         }
         return false;
+    }
+
+    void FindTargetOctant(){
+                Octant.PointsToOctant(parentTransform.position, targetObject.transform.position,
+                  parentTransform.right, parentTransform.up, out horOctant, out vertOctant);
     }
 
     void ChangeToState(string nextState)

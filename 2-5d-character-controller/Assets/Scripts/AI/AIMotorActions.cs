@@ -69,29 +69,19 @@ public class AIMotorActions : MonoBehaviour {
 		PushBothAxisToOctant(point);
 	}
 
-	void PushBothAxisToOctant(Vector3 point){
-		Vector3 vectorToPoint = point - parentTransform.position;
-		float horDist = Vector3.Dot(vectorToPoint, parentTransform.right);
-		float vertDist = Vector3.Dot(vectorToPoint, parentTransform.up);
+    void PushBothAxisToOctant(Vector3 point)
+    {
+        float horOctant;
+        float vertOctant;
 
-		float radAngle = Mathf.Atan(Mathf.Abs(vertDist)/Mathf.Abs(horDist));
-		float angle = Mathf.Rad2Deg * radAngle;
-		print(angle);
-		if (angle < 22.5f){ //Horizontal octant
-			virtualController.PushHorAxis(Mathf.Sign(horDist));
-			virtualController.PushVertAxis(0f);
-		}
-		else if (angle >= 22.5 && angle < 67.5){ //Diagonal octants
-			virtualController.PushHorAxis(Mathf.Sign(horDist));
-			virtualController.PushVertAxis(Mathf.Sign(vertDist));
-		}
-		else{ //Vertical octants
-			virtualController.PushHorAxis(0f);
-			virtualController.PushVertAxis(Mathf.Sign(vertDist));
-		}
-	}
+        Octant.PointsToOctant(parentTransform.position, point,
+            parentTransform.right, parentTransform.up, out horOctant, out vertOctant);
 
-	void ReleaseFireAtObject(GameObject target){
+        virtualController.PushHorAxis(horOctant);
+        virtualController.PushVertAxis(vertOctant);
+    }
+
+    void ReleaseFireAtObject(GameObject target){
 		ReleaseFireAtPoint(target.transform.position);
 	}
 	
