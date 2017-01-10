@@ -6,6 +6,7 @@ public class FSM : MonoBehaviour
 {
     private FSMState activeState;
     private Dictionary<string, FSMState> states;
+    private FSM parentFSM = null;
 
     //Decision making information.
     private float timer;
@@ -80,12 +81,13 @@ public class FSM : MonoBehaviour
 
     private void EvaluateTransitions()
     {
+        EvaluateParentTransitions(); //Check if a higher level FSM is changing state
+
         List<FSMTransition> transitions = activeState.GetTransitions();
         bool transitionTruth = false;
         string nextState = null;
         foreach (FSMTransition transition in transitions)
         {
-            print("Testing transition " + transition.ToString());
             transitionTruth = TestTransition(transition);
             if(transitionTruth){
                 nextState = transition.GetState();
@@ -99,12 +101,17 @@ public class FSM : MonoBehaviour
         }
     }
 
+    private void EvaluateParentTransitions(){
+        if (parentFSM != null){
+            parentFSM.EvaluateTransitions();
+        }
+    }
+
     //A transition is true if all of its expressions evaluate to true.
     //eg, if all of the expression have their conditions evaluate to the same bool as their truth value.
     private bool TestTransition(FSMTransition transition){
         foreach(FSMExpression expression in transition.GetExpressions())
         {
-            print("Testing expression " + expression.condition.ToString());
             bool conditionTruth = TestCondition(expression.condition, expression.param);
             if(conditionTruth != expression.trueIfConditionTrue) return false;
         }

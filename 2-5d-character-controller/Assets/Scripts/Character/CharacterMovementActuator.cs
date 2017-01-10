@@ -289,6 +289,24 @@ public class CharacterMovementActuator : MonoBehaviour
         }
     }
 
+    public void DashCommand(Vector3 dashVector, float dashMaxDistance){
+        body.velocity = new Vector3(0f, 0f, 0f);
+        //cast ray
+        //teleport to the float distance, or the length until the ray hit something.
+            Vector3 rayOrigin = this.transform.position;
+            RaycastHit hit;
+            bool isHit = Physics.Raycast(rayOrigin, this.transform.rotation * dashVector, out hit, dashMaxDistance);
+           Vector3 dashPoint = this.transform.position + body.rotation * dashVector * (dashMaxDistance - 1f);
+           if (isHit){
+               dashPoint = hit.point;
+           }
+           //Teleport at least 1 unit to avoid teleporting through terrain
+           if(Vector3.Magnitude(body.transform.position - dashPoint) > 1f){
+             body.transform.position = dashPoint - body.rotation * (dashVector * 1f); //Reduce teleport distance so doesn't teleport into a wall.
+           }
+        OrientToGravityFocus();
+    }
+
     void ApplyGravity()
     {
         float verticalSpeed = GetVerticalSpeed();

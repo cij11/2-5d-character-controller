@@ -74,6 +74,7 @@ public class MovementController : MonoBehaviour
     //Determine what type of jump is appropriate when jump pressed, and apply
     public void Jump(float hor, float vert)
     {
+        if(!isTargetting){
         //Detect ground and add upwards component to velocity if standing.
         //If terrain is too steep, walljump instead
         //Only allow jumping if standing on or adjacent to something
@@ -96,6 +97,11 @@ public class MovementController : MonoBehaviour
         //If jump has been pressed, count as leaving the ground to prevent
         //being able to immediately take a second jump in the air is if grounded.
         ZeroFallingGraceTimer();
+        }
+        else
+        {
+            movementActuator.DashCommand(new Vector3(hor, vert, 0f), 5f);
+        }
     }
 
     private void JumpAwayFromSlope()

@@ -11,12 +11,11 @@ public abstract class Weapon : MonoBehaviour {
 
 	protected WeaponState weaponState = WeaponState.IDLE;
 
+	private float cycleTimer = 0f;
 	private float windupPeriod = 0f;
-	private float windupTimer = 0f;
 	private float firingPeriod = 0.2f;
-	private float firingTimer = 0f;
+	private float winddownPeriod = 0.1f;
 	private float cooldownPeriod = 0.4f;
-	private float cooldownTimer = 0f;
 
 	// Use this for initialization
 	void Start () {
@@ -42,7 +41,7 @@ public abstract class Weapon : MonoBehaviour {
 
 	private void WindupWeapon(){
 		weaponState = WeaponState.WINDINGUP;
-		windupTimer = windupPeriod;
+		cycleTimer = windupPeriod;
 	}
 	
 	// Update is called once per frame
@@ -57,41 +56,53 @@ public abstract class Weapon : MonoBehaviour {
 		else if (weaponState == WeaponState.FIRING){
 			UpdateFiring();
 		}
+		else if (weaponState == WeaponState.WINDINGDOWN){
+			UpdateWindingDown();
+		}
 		else if(weaponState == WeaponState.COOLINGDOWN){
 			UpdateCoolingdown();
 		}
 	}
 
 	void UpdateWindup(){
-		windupTimer -= Time.deltaTime;
-		if (windupTimer <= 0f){
+		cycleTimer -= Time.deltaTime;
+		if (cycleTimer <= 0f){
 			TransitionToFiring();
 		}
 	}
 
 	void TransitionToFiring(){
 			Fire();
-			firingTimer = firingPeriod;
+			cycleTimer = firingPeriod;
 			weaponState = WeaponState.FIRING;
 	}
 
 	 protected abstract void Fire();
 
 	void UpdateFiring(){
-		firingTimer -= Time.deltaTime;
-		if(firingTimer <= 0f){
-			TransitionToCoolingDown();
+		cycleTimer -= Time.deltaTime;
+		if(cycleTimer <= 0f){
+			TransitionToWindingDown();
 		}
 	}
 
+	void TransitionToWindingDown(){
+		cycleTimer = winddownPeriod;
+		weaponState = WeaponState.WINDINGDOWN;
+	}
+	void UpdateWindingDown(){
+		cycleTimer -= Time.deltaTime;
+		if(cycleTimer <= 0f) TransitionToCoolingDown();
+	}
+
 	void TransitionToCoolingDown(){
-		cooldownTimer = cooldownPeriod;
+		cycleTimer = cooldownPeriod;
 		weaponState = WeaponState.COOLINGDOWN;
 	}
 
 	void UpdateCoolingdown(){
-		cooldownTimer -= Time.deltaTime;
-		if(cooldownTimer <= 0f){
+		cycleTimer -= Time.deltaTime;
+		if(cycleTimer <= 0f){
 			weaponState = WeaponState.IDLE;
 		}
 	}
