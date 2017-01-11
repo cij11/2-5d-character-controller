@@ -13,8 +13,8 @@ public class CharacterContactSensor : MonoBehaviour
 
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
-    float skinWidth = 0.05f;
-    float detectionRayLengthGround = 0.3f;
+    float skinWidth = 0.01f;
+    float detectionRayLengthGround = 0.1f;
     float detectionRayLengthSides = 0.1f;
     int verticalRayCount = 4;
     int horizontalRayCount = 2;
@@ -70,22 +70,9 @@ public class CharacterContactSensor : MonoBehaviour
             {
                 contactState = ContactState.FLATGROUND;
             }
-            else if (collisions.groundSlopeAngle < minWallGrabAngle)
-            {
-                contactState = ContactState.STEEPSLOPE;
-            }
             else
             {
-                contactState = ContactState.WALLGRAB;
-
-                if (UphillDirection() > 0)
-                {
-                    sideGrabbed = MovementDirection.RIGHT;
-                }
-                else
-                {
-                    sideGrabbed = MovementDirection.LEFT;
-                }
+                contactState = ContactState.STEEPSLOPE;
             }
         }
         //If there is a collision on the side but the slope is not vertical enough, the character is also on a steep slope.
@@ -131,11 +118,14 @@ public class CharacterContactSensor : MonoBehaviour
             rayOrigin += body.transform.right * (verticalRaySpacing * i);
             RaycastHit hit;
             bool isHit = Physics.Raycast(rayOrigin, -body.transform.up, out hit, rayLength, collisionMask);
-            Debug.DrawRay(rayOrigin, -body.transform.up * rayLength, Color.red);
+            Color debugRayColor = isHit ? Color.yellow : Color.red;
+            Debug.DrawRay(rayOrigin, -body.transform.up * rayLength, debugRayColor);
 
             //If any ray hits, register a collision below, and store the surface angle and normal
             if (isHit)
-            {
+            {   
+                float slope = Vector3.Angle(hit.normal, body.transform.up);
+
                 collisions.below = true;
                 collisions.groundNormal = hit.normal;
                 collisions.groundSlopeAngle = Vector3.Angle(hit.normal, body.transform.up);
