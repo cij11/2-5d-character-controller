@@ -15,8 +15,8 @@ public class MovementController : MonoBehaviour
     int maxDoubleJumps = 1;
     int remainingDoubleJumps = 0;
 
-    float phaseSpeed = 30f;
-    float phaseDuration = 0.2f;
+    float phaseSpeed = 40f;
+    float phaseDuration = 0.1f;
 
     // Use this for initialization
     void Start()
@@ -112,7 +112,8 @@ public class MovementController : MonoBehaviour
         }
         else if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
-            movementActuator.PhaseCommand(hor, vert, phaseSpeed, phaseDuration);
+           // movementActuator.PhaseCommand(hor, vert, phaseSpeed, phaseDuration);
+           AttemptAirborneJump();
         }
         //If jump has been pressed, count as leaving the ground to prevent
         //being able to immediately take a second jump in the air is if grounded.

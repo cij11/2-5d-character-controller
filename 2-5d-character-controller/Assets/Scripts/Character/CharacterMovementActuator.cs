@@ -39,6 +39,7 @@ public class CharacterMovementActuator : MonoBehaviour
     bool isRolling = false; //Rolling is a horizontal phase that sticks to the ground.
 
     float phaseDirection = 1f;
+    float phaseVerticalDireciton = 0f;
     float exitPhaseSpeed = 2f;
     float phasePeriod;
 
@@ -338,7 +339,8 @@ public class CharacterMovementActuator : MonoBehaviour
 
     private void InitialisePhasing(float hor, float vert, float speed, float period)
     {
-        phaseDirection = Mathf.Sign(hor);
+        phaseDirection = hor;
+        phaseVerticalDireciton = vert;
         body.velocity = body.rotation * new Vector3(hor, vert, 0f).normalized * speed;
         this.phasePeriod = period;
         isPhasing = true;
@@ -380,7 +382,7 @@ public class CharacterMovementActuator : MonoBehaviour
             Vector3 groundVector = CalculatePerpendicular(contactSensor.GetGroundNormal());
             groundVector.Normalize();
 
-                body.velocity = phaseDirection * groundVector * speed;
+            body.velocity = phaseDirection * groundVector * speed;
 
         }
 
@@ -390,8 +392,23 @@ public class CharacterMovementActuator : MonoBehaviour
     {
         isPhasing = false;
         isRolling = false;
-        body.velocity = body.velocity.normalized * exitPhaseSpeed;
+
+        EaseOutOfPhasing();
+        JumpOutOfVerticalPhasing();
         this.gameObject.layer = 0;
+    }
+
+    void EaseOutOfPhasing()
+    {
+        body.velocity = body.velocity.normalized * exitPhaseSpeed;
+    }
+
+    void JumpOutOfVerticalPhasing()
+    {
+        if (phaseVerticalDireciton > 0f)
+        {
+            body.velocity = body.velocity + new Vector3(0f, jumpSpeed, 0f);
+        }
     }
 
     void ApplyGravity()
