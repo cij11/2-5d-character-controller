@@ -15,6 +15,9 @@ public class MovementController : MonoBehaviour
     int maxDoubleJumps = 1;
     int remainingDoubleJumps = 0;
 
+    float phaseSpeed = 30f;
+    float phaseDuration = 0.1f;
+
     // Use this for initialization
     void Start()
     {
@@ -76,7 +79,6 @@ public class MovementController : MonoBehaviour
     //Determine what type of jump is appropriate when jump pressed, and apply
     public void Jump(float hor, float vert)
     {
-        if(!isTargetting){
         //Detect ground and add upwards component to velocity if standing.
         //If terrain is too steep, walljump instead
         //Only allow jumping if standing on or adjacent to something
@@ -94,17 +96,12 @@ public class MovementController : MonoBehaviour
         }
         else if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
-            AttemptAirborneJump();
+             movementActuator.PhaseCommand(aimingController.GetAimingVector(), phaseSpeed, phaseDuration);
         }
         //If jump has been pressed, count as leaving the ground to prevent
         //being able to immediately take a second jump in the air is if grounded.
         ZeroFallingGraceTimer();
-        }
-        else
-        {
-          //  movementActuator.TeleportCommand(new Vector3(hor, vert, 0f), 5f);
-          movementActuator.PhaseCommand(aimingController.GetAimingVector(), 20f, 1f);
-        }
+        
     }
 
     private void JumpAwayFromSlope()

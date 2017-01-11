@@ -36,6 +36,7 @@ public class CharacterMovementActuator : MonoBehaviour
 
     float phaseTimer = 0f;
     bool isPhasing = false;
+    bool isRolling = false; //Rolling is a horizontal phase that sticks to the ground.
     Vector3 storedPhaseVelocity;
     float phasePeriod;
 
@@ -149,8 +150,9 @@ public class CharacterMovementActuator : MonoBehaviour
         {
             physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
         }
-        
-        if(isPhasing){
+
+        if (isPhasing)
+        {
             physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
         }
     }
@@ -301,29 +303,38 @@ public class CharacterMovementActuator : MonoBehaviour
         }
     }
 
-    public void TeleportCommand(Vector3 dashVector, float dashMaxDistance){
+    public void TeleportCommand(Vector3 dashVector, float dashMaxDistance)
+    {
         body.velocity = new Vector3(0f, 0f, 0f);
         //cast ray
         //teleport to the float distance, or the length until the ray hit something.
-            Vector3 rayOrigin = this.transform.position;
-            RaycastHit hit;
-            bool isHit = Physics.Raycast(rayOrigin, this.transform.rotation * dashVector, out hit, dashMaxDistance);
-           Vector3 dashPoint = this.transform.position + body.rotation * dashVector * (dashMaxDistance - 1f);
-           if (isHit){
-               dashPoint = hit.point;
-           }
-           //Teleport at least 1 unit to avoid teleporting through terrain
-           if(Vector3.Magnitude(body.transform.position - dashPoint) > 1f){
-             body.transform.position = dashPoint - body.rotation * (dashVector * 1f); //Reduce teleport distance so doesn't teleport into a wall.
-           }
+        Vector3 rayOrigin = this.transform.position;
+        RaycastHit hit;
+        bool isHit = Physics.Raycast(rayOrigin, this.transform.rotation * dashVector, out hit, dashMaxDistance);
+        Vector3 dashPoint = this.transform.position + body.rotation * dashVector * (dashMaxDistance - 1f);
+        if (isHit)
+        {
+            dashPoint = hit.point;
+        }
+        //Teleport at least 1 unit to avoid teleporting through terrain
+        if (Vector3.Magnitude(body.transform.position - dashPoint) > 1f)
+        {
+            body.transform.position = dashPoint - body.rotation * (dashVector * 1f); //Reduce teleport distance so doesn't teleport into a wall.
+        }
         OrientToGravityFocus();
     }
 
-    public void PhaseCommand(Vector3 vector, float speed, float period){
+    public void RollCommand(Vector3 vector, float speed, float period){
+        isRolling = true;
+        PhaseCommand(vector, speed, period);
+    }
+    public void PhaseCommand(Vector3 vector, float speed, float period)
+    {
         InitialisePhasing(vector, speed, period);
     }
 
-    private void InitialisePhasing(Vector3 vector, float speed, float period){
+    private void InitialisePhasing(Vector3 vector, float speed, float period)
+    {
         this.storedPhaseVelocity = body.velocity;
         body.velocity = body.rotation * vector * speed;
         this.phasePeriod = period;
@@ -331,23 +342,57 @@ public class CharacterMovementActuator : MonoBehaviour
         phaseTimer = this.phasePeriod;
         this.gameObject.layer = 9; //Layer 9 is phasing layer.
     }
-    void ProcessPhasing(){
-        if(isPhasing){
-            phaseTimer -= Time.deltaTime;
-            if (phaseTimer <= 0f){
-                 StopPhasing();
+    void ProcessPhasing()
+    {
+        if (isPhasing)
+        {
+            UpdatePhasingTimer();
+            NegateGravity();
+            if(isRolling){
+            HugGroundWhilePhasing();
             }
-          //  if(Vector3.Magnitude(body.velocity) < phaseSpeed){
-                body.AddForce(-body.transform.up * gravityForce * Time.deltaTime);
-         //   }
         }
     }
 
-    void StopPhasing(){
+    void UpdatePhasingTimer()
+    {
+        phaseTimer -= Time.deltaTime;
+        if (phaseTimer <= 0f)
+        {
+            StopPhasing();
+        }
+    }
+
+    void NegateGravity()
+    {
+        body.AddForce(-body.transform.up * gravityForce * Time.deltaTime);
+    }
+
+    void HugGroundWhilePhasing()
+    {
+        if (contactSensor.GetContactState() == ContactState.FLATGROUND || contactSensor.GetContactState() == ContactState.STEEPSLOPE)
+        {
+            float speed = Vector3.Magnitude(body.velocity);
+            Vector3 groundVector = CalculatePerpendicular(contactSensor.GetGroundNormal());
+            groundVector.Normalize();
+            if (GetHorizontalSpeed() > 0)
+            {
+                body.velocity = groundVector * speed;
+            }
+            else
+            {
+                body.velocity = -groundVector * speed;
+            }
+        }
+
+    }
+
+    void StopPhasing()
+    {
         isPhasing = false;
+        isRolling = false;
         body.velocity = storedPhaseVelocity;
         this.gameObject.layer = 0;
-
     }
 
     void ApplyGravity()
@@ -396,7 +441,8 @@ public class CharacterMovementActuator : MonoBehaviour
         return HorizontalSpeed();
     }
 
-    public void SetWalkingSpeed(float newSpeed){
+    public void SetWalkingSpeed(float newSpeed)
+    {
         maxWalkSpeed = newSpeed;
     }
 }
