@@ -3,25 +3,26 @@ using System.Collections;
 
 public class AimingController : MonoBehaviour
 {
+    
+    CharacterContactSensor characterContact;
 
-    float horizontalStored;
-    float verticalStored;
     float horizontalInput;
     float verticalInput;
-    float facingDirection = 1f;
 
-    Vector3 aimingVector;
-    bool isAiming;
-
-    CharacterContactSensor characterContact;
     bool isWallGrabbing;
     MovementDirection wallSide;
+    float facingDirection = 1f;
 
-    // Use this for initialization
+    float horizontalAiming;
+    float verticalAiming;
+    Vector3 aimingVector;
+
+    bool isAiming;
+
     void Start()
     {
-        horizontalStored = 0f;
-        verticalStored = 0f;
+        horizontalAiming = 0f;
+        verticalAiming = 0f;
         horizontalInput = 0f;
         verticalInput = 0f;
         isAiming = false;
@@ -36,9 +37,7 @@ public class AimingController : MonoBehaviour
     {
         CheckCharacterWallGrabbing();
         DetermineFacingDirection();
-        MatchAimingToControlsIfFireAndDirectionHeld();
-        aimingVector = new Vector3(horizontalStored, verticalStored, 0f);
-        aimingVector.Normalize();
+        UpdateAimingVector();
     }
 
     void CheckCharacterWallGrabbing()
@@ -85,21 +84,47 @@ public class AimingController : MonoBehaviour
             }
         }
     }
-
-    public void StartTargetting()
+    
+    public float GetFacingDirection()
     {
-        isAiming = true;
-        DefaultAiming();
+        return facingDirection;
     }
 
-    void DefaultAiming()
+    void UpdateAimingVector()
     {
         //If no input is pressed, set the aiming direction to the current facing direction.
         if (Mathf.Abs(horizontalInput) < 0.001f && Mathf.Abs(verticalInput) < 0.001f)
         {
-            horizontalStored = facingDirection;
-			verticalStored = 0f;
+            AimInFacingDirection();
         }
+        else
+        {
+            AimInInputDirection();
+        }
+        aimingVector = new Vector3(horizontalAiming, verticalAiming, 0f);
+        aimingVector.Normalize();
+    }
+
+    void AimInFacingDirection()
+    {
+        horizontalAiming = facingDirection;
+        verticalAiming = 0f;
+    }
+    
+    void AimInInputDirection()
+    {
+        horizontalAiming = horizontalInput;
+        verticalAiming = verticalInput;
+    }
+    
+    public Vector3 GetAimingVector()
+    {
+        return aimingVector;
+    }
+
+    public void StartTargetting()
+    {
+        isAiming = true;
     }
 
     public void StopTargetting()
@@ -107,21 +132,9 @@ public class AimingController : MonoBehaviour
         isAiming = false;
     }
 
-    void MatchAimingToControlsIfFireAndDirectionHeld()
-    {
-        if (isAiming && ((Mathf.Abs(horizontalInput) > 0.001f) || (Mathf.Abs(verticalInput) > 0.001f)))
-        {
-            horizontalStored = horizontalInput;
-            verticalStored = verticalInput;
-        }
-    }
 
-    public Vector3 GetAimingVector()
+    public Vector3 GetAimingVectorWorldSpace()
     {
-        return aimingVector;
-    }
-
-    public Vector3 GetAimingVectorWorldSpace(){
         return characterContact.gameObject.transform.rotation * aimingVector;
     }
 
@@ -137,9 +150,5 @@ public class AimingController : MonoBehaviour
     public void SetVerticalInput(float vert)
     {
         verticalInput = vert;
-    }
-
-    public float GetFacingDirection(){
-        return facingDirection;
     }
 }

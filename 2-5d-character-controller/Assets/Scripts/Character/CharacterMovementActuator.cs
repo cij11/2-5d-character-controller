@@ -37,7 +37,9 @@ public class CharacterMovementActuator : MonoBehaviour
     float phaseTimer = 0f;
     bool isPhasing = false;
     bool isRolling = false; //Rolling is a horizontal phase that sticks to the ground.
-    Vector3 storedPhaseVelocity;
+
+    float phaseDirection = 1f;
+    float exitPhaseSpeed = 2f;
     float phasePeriod;
 
     public PhysicMaterial[] physicMaterials;
@@ -324,19 +326,20 @@ public class CharacterMovementActuator : MonoBehaviour
         OrientToGravityFocus();
     }
 
-    public void RollCommand(Vector3 vector, float speed, float period){
-        isRolling = true;
-        PhaseCommand(vector, speed, period);
-    }
-    public void PhaseCommand(Vector3 vector, float speed, float period)
+    public void RollCommand(float hor, float vert, float facing, float speed, float period)
     {
-        InitialisePhasing(vector, speed, period);
+        isRolling = true;
+        PhaseCommand(hor, vert, facing, speed, period);
+    }
+    public void PhaseCommand(float hor, float vert, float facing, float speed, float period)
+    {
+        InitialisePhasing(hor, vert, facing, speed, period);
     }
 
-    private void InitialisePhasing(Vector3 vector, float speed, float period)
+    private void InitialisePhasing(float hor, float vert, float facing, float speed, float period)
     {
-        this.storedPhaseVelocity = body.velocity;
-        body.velocity = body.rotation * vector * speed;
+        phaseDirection = Mathf.Sign(facing);
+        body.velocity = body.rotation * new Vector3(hor, vert, 0f).normalized * speed;
         this.phasePeriod = period;
         isPhasing = true;
         phaseTimer = this.phasePeriod;
@@ -348,8 +351,9 @@ public class CharacterMovementActuator : MonoBehaviour
         {
             UpdatePhasingTimer();
             NegateGravity();
-            if(isRolling){
-            HugGroundWhilePhasing();
+            if (isRolling)
+            {
+                HugGroundWhilePhasing();
             }
         }
     }
@@ -375,14 +379,9 @@ public class CharacterMovementActuator : MonoBehaviour
             float speed = Vector3.Magnitude(body.velocity);
             Vector3 groundVector = CalculatePerpendicular(contactSensor.GetGroundNormal());
             groundVector.Normalize();
-            if (GetHorizontalSpeed() > 0)
-            {
-                body.velocity = groundVector * speed;
-            }
-            else
-            {
-                body.velocity = -groundVector * speed;
-            }
+
+                body.velocity = phaseDirection * groundVector * speed;
+
         }
 
     }
@@ -391,7 +390,7 @@ public class CharacterMovementActuator : MonoBehaviour
     {
         isPhasing = false;
         isRolling = false;
-        body.velocity = storedPhaseVelocity;
+        body.velocity = body.velocity.normalized * exitPhaseSpeed;
         this.gameObject.layer = 0;
     }
 

@@ -30,7 +30,7 @@ public class MovementController : MonoBehaviour
     void Update()
     {
         UpdateArialJumpingTrackers();
-        
+
         HugWallIfAdjacentAndGripsWalls();
 
         if (isTargetting)
@@ -63,7 +63,8 @@ public class MovementController : MonoBehaviour
         if (!isTargetting)
             movementActuator.MoveHorizontalCommand(direction);
     }
-    public void SetWalkingSpeed(float newSpeed){
+    public void SetWalkingSpeed(float newSpeed)
+    {
         movementActuator.SetWalkingSpeed(newSpeed);
     }
     public void MoveVertical(float direction)
@@ -84,11 +85,26 @@ public class MovementController : MonoBehaviour
         //Only allow jumping if standing on or adjacent to something
         if (contactSensor.GetContactState() == ContactState.FLATGROUND)
         {
-            movementActuator.GroundJump();
+            //If vertical control held down
+            if (vert < 0f)
+            {
+                movementActuator.RollCommand(hor, vert, aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
+            }
+            else
+            {
+                movementActuator.GroundJump();
+            }
         }
         else if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
         {
-            JumpAwayFromSlope();
+            if (vert < 0f)
+            {
+                movementActuator.RollCommand(hor, vert, aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
+            }
+            else
+            {
+                JumpAwayFromSlope();
+            }
         }
         else if (contactSensor.GetContactState() == ContactState.WALLGRAB)
         {
@@ -96,12 +112,12 @@ public class MovementController : MonoBehaviour
         }
         else if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
-             movementActuator.PhaseCommand(aimingController.GetAimingVector(), phaseSpeed, phaseDuration);
+            movementActuator.PhaseCommand(hor, vert, aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
         }
         //If jump has been pressed, count as leaving the ground to prevent
         //being able to immediately take a second jump in the air is if grounded.
         ZeroFallingGraceTimer();
-        
+
     }
 
     private void JumpAwayFromSlope()
@@ -150,7 +166,8 @@ public class MovementController : MonoBehaviour
         }
     }
 
-    private void ZeroFallingGraceTimer(){
+    private void ZeroFallingGraceTimer()
+    {
         fallingTimer = -1f;
     }
 
