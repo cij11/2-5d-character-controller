@@ -6,6 +6,7 @@ public class MovementController : MonoBehaviour
 
     CharacterMovementActuator movementActuator;
     CharacterContactSensor contactSensor;
+    AimingController aimingController;
     bool isTargetting;
     bool hugsWalls = true;
 
@@ -19,6 +20,7 @@ public class MovementController : MonoBehaviour
     {
         movementActuator = this.GetComponentInParent<CharacterMovementActuator>() as CharacterMovementActuator;
         contactSensor = this.GetComponentInParent<CharacterContactSensor>() as CharacterContactSensor;
+        aimingController = this.GetComponent<AimingController>() as AimingController;
     }
 
     // Update is called once per frame
@@ -100,7 +102,8 @@ public class MovementController : MonoBehaviour
         }
         else
         {
-            movementActuator.DashCommand(new Vector3(hor, vert, 0f), 5f);
+          //  movementActuator.TeleportCommand(new Vector3(hor, vert, 0f), 5f);
+          movementActuator.PhaseCommand(aimingController.GetAimingVector(), 20f, 1f);
         }
     }
 

@@ -33,6 +33,12 @@ public class CharacterMovementActuator : MonoBehaviour
     float paracuteDeceleration = 1.5f;
     float terminalArialSpeed = -50f;
     float terminalWallSlideSpeed = -5f;
+
+    float phaseTimer = 0f;
+    bool isPhasing = false;
+    Vector3 storedPhaseVelocity;
+    float phasePeriod;
+
     public PhysicMaterial[] physicMaterials;
 
     bool isMoveHorizontalCommandGiven = false;
@@ -57,6 +63,8 @@ public class CharacterMovementActuator : MonoBehaviour
         AssignPhysicMaterial();
         isMoveHorizontalCommandGiven = false;
         isSlideCommandGiven = false;
+
+        ProcessPhasing();
     }
 
     void OrientToGravityFocus()
@@ -139,6 +147,10 @@ public class CharacterMovementActuator : MonoBehaviour
         //if ground has not been detected (eg, if standing on peak)
         if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
+            physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
+        }
+        
+        if(isPhasing){
             physCollider.material = physicMaterials[(int)PhysicMatTypes.FRICTIONLESS];
         }
     }
@@ -289,7 +301,7 @@ public class CharacterMovementActuator : MonoBehaviour
         }
     }
 
-    public void DashCommand(Vector3 dashVector, float dashMaxDistance){
+    public void TeleportCommand(Vector3 dashVector, float dashMaxDistance){
         body.velocity = new Vector3(0f, 0f, 0f);
         //cast ray
         //teleport to the float distance, or the length until the ray hit something.
@@ -305,6 +317,37 @@ public class CharacterMovementActuator : MonoBehaviour
              body.transform.position = dashPoint - body.rotation * (dashVector * 1f); //Reduce teleport distance so doesn't teleport into a wall.
            }
         OrientToGravityFocus();
+    }
+
+    public void PhaseCommand(Vector3 vector, float speed, float period){
+        InitialisePhasing(vector, speed, period);
+    }
+
+    private void InitialisePhasing(Vector3 vector, float speed, float period){
+        this.storedPhaseVelocity = body.velocity;
+        body.velocity = body.rotation * vector * speed;
+        this.phasePeriod = period;
+        isPhasing = true;
+        phaseTimer = this.phasePeriod;
+        this.gameObject.layer = 9; //Layer 9 is phasing layer.
+    }
+    void ProcessPhasing(){
+        if(isPhasing){
+            phaseTimer -= Time.deltaTime;
+            if (phaseTimer <= 0f){
+                 StopPhasing();
+            }
+          //  if(Vector3.Magnitude(body.velocity) < phaseSpeed){
+                body.AddForce(-body.transform.up * gravityForce * Time.deltaTime);
+         //   }
+        }
+    }
+
+    void StopPhasing(){
+        isPhasing = false;
+        body.velocity = storedPhaseVelocity;
+        this.gameObject.layer = 0;
+
     }
 
     void ApplyGravity()
