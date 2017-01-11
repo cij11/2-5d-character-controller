@@ -14,8 +14,8 @@ public class FSM : MonoBehaviour
     private GameObject targetObject;
     
     //Horizontal and vertical directions pointing to the closest octant to the target
-    float horOctant;
-    float vertOctant;
+    int horOctant;
+    int vertOctant;
     private AIRaycastSensors raycastSensors;
     private AIMotorActions motorActions;
     private Transform parentTransform;

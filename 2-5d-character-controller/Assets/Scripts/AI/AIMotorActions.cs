@@ -20,11 +20,11 @@ public class AIMotorActions : MonoBehaviour {
 				break;
 			}
 			case Action.MOVELEFT:{
-				MoveTowardsDirection(-1f);
+				MoveTowardsDirection(-1);
 				break;
 			}
 			case Action.MOVERIGHT:{
-				MoveTowardsDirection(1f);
+				MoveTowardsDirection(1);
 				break;
 			}
 			case Action.AIMTARGET:{
@@ -44,7 +44,7 @@ public class AIMotorActions : MonoBehaviour {
 	void MoveTowardsPoint(Vector3 goalPoint){
 		Vector3 vectorToGoal = (goalPoint - this.transform.parent.position);
 
-		float horizontalDirectionToGoal = Mathf.Sign(Vector3.Dot(vectorToGoal, this.transform.parent.right));
+		int horizontalDirectionToGoal = (int)Mathf.Sign(Vector3.Dot(vectorToGoal, this.transform.parent.right));
 		virtualController.PushHorAxis(horizontalDirectionToGoal);
 	}
 
@@ -54,10 +54,10 @@ public class AIMotorActions : MonoBehaviour {
 
 	void MoveTowardsDirection(float dir){
 		if (dir < 0){
-			virtualController.PushHorAxis(-1f);
+			virtualController.PushHorAxis(-1);
 		}
 		else
-			virtualController.PushHorAxis(1f);
+			virtualController.PushHorAxis(1);
 	}
 
 	void AimAtObject(GameObject target){
@@ -71,8 +71,8 @@ public class AIMotorActions : MonoBehaviour {
 
     void PushBothAxisToOctant(Vector3 point)
     {
-        float horOctant;
-        float vertOctant;
+        int horOctant;
+        int vertOctant;
 
         Octant.PointsToOctant(parentTransform.position, point,
             parentTransform.right, parentTransform.up, out horOctant, out vertOctant);
@@ -91,8 +91,8 @@ public class AIMotorActions : MonoBehaviour {
 	}
 
 	void ResetController(){
-		virtualController.PushHorAxis(0f);
-		virtualController.PushVertAxis(0f);
+		virtualController.PushHorAxis(0);
+		virtualController.PushVertAxis(0);
 		virtualController.ReleaseFire();
 		virtualController.ReleaseJump();
 		virtualController.ReleaseSwap();

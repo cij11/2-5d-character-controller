@@ -3,8 +3,8 @@ using System.Collections;
 
 public class AIVirtualController : MonoBehaviour {
 
-	float horAxis;
-	float vertAxis;
+	int horAxis;
+	int vertAxis;
 	bool jump;
 	bool fire;
 	bool swap;
@@ -14,8 +14,8 @@ public class AIVirtualController : MonoBehaviour {
 	bool swapTapped;
 	// Use this for initialization
 	void Start () {
-		horAxis = 0f;
-		vertAxis = 0f;
+		horAxis = 0;
+		vertAxis = 0;
 		jump = false;
 		fire = false;
 		swap = false;
@@ -25,10 +25,10 @@ public class AIVirtualController : MonoBehaviour {
 	}
 
 
-	public void PushHorAxis(float direction){
+	public void PushHorAxis(int direction){
 		horAxis = direction;
 	}
-	public void PushVertAxis(float direction){
+	public void PushVertAxis(int direction){
 		vertAxis = direction;
 	}
 
@@ -66,10 +66,10 @@ public class AIVirtualController : MonoBehaviour {
 		swap = false;
 	}
 
-	public float GetHorAxis(){
+	public int GetHorAxis(){
 		return horAxis;
 	}
-	public float GetVertAxis(){
+	public int GetVertAxis(){
 		return vertAxis;
 	}
 	public bool GetJump(){

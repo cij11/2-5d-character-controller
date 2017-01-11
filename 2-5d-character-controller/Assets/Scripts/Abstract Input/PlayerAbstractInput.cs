@@ -10,25 +10,25 @@ public class PlayerAbstractInput : AbstractInput {
 
 	void HorizontalInput(){
 		if (Input.GetAxis("Horizontal") < 0){
-			horAxis = -1f;
+			horAxis = -1;
 		}
 		else if (Input.GetAxis("Horizontal") > 0){
-			horAxis = 1f;
+			horAxis = 1;
 		}
 		else{
-			horAxis = 0f;
+			horAxis = 0;
 		}
 	}
 
 	void VerticalInput(){
 		if (Input.GetAxis("Vertical") < 0){
-			vertAxis = -1f;
+			vertAxis = -1;
 		}
 		else if (Input.GetAxis("Vertical") > 0){
-			vertAxis = 1f;
+			vertAxis = 1;
 		}
 		else{
-			vertAxis = 0f;
+			vertAxis = 0;
 		}
 	}
 

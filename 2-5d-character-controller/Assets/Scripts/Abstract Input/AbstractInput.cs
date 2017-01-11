@@ -2,8 +2,8 @@
 using System.Collections;
 
 public abstract class AbstractInput : MonoBehaviour{
-	protected float horAxis;
-	protected float vertAxis;
+	protected int horAxis;
+	protected int vertAxis;
 	protected bool jumpDown;
 	protected bool jump;
 	protected bool jumpUp;

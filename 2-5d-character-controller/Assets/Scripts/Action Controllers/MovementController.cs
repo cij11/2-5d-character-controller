@@ -38,7 +38,8 @@ public class MovementController : MonoBehaviour
         if (isTargetting)
         {
             hangtimeTimer -= Time.deltaTime;
-            if (hangtimeTimer < 0){
+            if (hangtimeTimer < 0)
+            {
                 isTargetting = false;
             }
             movementActuator.ParachuteCommand();
@@ -118,13 +119,14 @@ public class MovementController : MonoBehaviour
         }
         else if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
-                        if (vert < 0f)
+            if (vert < 0f)
             {
                 movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
             }
-            else{
-           // movementActuator.PhaseCommand(hor, vert, phaseSpeed, phaseDuration);
-           AttemptAirborneJump();
+            else
+            {
+                // movementActuator.PhaseCommand(hor, vert, phaseSpeed, phaseDuration);
+                AttemptAirborneJump();
             }
         }
         //If jump has been pressed, count as leaving the ground to prevent
