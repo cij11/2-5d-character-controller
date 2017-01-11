@@ -16,7 +16,7 @@ public class MovementController : MonoBehaviour
     int remainingDoubleJumps = 0;
 
     float phaseSpeed = 30f;
-    float phaseDuration = 0.1f;
+    float phaseDuration = 0.2f;
 
     // Use this for initialization
     void Start()
