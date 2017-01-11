@@ -8,6 +8,8 @@ public class MovementController : MonoBehaviour
     CharacterContactSensor contactSensor;
     AimingController aimingController;
     bool isTargetting;
+    float hangtimePeriod = 1f;
+    float hangtimeTimer = 0f;
     bool hugsWalls = true;
 
     float jumpAfterFallingGracePeriod = 0.1f;
@@ -35,6 +37,10 @@ public class MovementController : MonoBehaviour
 
         if (isTargetting)
         {
+            hangtimeTimer -= Time.deltaTime;
+            if (hangtimeTimer < 0){
+                isTargetting = false;
+            }
             movementActuator.ParachuteCommand();
         }
     }
@@ -175,6 +181,7 @@ public class MovementController : MonoBehaviour
     public void StartTargetting()
     {
         isTargetting = true;
+        hangtimeTimer = hangtimePeriod;
     }
     public void StopTargetting()
     {
