@@ -326,19 +326,19 @@ public class CharacterMovementActuator : MonoBehaviour
         OrientToGravityFocus();
     }
 
-    public void RollCommand(float hor, float vert, float facing, float speed, float period)
+    public void RollCommand(float facing, float speed, float period)
     {
         isRolling = true;
-        PhaseCommand(hor, vert, facing, speed, period);
+        PhaseCommand(facing, 0f, speed, period);
     }
-    public void PhaseCommand(float hor, float vert, float facing, float speed, float period)
+    public void PhaseCommand(float hor, float vert, float speed, float period)
     {
-        InitialisePhasing(hor, vert, facing, speed, period);
+        InitialisePhasing(hor, vert, speed, period);
     }
 
-    private void InitialisePhasing(float hor, float vert, float facing, float speed, float period)
+    private void InitialisePhasing(float hor, float vert, float speed, float period)
     {
-        phaseDirection = Mathf.Sign(facing);
+        phaseDirection = Mathf.Sign(hor);
         body.velocity = body.rotation * new Vector3(hor, vert, 0f).normalized * speed;
         this.phasePeriod = period;
         isPhasing = true;

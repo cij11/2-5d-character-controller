@@ -88,7 +88,7 @@ public class MovementController : MonoBehaviour
             //If vertical control held down
             if (vert < 0f)
             {
-                movementActuator.RollCommand(hor, vert, aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
+                movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
             }
             else
             {
@@ -99,7 +99,7 @@ public class MovementController : MonoBehaviour
         {
             if (vert < 0f)
             {
-                movementActuator.RollCommand(hor, vert, aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
+                movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
             }
             else
             {
@@ -112,7 +112,7 @@ public class MovementController : MonoBehaviour
         }
         else if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
-            movementActuator.PhaseCommand(hor, vert, aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
+            movementActuator.PhaseCommand(hor, vert, phaseSpeed, phaseDuration);
         }
         //If jump has been pressed, count as leaving the ground to prevent
         //being able to immediately take a second jump in the air is if grounded.
