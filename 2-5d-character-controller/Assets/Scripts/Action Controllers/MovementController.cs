@@ -94,7 +94,7 @@ public class MovementController : MonoBehaviour
         {
             EncumberedJump(hor);
         }
-        else if (vert < 0)
+        else if (vert < 0 && contactSensor.GetContactState() != ContactState.WALLGRAB)
         {
             RollJump(hor);
         }
@@ -106,7 +106,7 @@ public class MovementController : MonoBehaviour
 
     private void EncumberedJump(float hor)
     {
-        movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
+       
     }
 
     private void RollJump(float hor)

@@ -14,8 +14,13 @@ public class CharacterContactSensor : MonoBehaviour
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
     float skinWidth = 0.01f;
-    float detectionRayLengthGround = 0.1f;
-    float detectionRayLengthSides = 0.1f;
+    float detectionRayLengthGround = 0.15f;
+    float detectionRayLengthSides = 0.15f;
+
+    //Pull the raycast origins further into the rigid body to prevent missing collisions when
+    //penetrating terrain
+    float bottomSkinInset = 0.1f;
+    float sideSkinInset = 0.1f;
     int verticalRayCount = 4;
     int horizontalRayCount = 2;
     float verticalRaySpacing;
@@ -203,10 +208,10 @@ public class CharacterContactSensor : MonoBehaviour
         float xoffset = (width / 2f) - skinWidth;
         float yoffset = (height / 2f) - skinWidth;
         float zpos = transform.position.z;
-        raycastOrigins.bottomLeft = physCollider.transform.position + physCollider.transform.rotation * new Vector3(-xoffset, -yoffset, zpos);
-        raycastOrigins.bottomRight = physCollider.transform.position + physCollider.transform.rotation * new Vector3(xoffset, -yoffset, zpos);
-        raycastOrigins.topLeft = physCollider.transform.position + physCollider.transform.rotation * new Vector3(-xoffset, yoffset, zpos);
-        raycastOrigins.topRight = physCollider.transform.position + physCollider.transform.rotation * new Vector3(xoffset, yoffset, zpos);
+        raycastOrigins.bottomLeft = physCollider.transform.position + physCollider.transform.rotation * new Vector3(-xoffset, -yoffset, zpos) + body.transform.up * bottomSkinInset;
+        raycastOrigins.bottomRight = physCollider.transform.position + physCollider.transform.rotation * new Vector3(xoffset, -yoffset, zpos) + body.transform.up * bottomSkinInset;
+        raycastOrigins.topLeft = physCollider.transform.position + physCollider.transform.rotation * new Vector3(-xoffset, yoffset, zpos) + body.transform.right * bottomSkinInset;
+        raycastOrigins.topRight = physCollider.transform.position + physCollider.transform.rotation * new Vector3(xoffset, yoffset, zpos) - body.transform.right * bottomSkinInset;
     }
 
     public struct CollisionInfo
