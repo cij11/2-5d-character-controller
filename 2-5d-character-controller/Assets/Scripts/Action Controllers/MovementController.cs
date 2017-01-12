@@ -7,6 +7,7 @@ public class MovementController : MonoBehaviour
     CharacterMovementActuator movementActuator;
     CharacterContactSensor contactSensor;
     AimingController aimingController;
+    FiringController firingController;
     bool isTargetting;
     float hangtimePeriod = 1f;
     float hangtimeTimer = 0f;
@@ -26,24 +27,15 @@ public class MovementController : MonoBehaviour
         movementActuator = this.GetComponentInParent<CharacterMovementActuator>() as CharacterMovementActuator;
         contactSensor = this.GetComponentInParent<CharacterContactSensor>() as CharacterContactSensor;
         aimingController = this.GetComponent<AimingController>() as AimingController;
+        firingController = this.GetComponent<FiringController>() as FiringController;
     }
 
     // Update is called once per frame
     void Update()
     {
         UpdateArialJumpingTrackers();
-
         HugWallIfAdjacentAndGripsWalls();
-
-        if (isTargetting)
-        {
-            hangtimeTimer -= Time.deltaTime;
-            if (hangtimeTimer < 0)
-            {
-                isTargetting = false;
-            }
-            movementActuator.ParachuteCommand();
-        }
+        AimingHang();
     }
 
     void UpdateArialJumpingTrackers()
@@ -64,19 +56,30 @@ public class MovementController : MonoBehaviour
         }
     }
 
+    void AimingHang()
+    {
+        if (isTargetting)
+        {
+            hangtimeTimer -= Time.deltaTime;
+            if (hangtimeTimer < 0)
+            {
+                isTargetting = false;
+            }
+            movementActuator.ParachuteCommand();
+        }
+    }
+
     //Paramaters - Direction. -1f = left. 1f = right. 0f = nil.
     public void MoveHorizontal(float direction)
     {
-        if (!isTargetting)
+        if (!firingController.GetIsEncumbered())
+        {
             movementActuator.MoveHorizontalCommand(direction);
+        }
     }
     public void SetWalkingSpeed(float newSpeed)
     {
         movementActuator.SetWalkingSpeed(newSpeed);
-    }
-    public void MoveVertical(float direction)
-    {
-
     }
 
     public void Grab()
@@ -87,31 +90,42 @@ public class MovementController : MonoBehaviour
     //Determine what type of jump is appropriate when jump pressed, and apply
     public void Jump(float hor, float vert)
     {
+        if (firingController.GetIsEncumbered())
+        {
+            EncumberedJump(hor);
+        }
+        else if (vert < 0)
+        {
+            RollJump(hor);
+        }
+        else
+        {
+            StandardJump(hor, vert);
+        }
+    }
+
+    private void EncumberedJump(float hor)
+    {
+        movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
+    }
+
+    private void RollJump(float hor)
+    {
+        movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
+    }
+
+    private void StandardJump(float hor, float vert)
+    {
         //Detect ground and add upwards component to velocity if standing.
         //If terrain is too steep, walljump instead
         //Only allow jumping if standing on or adjacent to something
         if (contactSensor.GetContactState() == ContactState.FLATGROUND)
         {
-            //If vertical control held down
-            if (vert < 0f)
-            {
-                movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
-            }
-            else
-            {
-                movementActuator.GroundJump();
-            }
+            movementActuator.GroundJump();
         }
         else if (contactSensor.GetContactState() == ContactState.STEEPSLOPE)
         {
-            if (vert < 0f)
-            {
-                movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
-            }
-            else
-            {
-                JumpAwayFromSlope();
-            }
+            JumpAwayFromSlope();
         }
         else if (contactSensor.GetContactState() == ContactState.WALLGRAB)
         {
@@ -119,20 +133,11 @@ public class MovementController : MonoBehaviour
         }
         else if (contactSensor.GetContactState() == ContactState.AIRBORNE)
         {
-            if (vert < 0f)
-            {
-                movementActuator.RollCommand(aimingController.GetFacingDirection(), phaseSpeed, phaseDuration);
-            }
-            else
-            {
-                // movementActuator.PhaseCommand(hor, vert, phaseSpeed, phaseDuration);
-                AttemptAirborneJump();
-            }
+            AttemptAirborneJump();
         }
         //If jump has been pressed, count as leaving the ground to prevent
         //being able to immediately take a second jump in the air is if grounded.
         ZeroFallingGraceTimer();
-
     }
 
     private void JumpAwayFromSlope()

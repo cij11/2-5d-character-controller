@@ -2,108 +2,168 @@
 using System.Collections;
 
 //Single responsibility: Weapons change state by being fired.
-public abstract class Weapon : MonoBehaviour {
-	
-	public GameObject launchableGO;
+public abstract class Weapon : MonoBehaviour
+{
 
-	protected AimingController aimingController;
-	protected Character character;
+    public GameObject launchableGO;
 
-	protected WeaponState weaponState = WeaponState.IDLE;
+    protected AimingController aimingController;
+    protected FiringController firingController;
+    protected Character character;
 
-	private float cycleTimer = 0f;
-	private float windupPeriod = 0f;
-	private float firingPeriod = 0.2f;
-	private float winddownPeriod = 0.1f;
-	private float cooldownPeriod = 0.4f;
+    protected WeaponState weaponState = WeaponState.IDLE;
+    protected bool stationaryWindup = true;
+	protected bool stationaryFiring = true;
+	protected bool stationaryWindDown = true;
 
-	// Use this for initialization
-	void Start () {
-		aimingController = this.transform.parent.Find("ActionControllers").GetComponent<AimingController>();
-		character = this.transform.parent.GetComponent<Character>() as Character;
-		LoadWeaponParameters();
-	}
+    private float cycleTimer = 0f;
+    private float windupPeriod = 0.2f;
+    private float firingPeriod = 0.2f;
+    private float winddownPeriod = 0.2f;
+    private float cooldownPeriod = 1f;
 
-	protected abstract void LoadWeaponParameters();
-	protected void SetCooldown(float newCooldown){
-		cooldownPeriod = newCooldown;
-	}
-	
-	//FireCommand only does anything if the weapon is not already winding up, firing, or on cooldown.
-	//The weapon does not fire immediately. The FireCommand just starts the firing cycle.
-	//The weapon fires during the FIRING state, after the windup.
-	//The weapon is ready to fire again once the cooldown completes.
-	public void FireCommand(){
-		if (weaponState == WeaponState.IDLE){
-			WindupWeapon();
+    // Use this for initialization
+    void Start()
+    {
+        aimingController = this.transform.parent.Find("ActionControllers").GetComponent<AimingController>();
+        firingController = this.transform.parent.Find("ActionControllers").GetComponent<FiringController>();
+        character = this.transform.parent.GetComponent<Character>() as Character;
+        LoadWeaponParameters();
+    }
+
+    protected abstract void LoadWeaponParameters();
+    protected void SetCooldown(float newCooldown)
+    {
+        cooldownPeriod = newCooldown;
+    }
+
+    //Start the windup timer, and enter winding up mode.
+    //At the end of winding up, enter wound up mode.
+    //If in wound up mode and fire released, fire weapon.
+    public void WindupCommand()
+    {
+        weaponState = WeaponState.WINDING_UP;
+        cycleTimer = windupPeriod;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        UpdateFiringCycle();
+    }
+
+    void UpdateFiringCycle()
+    {
+        if (weaponState == WeaponState.WINDING_UP)
+        {
+            UpdateWindup();
+        }
+        else if (weaponState == WeaponState.WOUND_UP)
+        {
+            UpdateWoundup();
+        }
+        else if (weaponState == WeaponState.FIRING)
+        {
+            UpdateFiring();
+        }
+        else if (weaponState == WeaponState.WINDING_DOWN)
+        {
+            UpdateWindingDown();
+        }
+        else if (weaponState == WeaponState.COOLING_DOWN)
+        {
+            UpdateCoolingdown();
+        }
+    }
+
+    void UpdateWindup()
+    {
+        cycleTimer -= Time.deltaTime;
+        if (cycleTimer <= 0f)
+        {
+            TransitionToWoundUp();
+        }
+    }
+
+    void TransitionToWoundUp()
+    {
+        //No time limit for how long the weapon can stay wound up
+        weaponState = WeaponState.WOUND_UP;
+    }
+
+    void UpdateWoundup()
+    {
+        //Leave Wound up state when fire button is no longer being pressed
+        if (!firingController.GetFireHeld())
+        {
+            TransitionToFiring();
+        }
+    }
+
+    void TransitionToFiring()
+    {
+        Fire();
+        cycleTimer = firingPeriod;
+        weaponState = WeaponState.FIRING;
+    }
+
+    protected abstract void Fire();
+
+    void UpdateFiring()
+    {
+        cycleTimer -= Time.deltaTime;
+        if (cycleTimer <= 0f)
+        {
+            TransitionToWindingDown();
+        }
+    }
+
+    void TransitionToWindingDown()
+    {
+        cycleTimer = winddownPeriod;
+        weaponState = WeaponState.WINDING_DOWN;
+    }
+    void UpdateWindingDown()
+    {
+        cycleTimer -= Time.deltaTime;
+        if (cycleTimer <= 0f) TransitionToCoolingDown();
+    }
+
+    void TransitionToCoolingDown()
+    {
+        cycleTimer = cooldownPeriod;
+        weaponState = WeaponState.COOLING_DOWN;
+    }
+
+    void UpdateCoolingdown()
+    {
+        cycleTimer -= Time.deltaTime;
+        if (cycleTimer <= 0f)
+        {
+            weaponState = WeaponState.IDLE;
+        }
+    }
+
+    public bool GetIsEncumbered()
+    {
+        if (stationaryWindup)
+        {
+            if (weaponState == WeaponState.WINDING_UP) return true;
+            if (weaponState == WeaponState.WOUND_UP) return true;
+        }
+
+		if(stationaryFiring){
+			if(weaponState == WeaponState.FIRING){
+				return true;
+			}
 		}
-	}
 
-	private void WindupWeapon(){
-		weaponState = WeaponState.WINDINGUP;
-		cycleTimer = windupPeriod;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		UpdateFiringCycle();
-	}
-
-	void UpdateFiringCycle(){
-		if (weaponState == WeaponState.WINDINGUP){
-			UpdateWindup();
+		if(stationaryWindDown){
+			if(weaponState == WeaponState.WINDING_DOWN){
+				return true;
+			}
 		}
-		else if (weaponState == WeaponState.FIRING){
-			UpdateFiring();
-		}
-		else if (weaponState == WeaponState.WINDINGDOWN){
-			UpdateWindingDown();
-		}
-		else if(weaponState == WeaponState.COOLINGDOWN){
-			UpdateCoolingdown();
-		}
-	}
 
-	void UpdateWindup(){
-		cycleTimer -= Time.deltaTime;
-		if (cycleTimer <= 0f){
-			TransitionToFiring();
-		}
-	}
-
-	void TransitionToFiring(){
-			Fire();
-			cycleTimer = firingPeriod;
-			weaponState = WeaponState.FIRING;
-	}
-
-	 protected abstract void Fire();
-
-	void UpdateFiring(){
-		cycleTimer -= Time.deltaTime;
-		if(cycleTimer <= 0f){
-			TransitionToWindingDown();
-		}
-	}
-
-	void TransitionToWindingDown(){
-		cycleTimer = winddownPeriod;
-		weaponState = WeaponState.WINDINGDOWN;
-	}
-	void UpdateWindingDown(){
-		cycleTimer -= Time.deltaTime;
-		if(cycleTimer <= 0f) TransitionToCoolingDown();
-	}
-
-	void TransitionToCoolingDown(){
-		cycleTimer = cooldownPeriod;
-		weaponState = WeaponState.COOLINGDOWN;
-	}
-
-	void UpdateCoolingdown(){
-		cycleTimer -= Time.deltaTime;
-		if(cycleTimer <= 0f){
-			weaponState = WeaponState.IDLE;
-		}
-	}
+        return false;
+    }
 }

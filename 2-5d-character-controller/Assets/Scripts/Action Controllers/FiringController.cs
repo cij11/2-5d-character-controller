@@ -2,25 +2,40 @@
 using System.Collections;
 
 //Firing controller passes on button up commands, to avoid polling and lag on state changes.
-public class FiringController : MonoBehaviour {
+public class FiringController : MonoBehaviour
+{
 
-	Weapon activeWeapon;
+	bool fireHeld = false;
+    Weapon activeWeapon;
 
-	public void RegisterWeapon(Weapon Weapon){
-		activeWeapon = Weapon;
+    public void RegisterWeapon(Weapon Weapon)
+    {
+        activeWeapon = Weapon;
+    }
+
+    public void InitiateFire()
+    {
+        if (activeWeapon != null)
+        {
+            activeWeapon.WindupCommand();
+        }
+		fireHeld = true;
+    }
+
+    public void ReleaseFire()
+    {
+		fireHeld = false;
+    }
+
+	public bool GetFireHeld(){
+		return fireHeld;
 	}
-
-	public void InitiateFire(){
-
-	}
-
-	public void SustainFire(){
-
-	}
-
-	public void ReleaseFire(){
-		if(activeWeapon != null){
-			activeWeapon.FireCommand();
-		}
-	}
+    public bool GetIsEncumbered()
+    {
+        if (activeWeapon != null)
+        {
+            return activeWeapon.GetIsEncumbered();
+        }
+        return false;
+    }
 }

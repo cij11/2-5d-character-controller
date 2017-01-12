@@ -20,7 +20,7 @@ public class AimingController : MonoBehaviour
     bool isAiming;
 
     float verticalGravityTimer = 0f;
-    float verticalGravityPeriod = 0.1f;
+    float verticalGravityPeriod = 0.15f;
     float horizontalGravityTimer = 0f;
     float horizontalGravityPeriod = 0.1f;
     void Start()

@@ -7,7 +7,7 @@ public abstract class Projectile : MonoBehaviour {
 	protected Character firingCharacter;
 	protected Vector3 worldLaunchVector;
 
-	protected float maxLifespan = 1f;
+	protected float maxLifespan = 0.4f;
 
 	protected int damage = 4;
 	protected float knockbackSpeed = 30f;

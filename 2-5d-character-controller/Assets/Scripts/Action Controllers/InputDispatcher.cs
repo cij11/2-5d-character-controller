@@ -47,12 +47,6 @@ public class InputDispatcher : MonoBehaviour {
 		if(abstractInput.GetHorAxis() > 0){
 			movementController.MoveHorizontal(1);
 		}
-		if(abstractInput.GetVertAxis() < 0){
-			movementController.MoveVertical(-1);
-		}
-		if(abstractInput.GetVertAxis() > 0){
-			movementController.MoveVertical(1);
-		}
 		if(abstractInput.GetJumpDown()){
 			movementController.Jump(abstractInput.GetHorAxis(), abstractInput.GetVertAxis());
 		}
@@ -80,9 +74,7 @@ public class InputDispatcher : MonoBehaviour {
 		if(abstractInput.GetFireDown()){
 			firingController.InitiateFire();
 		}
-		if(abstractInput.GetFire()){
-			firingController.SustainFire();
-		}
+
 		if(abstractInput.GetFireUp()){
 			firingController.ReleaseFire();
 		}
