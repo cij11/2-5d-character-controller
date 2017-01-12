@@ -3,7 +3,7 @@ using System.Collections;
 
 public class AimingController : MonoBehaviour
 {
-    
+
     CharacterContactSensor characterContact;
 
     float horizontalInput;
@@ -19,6 +19,10 @@ public class AimingController : MonoBehaviour
 
     bool isAiming;
 
+    float verticalGravityTimer = 0f;
+    float verticalGravityPeriod = 0.1f;
+    float horizontalGravityTimer = 0f;
+    float horizontalGravityPeriod = 0.1f;
     void Start()
     {
         horizontalAiming = 0f;
@@ -35,9 +39,16 @@ public class AimingController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        UpdateGravityTimers();
         CheckCharacterWallGrabbing();
         DetermineFacingDirection();
         UpdateAimingVector();
+    }
+
+    void UpdateGravityTimers()
+    {
+        if (verticalGravityTimer > 0) verticalGravityTimer -= Time.deltaTime;
+        if(horizontalGravityTimer > 0) horizontalGravityTimer -= Time.deltaTime;
     }
 
     void CheckCharacterWallGrabbing()
@@ -84,7 +95,7 @@ public class AimingController : MonoBehaviour
             }
         }
     }
-    
+
     public float GetFacingDirection()
     {
         return facingDirection;
@@ -95,7 +106,10 @@ public class AimingController : MonoBehaviour
         //If no input is pressed, set the aiming direction to the current facing direction.
         if (Mathf.Abs(horizontalInput) < 0.001f && Mathf.Abs(verticalInput) < 0.001f)
         {
-            AimInFacingDirection();
+            //Only pull to default after vertical gravity has expired.
+            if(verticalGravityTimer <= 0){
+              AimInFacingDirection();
+            }
         }
         else
         {
@@ -108,15 +122,38 @@ public class AimingController : MonoBehaviour
     void AimInFacingDirection()
     {
         horizontalAiming = facingDirection;
-        verticalAiming = 0f;
+        //Only update vertical to 0 after <gravity> time has passed
+        if (verticalGravityTimer < 0)
+        {
+            verticalAiming = 0;
+        }
     }
-    
+
     void AimInInputDirection()
     {
-        horizontalAiming = horizontalInput;
-        verticalAiming = verticalInput;
+        if(horizontalInput == 0){
+            if(horizontalGravityTimer <= 0){
+                horizontalAiming = 0;
+            }
+        }
+        else{
+          horizontalAiming = horizontalInput;
+        }
+
+        //If vertical input is 0, only update it after <gravity> time has passed.
+        if (verticalInput == 0)
+        {
+            if (verticalGravityTimer <= 0)
+            {
+                verticalAiming = 0;
+            }
+        }
+        else
+        {
+            verticalAiming = verticalInput;
+        }
     }
-    
+
     public Vector3 GetAimingVector()
     {
         return aimingVector;
@@ -146,9 +183,11 @@ public class AimingController : MonoBehaviour
     public void SetHorizontalInput(float hor)
     {
         horizontalInput = hor;
+        if(hor != 0) horizontalGravityTimer = horizontalGravityPeriod;
     }
-    public void SetVerticalInput(float vert)
+    public void SetVerticalInput(int vert)
     {
         verticalInput = vert;
+        if (vert != 0) verticalGravityTimer = verticalGravityPeriod; //Only reset gravity timer when axis is perturbed.
     }
 }

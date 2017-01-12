@@ -33,6 +33,7 @@ public class CharacterMovementActuator : MonoBehaviour
     float paracuteDeceleration = 1.5f;
     float terminalArialSpeed = -50f;
     float terminalWallSlideSpeed = -5f;
+    float terminalWallClimbSpeed = 1f;
 
     float phaseTimer = 0f;
     bool isPhasing = false;
@@ -69,6 +70,7 @@ public class CharacterMovementActuator : MonoBehaviour
         isSlideCommandGiven = false;
 
         ProcessPhasing();
+        KillUpwardsVelocityOnStartWallgrab();
     }
 
     void OrientToGravityFocus()
@@ -107,6 +109,16 @@ public class CharacterMovementActuator : MonoBehaviour
     void LimitWallSlideSpeed()
     {
         //Negate gravity
+    }
+
+    void LimitWallClimbSpeed(){
+        if(contactSensor.GetContactState() == ContactState.WALLGRAB){
+        float verticalSpeed = VerticalSpeed();
+        if (verticalSpeed > terminalWallClimbSpeed){
+            body.velocity = body.transform.up;
+        }
+        }
+        
     }
 
     //Assign physic material to idle, unless on a steep slope, a wall, or input given
@@ -460,5 +472,13 @@ public class CharacterMovementActuator : MonoBehaviour
     public void SetWalkingSpeed(float newSpeed)
     {
         maxWalkSpeed = newSpeed;
+    }
+
+    void KillUpwardsVelocityOnStartWallgrab(){
+        if (contactSensor.GetHasContactStateChanged()){
+            if(contactSensor.GetContactState() == ContactState.WALLGRAB){
+                LimitWallClimbSpeed();
+            }
+        }
     }
 }

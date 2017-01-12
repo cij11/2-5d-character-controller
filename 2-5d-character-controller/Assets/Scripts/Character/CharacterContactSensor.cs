@@ -32,6 +32,9 @@ public class CharacterContactSensor : MonoBehaviour
     UpdateTimer updateTimer;
     public int updatePeriod = 1;
 
+    bool contactStateChanged = false;
+    ContactState oldContactState = ContactState.FLATGROUND;
+
     // Use this for initialization
     void Start()
     {
@@ -96,6 +99,14 @@ public class CharacterContactSensor : MonoBehaviour
         {
             contactState = ContactState.AIRBORNE;
         }
+
+        if(oldContactState != contactState){
+            contactStateChanged = true;
+        }
+        else{
+            contactStateChanged = false;
+        }
+        oldContactState = contactState;
     }
 
     void Raycasts()
@@ -294,5 +305,8 @@ public class CharacterContactSensor : MonoBehaviour
         if (contactState == ContactState.STEEPSLOPE) return true;
         if (contactState == ContactState.WALLGRAB) return true;
         return false;
+    }
+    public bool GetHasContactStateChanged(){
+        return contactStateChanged;
     }
 }

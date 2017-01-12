@@ -24,10 +24,10 @@ public abstract class AbstractInput : MonoBehaviour{
 	//To use a virtual controller, must call UpdateInput() prior To
 	//getting any axis/button states.
 	public abstract void UpdateInput();
-	public float GetHorAxis(){
+	public int GetHorAxis(){
 		return horAxis;
 	}
-	public float GetVertAxis(){
+	public int GetVertAxis(){
 		return vertAxis;
 	}
 	public bool GetJumpDown(){
