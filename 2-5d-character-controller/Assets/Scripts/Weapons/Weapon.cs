@@ -163,7 +163,6 @@ public abstract class Weapon : MonoBehaviour
 				return true;
 			}
 		}
-
         return false;
     }
 }
