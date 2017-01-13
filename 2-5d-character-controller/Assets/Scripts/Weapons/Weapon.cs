@@ -9,6 +9,7 @@ public abstract class Weapon : MonoBehaviour
 
     protected AimingController aimingController;
     protected FiringController firingController;
+    protected CharacterContactSensor contactSensor;
     protected Character character;
 
     protected WeaponState weaponState = WeaponState.IDLE;
@@ -28,6 +29,7 @@ public abstract class Weapon : MonoBehaviour
         aimingController = this.transform.parent.Find("ActionControllers").GetComponent<AimingController>();
         firingController = this.transform.parent.Find("ActionControllers").GetComponent<FiringController>();
         character = this.transform.parent.GetComponent<Character>() as Character;
+        contactSensor = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
         LoadWeaponParameters();
     }
 
@@ -35,6 +37,9 @@ public abstract class Weapon : MonoBehaviour
     protected void SetCooldown(float newCooldown)
     {
         cooldownPeriod = newCooldown;
+    }
+    protected void SetFiringPeriod(float newFiringTime){
+        firingPeriod = newFiringTime;
     }
 
     //Start the windup timer, and enter winding up mode.
@@ -164,5 +169,9 @@ public abstract class Weapon : MonoBehaviour
 			}
 		}
         return false;
+    }
+
+    protected void CancelFiring(){
+        weaponState = WeaponState.IDLE;
     }
 }

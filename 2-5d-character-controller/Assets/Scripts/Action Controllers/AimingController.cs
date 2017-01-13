@@ -6,15 +6,15 @@ public class AimingController : MonoBehaviour
 
     CharacterContactSensor characterContact;
 
-    float horizontalInput;
-    float verticalInput;
+    int horizontalInput;
+    int verticalInput;
 
     bool isWallGrabbing;
     MovementDirection wallSide;
-    float facingDirection = 1f;
+    int facingDirection = 1;
 
-    float horizontalAiming;
-    float verticalAiming;
+    int horizontalAiming;
+    int verticalAiming;
     Vector3 aimingVector;
 
     bool isAiming;
@@ -25,10 +25,10 @@ public class AimingController : MonoBehaviour
     float horizontalGravityPeriod = 0.1f;
     void Start()
     {
-        horizontalAiming = 0f;
-        verticalAiming = 0f;
-        horizontalInput = 0f;
-        verticalInput = 0f;
+        horizontalAiming = 0;
+        verticalAiming = 0;
+        horizontalInput = 0;
+        verticalInput = 0;
         isAiming = false;
         isWallGrabbing = false;
         wallSide = MovementDirection.NEUTRAL;
@@ -80,23 +80,23 @@ public class AimingController : MonoBehaviour
         if (isWallGrabbing)
         {
             //Face right if grabbing left wall, otherwise face left.
-            facingDirection = (wallSide == MovementDirection.LEFT) ? 1f : -1f;
+            facingDirection = (wallSide == MovementDirection.LEFT) ? 1 : -1;
         }
         else
         {
             //Else update to change direction if a direciton is pressed
             if (horizontalInput < 0)
             {
-                facingDirection = -1f;
+                facingDirection = -1;
             }
             if (horizontalInput > 0)
             {
-                facingDirection = 1f;
+                facingDirection = 1;
             }
         }
     }
 
-    public float GetFacingDirection()
+    public int GetFacingDirection()
     {
         return facingDirection;
     }
@@ -104,7 +104,7 @@ public class AimingController : MonoBehaviour
     void UpdateAimingVector()
     {
         //If no input is pressed, set the aiming direction to the current facing direction.
-        if (Mathf.Abs(horizontalInput) < 0.001f && Mathf.Abs(verticalInput) < 0.001f)
+        if (horizontalInput == 0 && verticalInput == 0)
         {
             //Only pull to default after vertical gravity has expired.
             if(verticalGravityTimer <= 0){
@@ -115,7 +115,7 @@ public class AimingController : MonoBehaviour
         {
             AimInInputDirection();
         }
-        aimingVector = new Vector3(horizontalAiming, verticalAiming, 0f);
+        aimingVector = new Vector3((float)horizontalAiming, (float)verticalAiming, 0f);
         aimingVector.Normalize();
     }
 
@@ -175,12 +175,14 @@ public class AimingController : MonoBehaviour
         return characterContact.gameObject.transform.rotation * aimingVector;
     }
 
+
+
     public bool GetIsAiming()
     {
         return isAiming;
     }
 
-    public void SetHorizontalInput(float hor)
+    public void SetHorizontalInput(int hor)
     {
         horizontalInput = hor;
         if(hor != 0) horizontalGravityTimer = horizontalGravityPeriod;
@@ -189,5 +191,13 @@ public class AimingController : MonoBehaviour
     {
         verticalInput = vert;
         if (vert != 0) verticalGravityTimer = verticalGravityPeriod; //Only reset gravity timer when axis is perturbed.
+    }
+
+    public int GetHorizontalAiming(){
+        return horizontalAiming;
+    }
+
+    public int GetVerticalAiming(){
+        return verticalAiming;
     }
 }

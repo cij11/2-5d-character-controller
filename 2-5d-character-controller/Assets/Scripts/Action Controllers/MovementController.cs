@@ -106,7 +106,7 @@ public class MovementController : MonoBehaviour
 
     private void EncumberedJump(float hor)
     {
-       
+
     }
 
     private void RollJump(float hor)
