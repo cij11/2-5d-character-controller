@@ -11,17 +11,28 @@ public abstract class Projectile : MonoBehaviour {
 
 	protected int damage = 4;
 	protected float knockbackSpeed = 30f;
+
+	protected Transform spriteTransform;
+	protected int direction = 1;
 	float age;
 
 	// Use this for initialization
 	void Start () {
 		age = 0f;
+		spriteTransform = this.transform.GetChild(0);
+		SetupSprite();
 	}
 
-	public void LoadLaunchParameters(Weapon firingWeapon, Character firingCharacter, Vector3 worldLaunch){
+	protected virtual void SetupSprite(){
+
+	}
+
+	public void LoadLaunchParameters(Weapon firingWeapon, Character firingCharacter, Vector3 worldLaunch, int facingDirection){
 		this.firingWeapon = firingWeapon;
 		this.firingCharacter = firingCharacter;
 		worldLaunchVector = worldLaunch;
+		direction = facingDirection;
+
 	}
 
 	public abstract void Launch();

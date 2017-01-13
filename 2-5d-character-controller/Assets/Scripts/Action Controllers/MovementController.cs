@@ -77,6 +77,10 @@ public class MovementController : MonoBehaviour
             movementActuator.MoveHorizontalCommand(direction);
         }
     }
+
+    public void Lunge(Vector3 lungeVector, float speed){
+        movementActuator.LungeCommand(lungeVector, speed);
+    }
     public void SetWalkingSpeed(float newSpeed)
     {
         movementActuator.SetWalkingSpeed(newSpeed);

@@ -111,14 +111,17 @@ public class CharacterMovementActuator : MonoBehaviour
         //Negate gravity
     }
 
-    void LimitWallClimbSpeed(){
-        if(contactSensor.GetContactState() == ContactState.WALLGRAB){
-        float verticalSpeed = VerticalSpeed();
-        if (verticalSpeed > terminalWallClimbSpeed){
-            body.velocity = body.transform.up;
+    void LimitWallClimbSpeed()
+    {
+        if (contactSensor.GetContactState() == ContactState.WALLGRAB)
+        {
+            float verticalSpeed = VerticalSpeed();
+            if (verticalSpeed > terminalWallClimbSpeed)
+            {
+                body.velocity = body.transform.up;
+            }
         }
-        }
-        
+
     }
 
     //Assign physic material to idle, unless on a steep slope, a wall, or input given
@@ -474,11 +477,18 @@ public class CharacterMovementActuator : MonoBehaviour
         maxWalkSpeed = newSpeed;
     }
 
-    void KillUpwardsVelocityOnStartWallgrab(){
-        if (contactSensor.GetHasContactStateChanged()){
-            if(contactSensor.GetContactState() == ContactState.WALLGRAB){
+    void KillUpwardsVelocityOnStartWallgrab()
+    {
+        if (contactSensor.GetHasContactStateChanged())
+        {
+            if (contactSensor.GetContactState() == ContactState.WALLGRAB)
+            {
                 LimitWallClimbSpeed();
             }
         }
+    }
+
+    public void LungeCommand(Vector3 lungeVector, float speed){
+        body.velocity = body.velocity + body.rotation * lungeVector * speed;
     }
 }

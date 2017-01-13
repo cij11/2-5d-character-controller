@@ -11,6 +11,7 @@ public abstract class Weapon : MonoBehaviour
     protected FiringController firingController;
     protected CharacterContactSensor contactSensor;
     protected Character character;
+    protected MovementController movementController;
 
     protected WeaponState weaponState = WeaponState.IDLE;
     protected bool stationaryWindup = true;
@@ -28,6 +29,7 @@ public abstract class Weapon : MonoBehaviour
     {
         aimingController = this.transform.parent.Find("ActionControllers").GetComponent<AimingController>();
         firingController = this.transform.parent.Find("ActionControllers").GetComponent<FiringController>();
+        movementController = this.transform.parent.Find("ActionControllers").GetComponent<MovementController>();
         character = this.transform.parent.GetComponent<Character>() as Character;
         contactSensor = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
         LoadWeaponParameters();

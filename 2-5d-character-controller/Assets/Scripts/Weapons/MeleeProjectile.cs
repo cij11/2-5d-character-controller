@@ -9,6 +9,11 @@ public class MeleeProjectile : Projectile {
 		IncreaseAge();
 	}
 
+
+	protected override void SetupSprite(){
+		BoxCollider boxCollider = GetComponent<BoxCollider>() as BoxCollider;
+		spriteTransform.localScale = boxCollider.size; 
+	}
 	public override void Launch(){
 		LaunchMelee();
 	}

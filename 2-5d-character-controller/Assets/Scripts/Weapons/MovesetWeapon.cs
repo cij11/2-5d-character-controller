@@ -8,9 +8,9 @@ public class MovesetWeapon : Weapon
     public GameObject sideAttack;
     public GameObject arialDownAttack;
 
-    Vector3 upSpawnOffset = new Vector3(1f, 1f, 0f);
-    Vector3 sideSpawnOffset = new Vector3(2f, 0f, 0f);
-    Vector3 downSpawnOffset = new Vector3(1f, -0.5f, 0f);
+    Vector3 upSpawnOffset = new Vector3(0.5f, 0.5f, 0f);
+    Vector3 sideSpawnOffset = new Vector3(1f, 0f, 0f);
+    Vector3 downSpawnOffset = new Vector3(0, -0.5f, 0f);
     Vector3 arialDownSpawnOffset = new Vector3(0f, -1f, 0f);
 
 
@@ -55,7 +55,7 @@ public class MovesetWeapon : Weapon
     {
         Vector3 spawnLocation = new Vector3((float)aimingController.GetFacingDirection() * spawnOffset.x, spawnOffset.y, spawnOffset.z);
         GameObject newProjectile = (GameObject)Instantiate(fireProjectile, this.transform.position + spawnLocation, Quaternion.identity);
-        newProjectile.GetComponent<MovesetProjectile>().LoadLaunchParameters(this, this.character, spawnLocation);
+        newProjectile.GetComponent<MovesetProjectile>().LoadLaunchParameters(this, this.character, spawnLocation, aimingController.GetFacingDirection());
         newProjectile.GetComponent<MovesetProjectile>().Launch();
     }
 }

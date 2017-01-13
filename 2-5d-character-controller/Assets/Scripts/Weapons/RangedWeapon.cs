@@ -29,7 +29,7 @@ public class RangedWeapon : Weapon {
 	private void LaunchRangedProjectile(){
 		Vector3 worldAimingVector = aimingController.GetAimingVectorWorldSpace();
 		GameObject newProjectile = (GameObject)Instantiate(launchableGO, this.transform.position + worldAimingVector, Quaternion.identity);
-		newProjectile.GetComponent<RangedProjectile>().LoadLaunchParameters(this, this.character, worldAimingVector);
+		newProjectile.GetComponent<RangedProjectile>().LoadLaunchParameters(this, this.character, worldAimingVector, aimingController.GetFacingDirection());
 		newProjectile.GetComponent<RangedProjectile>().Launch();
 	}
 }
