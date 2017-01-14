@@ -4,7 +4,9 @@ using System.Collections;
 public class CharacterMovementActuator : MonoBehaviour
 {
 
-    public Vector3 gravityFocus = new Vector3(0, 0, 0);
+    public Vector3 radialGravityFocus = new Vector3(0, 0, 0);
+    public Vector3 directionalGravityUp = new Vector3 (0f, -1f, 0f);
+    bool radialGravity = false;
     Rigidbody body;
     Collider physCollider;
     CharacterContactSensor contactSensor;
@@ -54,12 +56,13 @@ public class CharacterMovementActuator : MonoBehaviour
         body = GetComponent<Rigidbody>();
         contactSensor = GetComponent<CharacterContactSensor>();
         physCollider = GetComponent<BoxCollider>();
+        directionalGravityUp.Normalize();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        OrientToGravityFocus();
+        OrientToGravity();
 
         ApplyGravity();
         LimitWallSlideSpeed();
@@ -73,14 +76,27 @@ public class CharacterMovementActuator : MonoBehaviour
         KillUpwardsVelocityOnStartWallgrab();
     }
 
+    void OrientToGravity(){
+        if(radialGravity){
+            OrientToGravityFocus();
+        }
+        else{
+            OrientToGravityDirection();
+        }
+    }
+
+
+    void OrientToGravityDirection(){
+        body.transform.rotation = Quaternion.FromToRotation(body.transform.up, directionalGravityUp) * transform.rotation;
+    }
     void OrientToGravityFocus()
     {
         //Get a vector to point feet at. This might be the center of a hull for a round world, or down for a ship
         //with artificial gravity. Give this body position as arguement to calculate down or radial orientation position
-        Vector3 pointToOrientTo = gravityFocus;
+        Vector3 pointToOrientTo = radialGravityFocus;
 
         //Align the up vector of the body with the vector from the focus towards the body.
-        Vector3 vectorFromFocusToBody = body.position - gravityFocus;
+        Vector3 vectorFromFocusToBody = body.position - radialGravityFocus;
         vectorFromFocusToBody.Normalize();
         body.transform.rotation = Quaternion.FromToRotation(body.transform.up, vectorFromFocusToBody) * transform.rotation;
     }
