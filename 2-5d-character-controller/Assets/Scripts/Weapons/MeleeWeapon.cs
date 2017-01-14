@@ -3,6 +3,7 @@ using System.Collections;
 
 public class MeleeWeapon : Weapon
 {
+    float lungeSpeed = 10f;
 
     protected override void LoadWeaponParameters()
     {
@@ -20,13 +21,13 @@ public class MeleeWeapon : Weapon
             else
             {
                 LaunchMeleeProjectile();
-				movementController.Lunge(aimingController.GetAimingVector(), 5f);
+				movementController.Lunge(aimingController.GetAimingVector(), lungeSpeed);
             }
         }
         else
         {
             LaunchMeleeProjectile();
-			movementController.Lunge(aimingController.GetAimingVector(), 5f);
+			movementController.Lunge(aimingController.GetAimingVector(), lungeSpeed);
         }
     }
 

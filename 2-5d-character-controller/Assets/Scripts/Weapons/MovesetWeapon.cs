@@ -25,13 +25,14 @@ public class MovesetWeapon : Weapon
         GameObject fireProjectile = sideAttack;
         Vector3 spawnOffset = sideSpawnOffset;
 
-        if (aimingController.GetHorizontalAiming() == 0)
-        {
             if (aimingController.GetVerticalAiming() == 1)
             {
                 fireProjectile = upAttack;
                 spawnOffset = upSpawnOffset;
             }
+            
+        if (aimingController.GetHorizontalAiming() == 0)
+        {
             if (aimingController.GetVerticalAiming() == -1)
             {
                 {
