@@ -6,13 +6,13 @@ public class CharacterMovementActuator : MonoBehaviour
 
     public Vector3 radialGravityFocus = new Vector3(0, 0, 0);
     public Vector3 directionalGravityUp = new Vector3 (0f, -1f, 0f);
-    bool radialGravity = false;
+    bool radialGravity = true;
     Rigidbody body;
     Collider physCollider;
     CharacterContactSensor contactSensor;
 
     //Speed the character walks at when left or right held
-    float maxWalkSpeed = 4;
+    float maxWalkSpeed = 12;
     //Time to attain walk velocity from stationary.
     float landSpeedUpForce = 1500f;
     float landBreakForce = 5000f;
