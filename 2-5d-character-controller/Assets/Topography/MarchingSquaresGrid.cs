@@ -42,6 +42,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 
 		DigCircle ((float)worldSizeX/2f, (float)worldSizeY/2f, vesselRadius - perimeterBuffer, true);
 		DigPerlinTunnels (perlinResolution);
+		StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
 
 
@@ -60,11 +61,11 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			InterpolateAllVertical ();
 	}
 
-	public void DigCircle(float cx, float cy, float radius, bool solid){
-		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 1, 0);
-		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 1, 0);
-		int xmax = (int)Mathf.Min ((int) cx + (int) radius + 1, nodeXSize-1);
-		int ymax = (int)Mathf.Min ((int) cy + (int) radius + 1, nodeYSize-1);
+/*	public void DigCircle(float cx, float cy, float radius, bool solid){
+		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 2, 0);
+		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 2, 0);
+		int xmax = (int)Mathf.Min ((int) cx + (int) radius + 2, nodeXSize-1);
+		int ymax = (int)Mathf.Min ((int) cy + (int) radius + 2, nodeYSize-1);
 
 		for (int i = xmin; i < xmax; i++) {
 			for (int j = ymin; j < ymax; j++) {
@@ -85,6 +86,33 @@ public class MarchingSquaresGrid : MonoBehaviour {
 							nodeArray[i,j] = 1 - overlap;
 					}
 
+				}
+			}
+		}
+	}*/
+
+	//Treat the circle as a hemisphere, then normalise elevation to the radius of the hemisphere.
+	public void DigCircle(float cx, float cy, float radius, bool solid){
+		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 2, 0);
+		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 2, 0);
+		int xmax = (int)Mathf.Min ((int) cx + (int) radius + 2, nodeXSize-1);
+		int ymax = (int)Mathf.Min ((int) cy + (int) radius + 2, nodeYSize-1);
+
+		float radiusSquared = radius * radius;
+		for (int i = xmin; i < xmax; i++) {
+			for (int j = ymin; j < ymax; j++) {
+				float xDistFromCenter = cx - i;
+				float yDistFromCenter = cy - j;
+				//height of hemisphere at this point
+				float baseSquared = xDistFromCenter*xDistFromCenter + yDistFromCenter * yDistFromCenter;
+				if (baseSquared > radiusSquared){ //point is outside the hemisphere
+
+				}
+				else{
+					float hemisphereHeight = Mathf.Sqrt(radiusSquared - baseSquared);
+					float hemisphereHeightNormalised = hemisphereHeight/ radius;
+					//if (hemisphereHeight > 1) hemisphereHeight = 1f;
+					nodeArray[i,j] = hemisphereHeightNormalised;
 				}
 			}
 		}
@@ -114,6 +142,45 @@ public class MarchingSquaresGrid : MonoBehaviour {
 				
 				if (perl < nodeArray [i, j] - 0.1f)	//If perl is less than the current node, but the current node is not on the border of a circle or otherwise at a gradient.
 					nodeArray [i, j] = perl;
+			}
+		}
+	}
+
+	public void StampAxisAlignedRect(int startX, int startY, int width, int height, float elevation){
+		RecieveStamp (BuildRectStamp (width, height, elevation), startX, startX);
+	}
+
+	public float [,] BuildRectStamp(int width, int height, float elevation){
+		float[,] stampNodeArray = new float[width, height];
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				stampNodeArray [i, j] = elevation;
+			}
+		}
+		return stampNodeArray;
+	}
+
+	//Apply the source marching grid stamp to the destination marching grid
+	public void RecieveStamp(float[,] stampNodeArray, int startLeftX, int startBotY){
+		//Loop through the stamp from the bottom left (0, 0) to the top right (stampsizeX, stampsizeY)
+		//Loop through the marching squares grid from startinb point (startLeftX, startBottomY) to the
+		//top right (startLeftX + stampsizeX, startBottomY + stampSizeY)
+		int destStartX = startLeftX;
+		int destStartY = startBotY;
+		int destEndX = startLeftX + stampNodeArray.GetLength (0);
+		int destEndY = startBotY + stampNodeArray.GetLength (1);
+
+		//Limit bounds of stamping to the bounds of the marching squares grid
+		if (destEndX > nodeXSize) destEndX = nodeXSize;
+		if (destEndY > nodeYSize)
+			destEndY = nodeYSize;
+
+		for (int i = destStartX; i < destEndX; i++) {
+			for (int j = destStartY; j < destEndY; j++) {
+				int stampX = i - destStartX;
+				int stampY = j - destStartY;
+
+				nodeArray [i, j] = stampNodeArray [stampX, stampY];
 			}
 		}
 	}
