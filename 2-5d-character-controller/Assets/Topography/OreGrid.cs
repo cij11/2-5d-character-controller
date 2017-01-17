@@ -106,6 +106,9 @@ public class OreGrid {
 	}
 
 	public int GetTile(int x, int y){
+		if (x >= width || y >= height) {
+			return (int)OreTypes.Mud;
+		}
 		return terrainMap [x, y];
 	}
 

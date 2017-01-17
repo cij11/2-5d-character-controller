@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class MarchingSquaresGrid : MonoBehaviour {
 	public int tileXSize = 10;
@@ -40,10 +41,11 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			}
 
 
-		DigCircle ((float)worldSizeX/2f, (float)worldSizeY/2f, vesselRadius - perimeterBuffer, true);
-		DigPerlinTunnels (perlinResolution);
-		StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
+	//	DigCircle ((float)worldSizeX/2f, (float)worldSizeY/2f, vesselRadius - perimeterBuffer, true);
+	//	DigPerlinTunnels (perlinResolution);
+	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
+		DigTestConvexHull(1f);
 
 
 			for (i = 0; i < tileXSize; i++){
@@ -182,6 +184,77 @@ public class MarchingSquaresGrid : MonoBehaviour {
 
 				nodeArray [i, j] = stampNodeArray [stampX, stampY];
 			}
+		}
+	}
+
+	//Test function. Construct a simple upper and lower hull. Call DigConvexHull.
+	public void DigTestConvexHull(float elevation){
+		List<Vector2> topHull = new List<Vector2> ();
+		List<Vector2> botHull = new List<Vector2> ();
+
+		topHull.Add (new Vector2 (10, 20));
+		topHull.Add (new Vector2 (30, 41));
+		topHull.Add (new Vector2 (45, 20));
+
+		botHull.Add (new Vector2 (10, 20));
+		botHull.Add (new Vector2 (30, 11));
+		botHull.Add (new Vector2 (45, 20));
+
+		DigConvexHull (topHull, botHull, elevation);
+	}
+
+	//Step along an upper and lower hull of a convex shape. Set all the nodes between these two hulls
+	//equal to the given elevation.
+	public void DigConvexHull(List<Vector2> topHull, List<Vector2> botHull, float elevation){
+		float startX = topHull [0].x;
+		startX = Mathf.Max (startX, 0);
+		float endX = topHull [topHull.Count - 1].x;
+		endX = Mathf.Min (endX, tileXSize);
+
+		int topHullIndex = 0;
+		int botHullIndex = 0;
+		float topGradient = HullSegmentGradient (topHull, topHullIndex);
+		float botGradient = HullSegmentGradient (botHull, botHullIndex);
+
+		for (int i = Mathf.CeilToInt (startX); i < Mathf.FloorToInt (endX); i++) {
+			if (CheckLineEnd (topHull, topHullIndex, i)) {
+				topHullIndex = topHullIndex + 1;
+				topGradient = HullSegmentGradient (topHull, topHullIndex);
+			}
+			if (CheckLineEnd (botHull, botHullIndex, i)) {
+				botHullIndex = botHullIndex + 1;
+				botGradient = HullSegmentGradient (botHull, botHullIndex);
+			}
+
+			float topIntersection = topGradient * (i - topHull [topHullIndex].x) + topHull [topHullIndex].y; //mx + c
+			float botIntersection = botGradient * (i - botHull [botHullIndex].x) + botHull [botHullIndex].y;
+
+			SetColumnSpanToElevation (i, Mathf.RoundToInt(botIntersection), Mathf.RoundToInt(topIntersection), elevation);
+		}
+	}
+
+	private float HullSegmentGradient(List<Vector2> hull, int index){
+		return (hull [index + 1].y - hull [index].y) / (hull [index + 1].x - hull [index].x);
+	}
+
+	//Advance to the next index in the hull if the column index is past the end of the current line segment
+	private bool CheckLineEnd(List<Vector2> hull, int hullIndex, int columnIndex){
+		if (columnIndex > hull [hullIndex + 1].x) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	void SetColumnSpanToElevation(int column, int botOfSpan, int topOfSpan, float elevation){
+		for (int j = botOfSpan; j < topOfSpan; j++) {
+			nodeArray [column, j] = elevation;
+		}
+	}
+
+	void SetColumnToElevation(int column, float elevation){
+		for (int j = 0; j < tileYSize; j++) {
+			nodeArray [column, j] = elevation;
 		}
 	}
 
