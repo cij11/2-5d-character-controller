@@ -192,13 +192,21 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		List<Vector2> topHull = new List<Vector2> ();
 		List<Vector2> botHull = new List<Vector2> ();
 
-		topHull.Add (new Vector2 (10, 20));
-		topHull.Add (new Vector2 (30, 41));
-		topHull.Add (new Vector2 (45, 20));
+/*		topHull.Add (new Vector2 (25, 20));
+		topHull.Add (new Vector2 (30, 100));
+		topHull.Add (new Vector2 (110, 95));
 
-		botHull.Add (new Vector2 (10, 20));
-		botHull.Add (new Vector2 (30, 11));
-		botHull.Add (new Vector2 (45, 20));
+		botHull.Add (new Vector2 (25, 20));
+		botHull.Add (new Vector2 (105, 15));
+		botHull.Add (new Vector2 (110, 95));*/
+
+		topHull.Add (new Vector2 (10, 60));
+		topHull.Add (new Vector2 (60, 110));
+		topHull.Add (new Vector2 (110, 60));
+
+		botHull.Add (new Vector2 (10, 60));
+		botHull.Add (new Vector2 (60, 10));
+		botHull.Add (new Vector2 (110, 60));
 
 		DigConvexHull (topHull, botHull, elevation);
 	}
@@ -226,10 +234,10 @@ public class MarchingSquaresGrid : MonoBehaviour {
 				botGradient = HullSegmentGradient (botHull, botHullIndex);
 			}
 
-			float topIntersection = topGradient * (i - topHull [topHullIndex].x) + topHull [topHullIndex].y; //mx + c
-			float botIntersection = botGradient * (i - botHull [botHullIndex].x) + botHull [botHullIndex].y;
+			float topIntersection = topGradient * ((float)i - topHull [topHullIndex].x) + topHull [topHullIndex].y; //mx + c
+			float botIntersection = botGradient * ((float)i - botHull [botHullIndex].x) + botHull [botHullIndex].y;
 
-			SetColumnSpanToElevation (i, Mathf.RoundToInt(botIntersection), Mathf.RoundToInt(topIntersection), elevation);
+			SetColumnSpanToElevation (i, botIntersection, topIntersection, elevation);
 		}
 	}
 
@@ -246,10 +254,46 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		}
 	}
 
-	void SetColumnSpanToElevation(int column, int botOfSpan, int topOfSpan, float elevation){
-		for (int j = botOfSpan; j < topOfSpan; j++) {
+	void SetColumnSpanToElevation(int column, float botOfSpan, float topOfSpan, float elevation){
+		int topNode = Mathf.FloorToInt (topOfSpan);
+		float topOverlap = topOfSpan - topNode;
+
+		int botNode = Mathf.CeilToInt (botOfSpan);
+		float botOverlap = Mathf.Abs(botOfSpan - botNode);
+
+		//Nodes on the boundry transition between elevation and the surrounding terrain, 
+		//so are set to get the correct topographic line, not the correct elevation.
+
+		//If need to push the topography further than 0.5, set current node to max, and lift adjacent node
+		if (topOverlap > 0.5f) {
+			nodeArray [column, topNode] = 1f;
+			nodeArray [column, topNode + 1] = InverseInterpolationOneToB (topOverlap);
+		} else {
+			nodeArray [column, topNode] = InverseInterpolationAToZero (topOverlap);
+		}
+		print (nodeArray [column, topNode]);
+		nodeArray [column, botNode] = InverseInterpolationAToZero (botOverlap);
+
+		if (botOverlap > 0.5f) {
+			nodeArray [column, botNode] = 1f;
+			nodeArray [column, botNode - 1] = InverseInterpolationOneToB (botOverlap);
+		} else {
+			nodeArray [column, botNode] = InverseInterpolationAToZero (botOverlap);
+		}
+
+		for (int j = botNode + 1; j < topNode; j++) {
 			nodeArray [column, j] = elevation;
 		}
+	}
+
+	//Push out from one node, assuming other node 0
+	float InverseInterpolationAToZero(float targetTopographic){
+		return (0.5f) / (1f - targetTopographic);
+	}
+
+	//Pull in from another node, assuming pulling from 1 node.
+	float InverseInterpolationOneToB(float targetTopograpohic){
+		return (1f - (0.5f / targetTopograpohic));
 	}
 
 	void SetColumnToElevation(int column, float elevation){
