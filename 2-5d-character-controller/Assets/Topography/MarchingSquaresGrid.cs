@@ -192,21 +192,21 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		List<Vector2> topHull = new List<Vector2> ();
 		List<Vector2> botHull = new List<Vector2> ();
 
-/*		topHull.Add (new Vector2 (25, 20));
+		topHull.Add (new Vector2 (25, 20));
 		topHull.Add (new Vector2 (30, 100));
 		topHull.Add (new Vector2 (110, 95));
 
 		botHull.Add (new Vector2 (25, 20));
 		botHull.Add (new Vector2 (105, 15));
-		botHull.Add (new Vector2 (110, 95));*/
+		botHull.Add (new Vector2 (110, 95));
 
-		topHull.Add (new Vector2 (10, 60));
+	/*	topHull.Add (new Vector2 (10, 60));
 		topHull.Add (new Vector2 (60, 110));
 		topHull.Add (new Vector2 (110, 60));
 
 		botHull.Add (new Vector2 (10, 60));
 		botHull.Add (new Vector2 (60, 10));
-		botHull.Add (new Vector2 (110, 60));
+		botHull.Add (new Vector2 (110, 60));*/
 
 		DigConvexHull (topHull, botHull, elevation);
 	}
@@ -214,6 +214,11 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	//Step along an upper and lower hull of a convex shape. Set all the nodes between these two hulls
 	//equal to the given elevation.
 	public void DigConvexHull(List<Vector2> topHull, List<Vector2> botHull, float elevation){
+		BulkAndFineHorizontalCutsPass (topHull, botHull, elevation);
+		FineVerticalCutsPass (topHull, botHull, elevation);
+	}
+
+	private void BulkAndFineHorizontalCutsPass(List<Vector2> topHull, List<Vector2> botHull, float elevation){
 		float startX = topHull [0].x;
 		startX = Mathf.Max (startX, 0);
 		float endX = topHull [topHull.Count - 1].x;
@@ -299,6 +304,24 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	void SetColumnToElevation(int column, float elevation){
 		for (int j = 0; j < tileYSize; j++) {
 			nodeArray [column, j] = elevation;
+		}
+	}
+
+	private void FineVerticalCutsPass(List<Vector2> topHull, List<Vector2> botHull, float elevation){
+		//Ascending top hull
+		int topIndex = 0;
+		for (int i = topIndex; i < topHull.Count - 1; i++) {
+			float topGradient = HullSegmentGradient (topHull, topIndex);
+			if (topGradient > 1) { //if this is steep
+				int startY = Mathf.CeilToInt(topHull[topIndex].y);
+				int endY = Mathf.FloorToInt (topHull [topIndex + 1].y);
+				for (int j = startY; j < endY + 1; j++) {
+					float xIntersect = topHull [topIndex].x + ((float)j - topHull [topIndex].y) / topGradient;
+					int nearestIncludedNode = Mathf.CeilToInt (xIntersect);
+					float overlap = nearestIncludedNode - xIntersect;
+					nodeArray [nearestIncludedNode, j] = overlap;
+				}
+			}
 		}
 	}
 
