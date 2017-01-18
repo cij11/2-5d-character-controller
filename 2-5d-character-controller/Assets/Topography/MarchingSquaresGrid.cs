@@ -31,20 +31,22 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			horizInterpArray = new float[tileXSize, nodeYSize];
 			vertInterpArray = new float[nodeXSize, tileYSize];
 
+		float defaultElevation = 1f;
+
 			int i = 0;
 			int j = 0;
 			for (i = 0; i < nodeXSize-1; i++){
 				for (j = 0; j < nodeYSize-1; j++){
 				//	nodeArray [i, j] = Mathf.PerlinNoise (i * perlinResolution, j * perlinResolution) * 0.9f;
-				nodeArray[i,j] = 0f;
+				nodeArray[i,j] = defaultElevation;
 				}
 			}
 
-	//	DigCircle ((float)worldSizeX/2f, (float)worldSizeY/2f, vesselRadius - perimeterBuffer, true);
+	//	DigCircle ((float)worldSizeX/2f, (float)worldSizeY/2f, vesselRadius - perimeterBuffer, false);
 	//	DigPerlinTunnels (perlinResolution);
 	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
-		DigTestConvexHull(true);
+		DigTestConvexHull(false);
 
 
 			for (i = 0; i < tileXSize; i++){
@@ -83,7 +85,12 @@ public class MarchingSquaresGrid : MonoBehaviour {
 					float hemisphereHeight = Mathf.Sqrt(radiusSquared - baseSquared);
 					float hemisphereHeightNormalised = hemisphereHeight/ radius;
 					//if (hemisphereHeight > 1) hemisphereHeight = 1f;
-					nodeArray[i,j] = hemisphereHeightNormalised;
+					if (solid) {
+						nodeArray [i, j] = hemisphereHeightNormalised;
+					}
+					else {
+						nodeArray [i, j] = 1f - hemisphereHeightNormalised;
+					}
 				}
 			}
 		}

@@ -86,14 +86,12 @@ public class MarchingSquaresCutTools {
 			int row = Mathf.FloorToInt (intersection);
 			if (row > 0 && row < tileYSize-1) {
 				float overlap = intersection - row;
-			//	nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
 				SetNodesToAchieveTopography(column, row, column, row+1, elevation, overlap);
 			}
 		} else {
 			int row = Mathf.CeilToInt (intersection);
 			if (row > 1 && row < tileYSize) {
 				float overlap = (float)row - intersection;
-			//	nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
 				SetNodesToAchieveTopography(column, row, column, row-1, elevation, overlap);
 			}
 		}
@@ -104,29 +102,55 @@ public class MarchingSquaresCutTools {
 			int column = Mathf.FloorToInt (intersection);
 			if (column > 0 && column < tileXSize-1) {
 				float overlap = intersection - column;
-			//	nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
 				SetNodesToAchieveTopography(column, row, column + 1, row, elevation, overlap);
 			}
 		} else {
 			int column = Mathf.CeilToInt (intersection);
 			if (column > 1 && column < tileXSize) {
 				float overlap = (float)column - intersection;
-			//	nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
 				SetNodesToAchieveTopography(column, row, column - 1, row, elevation, overlap);
 			}
 		}
 	}
 
 	void SetNodesToAchieveTopography(int acol, int arow, int bcol, int brow, float elevation, float overlap){
-	//	nodeArray [acol, arow] = Mathf.Abs (overlap + elevation - 1);
-			//If need to push the topography further than 0.5, set current node to max, and lift adjacent node
-		if (overlap > 0.5f) {
-			nodeArray [acol, arow] = 1f;
-			nodeArray [bcol, brow] = InverseInterpolationOneToB (overlap);
+
+		//If adjacent node already on the same side of elevation, set current node to elevation.
+		if (elevation > 0.5) {
+			if (nodeArray [bcol, brow] > 0.5) {
+				nodeArray [acol, arow] = elevation;
+				return;
+			}
+		}
+		if (elevation < 0.5) {
+			if (nodeArray [bcol, brow] < 0.5) {
+				nodeArray [acol, arow] = elevation;
+				return;
+			}
+		}
+
+		//If this is a solid stamp
+		if (elevation > 0.5) {
+			if (overlap > 0.5f) { //If the boundary needs to be pulled as well as pushed.
+				nodeArray [acol, arow] = 1f;
+				nodeArray [bcol, brow] = InverseInterpolationOneToB (overlap);
 			} else {
 				nodeArray [acol, arow] = InverseInterpolationAToZero (overlap);
 			}
-				
+			return;
+		}
+
+		//If this is an empty stamp, invert the overlap and treat node b as the one pushing the boundry.
+		if (elevation < 0.5) {
+			overlap = 1f - overlap;  //Just treat the other node as the tall one.
+			if (overlap > 0.5f) { //If the boundary needs to be pulled as well as pushed.
+				nodeArray [bcol, brow] = 1f;
+				nodeArray [acol, arow] = InverseInterpolationOneToB (overlap);
+			} else {
+				nodeArray [bcol, brow] = InverseInterpolationAToZero (overlap);
+			}
+			return;
+		}
 	}
 
 	float InverseInterpolationAToZero(float targetTopographic){
