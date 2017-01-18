@@ -15,12 +15,16 @@ public class MarchingSquaresCutTools {
 	}
 	//Step along an upper and lower hull of a convex shape. Set all the nodes between these two hulls
 	//equal to the given elevation.
-	public void DigConvexHull(List<Vector2> topHull, List<Vector2> botHull, float elevation){
-		BulkAndFineHorizontalCutsPass (topHull, botHull, elevation);
-		FineVerticalCutsPass (topHull, botHull, elevation);
+	public void DigConvexHull(List<Vector2> topHull, List<Vector2> botHull, bool isSolid){
+		BulkAndFineHorizontalCutsPass (topHull, botHull, isSolid);
+		FineVerticalCutsPass (topHull, botHull, isSolid);
 	}
 
-	private void BulkAndFineHorizontalCutsPass(List<Vector2> topHull, List<Vector2> botHull, float elevation){
+	private void BulkAndFineHorizontalCutsPass(List<Vector2> topHull, List<Vector2> botHull, bool isSolid){
+		float elevation = 0f;
+		if (isSolid)
+			elevation = 1f;
+		
 		float startX = topHull [0].x;
 		startX = Mathf.Max (startX, 0);
 		float endX = topHull [topHull.Count - 1].x;
@@ -32,11 +36,11 @@ public class MarchingSquaresCutTools {
 		float botGradient = HullSegmentGradient (botHull, botHullIndex);
 
 		for (int i = Mathf.CeilToInt (startX); i < Mathf.FloorToInt (endX); i++) {
-			if (CheckLineEnd (topHull, topHullIndex, i)) {
+			while (CheckLineEnd (topHull, topHullIndex, i)) {
 				topHullIndex = topHullIndex + 1;
 				topGradient = HullSegmentGradient (topHull, topHullIndex);
 			}
-			if (CheckLineEnd (botHull, botHullIndex, i)) {
+			while (CheckLineEnd (botHull, botHullIndex, i)) {
 				botHullIndex = botHullIndex + 1;
 				botGradient = HullSegmentGradient (botHull, botHullIndex);
 			}
@@ -44,7 +48,9 @@ public class MarchingSquaresCutTools {
 			float topIntersection = topGradient * ((float)i - topHull [topHullIndex].x) + topHull [topHullIndex].y; //mx + c
 			float botIntersection = botGradient * ((float)i - botHull [botHullIndex].x) + botHull [botHullIndex].y;
 
-			SetColumnSpanToElevation (i, botIntersection, topIntersection, elevation);
+			BulkFillColumnSpan(i, botIntersection, topIntersection, elevation);
+			SetColumnNodeToVertOverlap(i, topIntersection, elevation, 1);
+			SetColumnNodeToVertOverlap(i, botIntersection, elevation, -1);
 		}
 	}
 
@@ -61,45 +67,37 @@ public class MarchingSquaresCutTools {
 		}
 	}
 
-	void SetColumnSpanToElevation(int column, float botOfSpan, float topOfSpan, float elevation){
+	void BulkFillColumnSpan(int column, float botOfSpan, float topOfSpan, float elevation){
 		int topNode = Mathf.FloorToInt (topOfSpan);
-		float topOverlap = topOfSpan - topNode;
-
 		int botNode = Mathf.CeilToInt (botOfSpan);
-		float botOverlap = Mathf.Abs(botOfSpan - botNode);
-
-		//Nodes on the boundry transition between elevation and the surrounding terrain, 
-		//so are set to get the correct topographic line, not the correct elevation.
-
-		//If need to push the topography further than 0.5, set current node to max, and lift adjacent node
-		if (topOverlap > 0.5f) {
-			nodeArray [column, topNode] = 1f;
-			nodeArray [column, topNode + 1] = InverseInterpolationOneToB (topOverlap);
-		} else {
-			nodeArray [column, topNode] = InverseInterpolationAToZero (topOverlap);
-		}
-		nodeArray [column, botNode] = InverseInterpolationAToZero (botOverlap);
-
-		if (botOverlap > 0.5f) {
-			nodeArray [column, botNode] = 1f;
-			nodeArray [column, botNode - 1] = InverseInterpolationOneToB (botOverlap);
-		} else {
-			nodeArray [column, botNode] = InverseInterpolationAToZero (botOverlap);
-		}
 
 		for (int j = botNode + 1; j < topNode; j++) {
 			nodeArray [column, j] = elevation;
 		}
 	}
 
-	//Push out from one node, assuming other node 0
-	float InverseInterpolationAToZero(float targetTopographic){
-		return (0.5f) / (1f - targetTopographic);
+	void SetColumnNodeToVertOverlap (int column, float intersection, float elevation, int direction){
+		if (direction == 1) { //If the cut overshoots above
+			int row = Mathf.FloorToInt (intersection);
+			float overlap = intersection - row;
+			nodeArray [column, row] = Mathf.Abs(overlap + elevation - 1);
+		} else {
+			int row = Mathf.CeilToInt (intersection);
+			float overlap = (float)row - intersection;
+			nodeArray [column, row] = Mathf.Abs(overlap + elevation - 1);
+		}
 	}
 
-	//Pull in from another node, assuming pulling from 1 node.
-	float InverseInterpolationOneToB(float targetTopograpohic){
-		return (1f - (0.5f / targetTopograpohic));
+	void SetRowNodeToHorizontalOverlap(int row, float intersection, float elevation, int direction){
+		if (direction == 1) {  //If the cut overshoots to the right
+			int column = Mathf.FloorToInt (intersection);
+			float overlap = intersection - column;
+			nodeArray [column, row] = Mathf.Abs(overlap + elevation - 1);
+		} else {
+			int column = Mathf.CeilToInt (intersection);
+			float overlap = (float)column - intersection;
+			nodeArray [column, row] = Mathf.Abs(overlap + elevation - 1);
+		}
 	}
 
 	void SetColumnToElevation(int column, float elevation){
@@ -108,33 +106,46 @@ public class MarchingSquaresCutTools {
 		}
 	}
 
-	private void FineVerticalCutsPass(List<Vector2> topHull, List<Vector2> botHull, float elevation){
-		//Ascending top hull
+	private void FineVerticalCutsPass(List<Vector2> topHull, List<Vector2> botHull, bool isSolid){
+		float elevation = 0f;
+		if (isSolid)
+			elevation = 1f;
+
+		//Top hull
 		for (int topIndex = 0;  topIndex < topHull.Count - 1; topIndex++) {
 			float topGradient = HullSegmentGradient (topHull, topIndex);
+			int startY = Mathf.CeilToInt(topHull[topIndex].y);
+			int endY = Mathf.FloorToInt (topHull [topIndex + 1].y);
 			if (topGradient > 1) { //if this is steep
-				int startY = Mathf.CeilToInt(topHull[topIndex].y);
-				int endY = Mathf.FloorToInt (topHull [topIndex + 1].y);
-				for (int j = startY; j < endY + 1; j++) {
+				for (int j = startY; j < endY + 1; j++) { //Advance from bottom to top
 					float xIntersect = topHull [topIndex].x + ((float)j - topHull [topIndex].y) / topGradient;
-					int nearestIncludedNode = Mathf.CeilToInt (xIntersect);
-					float overlap = nearestIncludedNode - xIntersect;
-					nodeArray [nearestIncludedNode, j] = overlap;
+					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, -1);
+				}
+			}
+
+			if (topGradient < -1) { //if this is steeply descending
+				for (int j = startY; j > endY + 1; j--) { //Advance from top to bottom
+					float xIntersect = topHull [topIndex].x + ((float)j - topHull [topIndex].y) / topGradient;
+					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, 1);
 				}
 			}
 		}
 
-		//Ascending bot hull
+		//Bot hull
 		for (int botIndex = 0; botIndex < botHull.Count - 1; botIndex++) {
 			float botGradient = HullSegmentGradient (botHull, botIndex);
+			int startY = Mathf.CeilToInt(botHull[botIndex].y);
+			int endY = Mathf.FloorToInt (botHull [botIndex + 1].y);
 			if (botGradient > 1) { //if this is steep
-				int startY = Mathf.CeilToInt(botHull[botIndex].y);
-				int endY = Mathf.FloorToInt (botHull [botIndex + 1].y);
 				for (int j = startY; j < endY + 1; j++) {
 					float xIntersect = botHull [botIndex].x + ((float)j - botHull [botIndex].y) / botGradient;
-					int nearestIncludedNode = Mathf.FloorToInt (xIntersect);
-					float overlap = xIntersect - nearestIncludedNode;
-					nodeArray [nearestIncludedNode, j] = overlap;
+					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, 1);
+				}
+			}
+			if (botGradient < -1) { //if this is steeply descending
+				for (int j = startY; j > endY + 1; j--) { //Advance from top to bottom
+					float xIntersect = topHull [botIndex].x + ((float)j - topHull [botIndex].y) / botGradient;
+					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, -1);
 				}
 			}
 		}

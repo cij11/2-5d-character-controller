@@ -33,19 +33,18 @@ public class MarchingSquaresGrid : MonoBehaviour {
 
 			int i = 0;
 			int j = 0;
-			for (i = 0; i < nodeXSize; i++){
-				for (j = 0; j < nodeYSize; j++){
+			for (i = 0; i < nodeXSize-1; i++){
+				for (j = 0; j < nodeYSize-1; j++){
 				//	nodeArray [i, j] = Mathf.PerlinNoise (i * perlinResolution, j * perlinResolution) * 0.9f;
-				nodeArray[i,j] = 0.0f;
+				nodeArray[i,j] = 0f;
 				}
 			}
-
 
 	//	DigCircle ((float)worldSizeX/2f, (float)worldSizeY/2f, vesselRadius - perimeterBuffer, true);
 	//	DigPerlinTunnels (perlinResolution);
 	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
-		DigTestConvexHull(1f);
+		DigTestConvexHull(true);
 
 
 			for (i = 0; i < tileXSize; i++){
@@ -62,36 +61,6 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			InterpolateAllHorizontal ();
 			InterpolateAllVertical ();
 	}
-
-/*	public void DigCircle(float cx, float cy, float radius, bool solid){
-		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 2, 0);
-		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 2, 0);
-		int xmax = (int)Mathf.Min ((int) cx + (int) radius + 2, nodeXSize-1);
-		int ymax = (int)Mathf.Min ((int) cy + (int) radius + 2, nodeYSize-1);
-
-		for (int i = xmin; i < xmax; i++) {
-			for (int j = ymin; j < ymax; j++) {
-				float dist = Vector3.Distance (new Vector3 (cx, cy, 0f), new Vector3 ((float)i, (float)j, 0f));
-				float overlap = radius - dist;
-				if (solid) {
-					if ((overlap > 1)) {
-						nodeArray [i, j] = 1f;
-					} else if (overlap > 0) {
-						nodeArray [i, j] = overlap;
-					}
-				} else {
-					
-					if ((overlap > 1)) {
-						nodeArray [i, j] = 0f;
-					} else if (overlap > 0){
-						if (1 - overlap < nodeArray[i,j])
-							nodeArray[i,j] = 1 - overlap;
-					}
-
-				}
-			}
-		}
-	}*/
 
 	//Treat the circle as a hemisphere, then normalise elevation to the radius of the hemisphere.
 	public void DigCircle(float cx, float cy, float radius, bool solid){
@@ -188,17 +157,17 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	}
 
 	//Test function. Construct a simple upper and lower hull. Call DigConvexHull.
-	public void DigTestConvexHull(float elevation){
+	public void DigTestConvexHull(bool isSolid){
 		List<Vector2> topHull = new List<Vector2> ();
 		List<Vector2> botHull = new List<Vector2> ();
 
-		topHull.Add (new Vector2 (25, 20));
-		topHull.Add (new Vector2 (30, 100));
-		topHull.Add (new Vector2 (110, 95));
+		topHull.Add (new Vector2 (100, 50));
+		topHull.Add (new Vector2 (110, 100));
+		topHull.Add (new Vector2 (120, 30));
 
-		botHull.Add (new Vector2 (25, 20));
-		botHull.Add (new Vector2 (105, 15));
-		botHull.Add (new Vector2 (110, 95));
+		botHull.Add (new Vector2 (100, 50));
+		botHull.Add (new Vector2 (110, 5));
+		botHull.Add (new Vector2 (120, 30));
 
 	/*	topHull.Add (new Vector2 (10, 60));
 		topHull.Add (new Vector2 (60, 110));
@@ -208,7 +177,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		botHull.Add (new Vector2 (60, 10));
 		botHull.Add (new Vector2 (110, 60));*/
 
-		new MarchingSquaresCutTools(nodeArray).DigConvexHull (topHull, botHull, elevation);
+		new MarchingSquaresCutTools(nodeArray).DigConvexHull (topHull, botHull, isSolid);
 	}
 
 	public float GetNode(int x, int y){
