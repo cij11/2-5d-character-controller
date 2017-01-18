@@ -115,17 +115,37 @@ public class OreGrid {
 	public int GetTileByIndex(int index, int x, int y){
 		switch (index) {
 		case 0:
+			if (OutsideBounds (x, y))
+				return (int)OreTypes.Mud;
 			return terrainMap [x, y];
 		case 2:
+			if (OutsideBounds (x, y+1))
+				return (int)OreTypes.Mud;
 			return terrainMap [x, y+1];
 		case 4:
+			if (OutsideBounds (x+1, y+1))
+				return (int)OreTypes.Mud;
 			return terrainMap [x+1, y+1];
 		case 6:
+			if (OutsideBounds (x+1, y))
+				return (int)OreTypes.Mud;
 			return terrainMap [x+1, y];
 		default:
 			return 0;
 
 		}
+	}
+
+	private bool OutsideBounds(int x, int y){
+		if (x < 0)
+			return true;
+		if (y < 0)
+			return true;
+		if (x >= width)
+			return true;
+		if (y >= height)
+			return true;
+		return false;
 	}
 
 	public Color32 GetOreColor(OreTypes ore){

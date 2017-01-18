@@ -36,7 +36,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			for (i = 0; i < nodeXSize-1; i++){
 				for (j = 0; j < nodeYSize-1; j++){
 				//	nodeArray [i, j] = Mathf.PerlinNoise (i * perlinResolution, j * perlinResolution) * 0.9f;
-				nodeArray[i,j] = 0f;
+				nodeArray[i,j] = 1f;
 				}
 			}
 
@@ -44,7 +44,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	//	DigPerlinTunnels (perlinResolution);
 	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
-		DigTestConvexHull(true);
+		DigTestConvexHull(false);
 
 
 			for (i = 0; i < tileXSize; i++){
@@ -161,13 +161,13 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		List<Vector2> topHull = new List<Vector2> ();
 		List<Vector2> botHull = new List<Vector2> ();
 
-		topHull.Add (new Vector2 (100, 50));
-		topHull.Add (new Vector2 (110, 100));
-		topHull.Add (new Vector2 (120, 30));
+		topHull.Add (new Vector2 (100, 100));
+		topHull.Add (new Vector2 (125, 190));
+		topHull.Add (new Vector2 (150, 100));
 
-		botHull.Add (new Vector2 (100, 50));
-		botHull.Add (new Vector2 (110, 5));
-		botHull.Add (new Vector2 (120, 30));
+		botHull.Add (new Vector2 (100, 100));
+		botHull.Add (new Vector2 (125, -50));
+		botHull.Add (new Vector2 (150, 100));
 
 	/*	topHull.Add (new Vector2 (10, 60));
 		topHull.Add (new Vector2 (60, 110));

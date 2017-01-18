@@ -71,6 +71,11 @@ public class MarchingSquaresCutTools {
 		int topNode = Mathf.FloorToInt (topOfSpan);
 		int botNode = Mathf.CeilToInt (botOfSpan);
 
+		if (topNode > tileYSize)
+			topNode = tileYSize;
+		if (botNode < 0)
+			botNode = 0;
+		
 		for (int j = botNode + 1; j < topNode; j++) {
 			nodeArray [column, j] = elevation;
 		}
@@ -79,24 +84,32 @@ public class MarchingSquaresCutTools {
 	void SetColumnNodeToVertOverlap (int column, float intersection, float elevation, int direction){
 		if (direction == 1) { //If the cut overshoots above
 			int row = Mathf.FloorToInt (intersection);
-			float overlap = intersection - row;
-			nodeArray [column, row] = Mathf.Abs(overlap + elevation - 1);
+			if (row > 0 && row < tileXSize) {
+				float overlap = intersection - row;
+				nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+			}
 		} else {
 			int row = Mathf.CeilToInt (intersection);
-			float overlap = (float)row - intersection;
-			nodeArray [column, row] = Mathf.Abs(overlap + elevation - 1);
+			if (row > 0 && row < tileXSize) {
+				float overlap = (float)row - intersection;
+				nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+			}
 		}
 	}
 
 	void SetRowNodeToHorizontalOverlap(int row, float intersection, float elevation, int direction){
 		if (direction == 1) {  //If the cut overshoots to the right
 			int column = Mathf.FloorToInt (intersection);
-			float overlap = intersection - column;
-			nodeArray [column, row] = Mathf.Abs(overlap + elevation - 1);
+			if (column > 0 && column < tileYSize) {
+				float overlap = intersection - column;
+				nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+			}
 		} else {
 			int column = Mathf.CeilToInt (intersection);
-			float overlap = (float)column - intersection;
-			nodeArray [column, row] = Mathf.Abs(overlap + elevation - 1);
+			if (column > 0 && column < tileYSize) {
+				float overlap = (float)column - intersection;
+				nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+			}
 		}
 	}
 
@@ -116,6 +129,16 @@ public class MarchingSquaresCutTools {
 			float topGradient = HullSegmentGradient (topHull, topIndex);
 			int startY = Mathf.CeilToInt(topHull[topIndex].y);
 			int endY = Mathf.FloorToInt (topHull [topIndex + 1].y);
+
+			if (startY > tileYSize)
+				startY = tileYSize;
+			if (startY < 0)
+				startY = 0;
+			if (endY > tileYSize)
+				endY = tileYSize;
+			if (endY < 0)
+				endY = 0;
+
 			if (topGradient > 1) { //if this is steep
 				for (int j = startY; j < endY + 1; j++) { //Advance from bottom to top
 					float xIntersect = topHull [topIndex].x + ((float)j - topHull [topIndex].y) / topGradient;
@@ -136,6 +159,16 @@ public class MarchingSquaresCutTools {
 			float botGradient = HullSegmentGradient (botHull, botIndex);
 			int startY = Mathf.CeilToInt(botHull[botIndex].y);
 			int endY = Mathf.FloorToInt (botHull [botIndex + 1].y);
+
+			if (startY > tileYSize)
+				startY = tileYSize;
+			if (startY < 0)
+				startY = 0;
+			if (endY > tileYSize)
+				endY = tileYSize;
+			if (endY < 0)
+				endY = 0;
+			
 			if (botGradient > 1) { //if this is steep
 				for (int j = startY; j < endY + 1; j++) {
 					float xIntersect = botHull [botIndex].x + ((float)j - botHull [botIndex].y) / botGradient;
