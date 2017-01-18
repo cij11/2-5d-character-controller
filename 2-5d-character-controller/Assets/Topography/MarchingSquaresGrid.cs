@@ -36,7 +36,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			for (i = 0; i < nodeXSize-1; i++){
 				for (j = 0; j < nodeYSize-1; j++){
 				//	nodeArray [i, j] = Mathf.PerlinNoise (i * perlinResolution, j * perlinResolution) * 0.9f;
-				nodeArray[i,j] = 1f;
+				nodeArray[i,j] = 0f;
 				}
 			}
 
@@ -44,7 +44,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	//	DigPerlinTunnels (perlinResolution);
 	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
-		DigTestConvexHull(false);
+		DigTestConvexHull(true);
 
 
 			for (i = 0; i < tileXSize; i++){

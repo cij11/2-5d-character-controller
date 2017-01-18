@@ -84,15 +84,17 @@ public class MarchingSquaresCutTools {
 	void SetColumnNodeToVertOverlap (int column, float intersection, float elevation, int direction){
 		if (direction == 1) { //If the cut overshoots above
 			int row = Mathf.FloorToInt (intersection);
-			if (row > 0 && row < tileXSize) {
+			if (row > 0 && row < tileYSize-1) {
 				float overlap = intersection - row;
-				nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+			//	nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+				SetNodesToAchieveTopography(column, row, column, row+1, elevation, overlap);
 			}
 		} else {
 			int row = Mathf.CeilToInt (intersection);
-			if (row > 0 && row < tileXSize) {
+			if (row > 1 && row < tileYSize) {
 				float overlap = (float)row - intersection;
-				nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+			//	nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+				SetNodesToAchieveTopography(column, row, column, row-1, elevation, overlap);
 			}
 		}
 	}
@@ -100,17 +102,40 @@ public class MarchingSquaresCutTools {
 	void SetRowNodeToHorizontalOverlap(int row, float intersection, float elevation, int direction){
 		if (direction == 1) {  //If the cut overshoots to the right
 			int column = Mathf.FloorToInt (intersection);
-			if (column > 0 && column < tileYSize) {
+			if (column > 0 && column < tileXSize-1) {
 				float overlap = intersection - column;
-				nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+			//	nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+				SetNodesToAchieveTopography(column, row, column + 1, row, elevation, overlap);
 			}
 		} else {
 			int column = Mathf.CeilToInt (intersection);
-			if (column > 0 && column < tileYSize) {
+			if (column > 1 && column < tileXSize) {
 				float overlap = (float)column - intersection;
-				nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+			//	nodeArray [column, row] = Mathf.Abs (overlap + elevation - 1);
+				SetNodesToAchieveTopography(column, row, column - 1, row, elevation, overlap);
 			}
 		}
+	}
+
+	void SetNodesToAchieveTopography(int acol, int arow, int bcol, int brow, float elevation, float overlap){
+	//	nodeArray [acol, arow] = Mathf.Abs (overlap + elevation - 1);
+			//If need to push the topography further than 0.5, set current node to max, and lift adjacent node
+		if (overlap > 0.5f) {
+			nodeArray [acol, arow] = 1f;
+			nodeArray [bcol, brow] = InverseInterpolationOneToB (overlap);
+			} else {
+				nodeArray [acol, arow] = InverseInterpolationAToZero (overlap);
+			}
+				
+	}
+
+	float InverseInterpolationAToZero(float targetTopographic){
+		return (0.5f) / (1f - targetTopographic);
+	}
+
+	//Pull in from another node, assuming pulling from 1 node.
+	float InverseInterpolationOneToB(float targetTopograpohic){
+		return (1f - (0.5f / targetTopograpohic));
 	}
 
 	void SetColumnToElevation(int column, float elevation){
