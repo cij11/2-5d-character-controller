@@ -31,7 +31,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			horizInterpArray = new float[tileXSize, nodeYSize];
 			vertInterpArray = new float[nodeXSize, tileYSize];
 
-		float defaultElevation = 0f;
+		float defaultElevation = 1f;
 
 			int i = 0;
 			int j = 0;
@@ -46,7 +46,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	//	DigPerlinTunnels (perlinResolution);
 	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
-		DigTestConvexHull(true);
+		DigTestConvexHull(false);
 
 
 			for (i = 0; i < tileXSize; i++){
@@ -168,25 +168,14 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		List<Vector2> topHull = new List<Vector2> ();
 		List<Vector2> botHull = new List<Vector2> ();
 
-/*		topHull.Add (new Vector2 (100, 100));
-		topHull.Add (new Vector2 (125, 190));
-		topHull.Add (new Vector2 (150, 100));
-
-		botHull.Add (new Vector2 (100, 100));
-		botHull.Add (new Vector2 (125, -50));
-		botHull.Add (new Vector2 (150, 100));*/
-
-	/*	topHull.Add (new Vector2 (10, 60));
-		topHull.Add (new Vector2 (60, 110));
-		topHull.Add (new Vector2 (110, 60));
-
-		botHull.Add (new Vector2 (10, 60));
-		botHull.Add (new Vector2 (60, 10));
-		botHull.Add (new Vector2 (110, 60));*/
-
 	//	new MarchingSquaresCutTools(nodeArray).DigConvexHull (topHull, botHull, isSolid);
-		for (int i = 20; i < 170; i += 31) {
-			QuadToHulls quadHulls = new QuadToHulls (new Vector2 (i, 100.5f), i, 20f, 20f);
+		for (int i = 0; i < 170; i += 10) {
+			QuadToHulls quadHulls = new QuadToHulls (new Vector2 (-20 + i*3, 100.5f), 0, 10f, 20f);
+			new MarchingSquaresCutTools (nodeArray).DigConvexHull (quadHulls.GetUpperHull (), quadHulls.GetLowerHull (), isSolid);
+		}
+
+		for (int i = 0; i < 170; i += 10) {
+			QuadToHulls quadHulls = new QuadToHulls (new Vector2 (-99 + i*3, 50.5f), i * 3, 10f, 20f);
 			new MarchingSquaresCutTools (nodeArray).DigConvexHull (quadHulls.GetUpperHull (), quadHulls.GetLowerHull (), isSolid);
 		}
 	}
@@ -282,16 +271,6 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			}
 		}
 	}
-
-/*	private float InterpolateEdge(float low, float high){
-
-		float ratio = (low + high) / 2f;
-
-		if (high > low)
-			ratio = 1f - ratio;
-
-		return ratio;
-	}*/
 
 	//Finds the point that a line from one node to another would intersect height 0.5
 	private float InterpolateEdge(float a, float b){

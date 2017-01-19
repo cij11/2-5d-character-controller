@@ -28,14 +28,14 @@ public class MarchingSquaresCutTools {
 		float startX = topHull [0].x;
 		startX = Mathf.Max (startX, 0);
 		float endX = topHull [topHull.Count - 1].x;
-		endX = Mathf.Min (endX, tileXSize);
+		endX = Mathf.Min (endX, tileXSize-1);
 
 		int topHullIndex = 0;
 		int botHullIndex = 0;
 		float topGradient = HullSegmentGradient (topHull, topHullIndex);
 		float botGradient = HullSegmentGradient (botHull, botHullIndex);
 
-		for (int i = Mathf.CeilToInt (startX); i < Mathf.FloorToInt (endX); i++) {
+		for (int i = Mathf.CeilToInt (startX)+1; i < Mathf.FloorToInt (endX); i++) {
 			while (CheckLineEnd (topHull, topHullIndex, i)) {
 				topHullIndex = topHullIndex + 1;
 				topGradient = HullSegmentGradient (topHull, topHullIndex);
@@ -47,13 +47,11 @@ public class MarchingSquaresCutTools {
 
 			float topIntersection = topGradient * ((float)i - topHull [topHullIndex].x) + topHull [topHullIndex].y; //mx + c
 			float botIntersection = botGradient * ((float)i - botHull [botHullIndex].x) + botHull [botHullIndex].y;
-
+			
 			BulkFillColumnSpan(i, botIntersection, topIntersection, elevation);
-		//	if (i > startX + 1) 
-			{
-				SetColumnNodeToVertOverlap (i, topIntersection, elevation, 1);
-				SetColumnNodeToVertOverlap (i, botIntersection, elevation, -1);
-			}
+
+			SetColumnNodeToVertOverlap (i, topIntersection, elevation, 1);
+			SetColumnNodeToVertOverlap (i, botIntersection, elevation, -1);
 		}
 	}
 
