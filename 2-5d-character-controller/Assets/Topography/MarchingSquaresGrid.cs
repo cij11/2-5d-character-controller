@@ -31,7 +31,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			horizInterpArray = new float[tileXSize, nodeYSize];
 			vertInterpArray = new float[nodeXSize, tileYSize];
 
-		float defaultElevation = 1f;
+		float defaultElevation = 0f;
 
 			int i = 0;
 			int j = 0;
@@ -42,11 +42,11 @@ public class MarchingSquaresGrid : MonoBehaviour {
 				}
 			}
 
-	//	DigCircle ((float)worldSizeX/2f, (float)worldSizeY/2f, vesselRadius - perimeterBuffer, false);
+	//	DigCircle ((float)worldSizeX/2f, (float)worldSizeY/2f, vesselRadius - perimeterBuffer, true);
 	//	DigPerlinTunnels (perlinResolution);
 	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
-		DigTestConvexHull(false);
+		DigTestConvexHull(true);
 
 
 			for (i = 0; i < tileXSize; i++){
@@ -168,13 +168,13 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		List<Vector2> topHull = new List<Vector2> ();
 		List<Vector2> botHull = new List<Vector2> ();
 
-		topHull.Add (new Vector2 (100, 100));
+/*		topHull.Add (new Vector2 (100, 100));
 		topHull.Add (new Vector2 (125, 190));
 		topHull.Add (new Vector2 (150, 100));
 
 		botHull.Add (new Vector2 (100, 100));
 		botHull.Add (new Vector2 (125, -50));
-		botHull.Add (new Vector2 (150, 100));
+		botHull.Add (new Vector2 (150, 100));*/
 
 	/*	topHull.Add (new Vector2 (10, 60));
 		topHull.Add (new Vector2 (60, 110));
@@ -184,7 +184,9 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		botHull.Add (new Vector2 (60, 10));
 		botHull.Add (new Vector2 (110, 60));*/
 
-		new MarchingSquaresCutTools(nodeArray).DigConvexHull (topHull, botHull, isSolid);
+	//	new MarchingSquaresCutTools(nodeArray).DigConvexHull (topHull, botHull, isSolid);
+		QuadToHulls quadHulls = new QuadToHulls(new Vector2(50.5f, 100.5f), 90f, 40f, 60f);
+		new MarchingSquaresCutTools (nodeArray).DigConvexHull (quadHulls.GetUpperHull (), quadHulls.GetLowerHull (), isSolid);
 	}
 
 	public float GetNode(int x, int y){
