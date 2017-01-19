@@ -116,7 +116,7 @@ public class MarchingSquaresCutTools {
 	void SetNodesToAchieveTopography(int acol, int arow, int bcol, int brow, float elevation, float overlap){
 
 		//If adjacent node already on the same side of elevation, set current node to elevation.
-		if (elevation > 0.5) {
+		if (elevation >= 0.5) {
 			if (nodeArray [bcol, brow] > 0.5) {
 				nodeArray [acol, arow] = elevation;
 				return;
@@ -130,12 +130,13 @@ public class MarchingSquaresCutTools {
 		}
 
 		//If this is a solid stamp
-		if (elevation > 0.5) {
+		if (elevation >= 0.5) {
 			if (overlap > 0.5f) { //If the boundary needs to be pulled as well as pushed.
 				nodeArray [acol, arow] = 1f;
 				nodeArray [bcol, brow] = InverseInterpolationOneToB (overlap);
 			} else {
 				nodeArray [acol, arow] = InverseInterpolationAToZero (overlap);
+				nodeArray [bcol, brow] = 0f;
 			}
 			return;
 		}
@@ -148,6 +149,7 @@ public class MarchingSquaresCutTools {
 				nodeArray [acol, arow] = InverseInterpolationOneToB (overlap);
 			} else {
 				nodeArray [bcol, brow] = InverseInterpolationAToZero (overlap);
+				nodeArray [acol, arow] = 0f;
 			}
 			return;
 		}
