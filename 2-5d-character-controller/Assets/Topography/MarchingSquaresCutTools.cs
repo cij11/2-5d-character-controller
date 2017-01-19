@@ -49,8 +49,11 @@ public class MarchingSquaresCutTools {
 			float botIntersection = botGradient * ((float)i - botHull [botHullIndex].x) + botHull [botHullIndex].y;
 
 			BulkFillColumnSpan(i, botIntersection, topIntersection, elevation);
-			SetColumnNodeToVertOverlap(i, topIntersection, elevation, 1);
-			SetColumnNodeToVertOverlap(i, botIntersection, elevation, -1);
+		//	if (i > startX + 1) 
+			{
+				SetColumnNodeToVertOverlap (i, topIntersection, elevation, 1);
+				SetColumnNodeToVertOverlap (i, botIntersection, elevation, -1);
+			}
 		}
 	}
 
@@ -178,8 +181,17 @@ public class MarchingSquaresCutTools {
 		//Top hull
 		for (int topIndex = 0;  topIndex < topHull.Count - 1; topIndex++) {
 			float topGradient = HullSegmentGradient (topHull, topIndex);
-			int startY = Mathf.CeilToInt(topHull[topIndex].y);
-			int endY = Mathf.FloorToInt (topHull [topIndex + 1].y);
+			int startY = 1;
+			int endY = 1;
+
+			if (topGradient > 1){
+				startY = Mathf.CeilToInt(topHull[topIndex].y);
+				endY = Mathf.FloorToInt (topHull [topIndex + 1].y);
+			}
+			if (topGradient < -1){
+				startY = Mathf.FloorToInt(topHull[topIndex].y);
+				endY = Mathf.CeilToInt (topHull [topIndex + 1].y);
+			}
 
 			if (startY > tileYSize)
 				startY = tileYSize;
@@ -191,14 +203,14 @@ public class MarchingSquaresCutTools {
 				endY = 0;
 
 			if (topGradient > 1) { //if this is steep
-				for (int j = startY; j < endY + 1; j++) { //Advance from bottom to top
+				for (int j = startY; j < endY  + 1; j++) { //Advance from bottom to top
 					float xIntersect = topHull [topIndex].x + ((float)j - topHull [topIndex].y) / topGradient;
 					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, -1);
 				}
 			}
 
 			if (topGradient < -1) { //if this is steeply descending
-				for (int j = startY; j > endY + 1; j--) { //Advance from top to bottom
+				for (int j = startY; j > endY - 1; j--) { //Advance from top to bottom
 					float xIntersect = topHull [topIndex].x + ((float)j - topHull [topIndex].y) / topGradient;
 					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, 1);
 				}
@@ -208,8 +220,17 @@ public class MarchingSquaresCutTools {
 		//Bot hull
 		for (int botIndex = 0; botIndex < botHull.Count - 1; botIndex++) {
 			float botGradient = HullSegmentGradient (botHull, botIndex);
-			int startY = Mathf.CeilToInt(botHull[botIndex].y);
-			int endY = Mathf.FloorToInt (botHull [botIndex + 1].y);
+			int startY = 1;
+			int endY = 1;
+
+			if(botGradient > 1){
+			 startY = Mathf.CeilToInt(botHull[botIndex].y);
+			 endY = Mathf.FloorToInt (botHull [botIndex + 1].y);
+			}
+			if (botGradient < -1){
+				startY = Mathf.FloorToInt(botHull[botIndex].y);
+				endY = Mathf.CeilToInt (botHull [botIndex + 1].y);
+			}
 
 			if (startY > tileYSize)
 				startY = tileYSize;
@@ -227,7 +248,7 @@ public class MarchingSquaresCutTools {
 				}
 			}
 			if (botGradient < -1) { //if this is steeply descending
-				for (int j = startY; j > endY + 1; j--) { //Advance from top to bottom
+				for (int j = startY; j > endY - 1; j--) { //Advance from top to bottom
 					float xIntersect = topHull [botIndex].x + ((float)j - topHull [botIndex].y) / botGradient;
 					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, -1);
 				}
