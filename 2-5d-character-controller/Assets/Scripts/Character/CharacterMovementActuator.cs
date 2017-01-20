@@ -6,7 +6,7 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	public Vector3 radialGravityFocus = new Vector3 (0, 0, 0);
 	public Vector3 directionalGravityUp = new Vector3 (0f, -1f, 0f);
-	bool radialGravity = true;
+	bool radialGravity = false;
 	Rigidbody body;
 	Collider physCollider;
 	CharacterContactSensor contactSensor;

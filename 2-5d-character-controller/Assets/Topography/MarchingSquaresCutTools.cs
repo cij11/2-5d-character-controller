@@ -299,13 +299,17 @@ public class MarchingSquaresCutTools {
 				}
 				else{
 					float hemisphereHeight = Mathf.Sqrt(radiusSquared - baseSquared);
-					float hemisphereHeightNormalised = hemisphereHeight/ radius;
+					float hemisphereHeightNormalised = (hemisphereHeight/ radius);
 					//if (hemisphereHeight > 1) hemisphereHeight = 1f;
 					if (solid) {
-						nodeArray [i, j] = hemisphereHeightNormalised;
+						if (nodeArray [i, j] <= 0.5f) { //Don't change nodes that are already at the correct elevation
+							nodeArray [i, j] = hemisphereHeightNormalised;
+						}
 					}
 					else {
+						if(nodeArray[i, j] >= 0.5f){
 						nodeArray [i, j] = 1f - hemisphereHeightNormalised;
+						}
 					}
 				}
 			}
