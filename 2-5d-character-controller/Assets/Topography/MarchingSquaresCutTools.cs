@@ -16,8 +16,20 @@ public class MarchingSquaresCutTools {
 	//Step along an upper and lower hull of a convex shape. Set all the nodes between these two hulls
 	//equal to the given elevation.
 	public void DigConvexHull(List<Vector2> topHull, List<Vector2> botHull, bool isSolid){
-		BulkAndFineHorizontalCutsPass (topHull, botHull, isSolid);
-		FineVerticalCutsPass (topHull, botHull, isSolid);
+		List<Vector2> topHullInGridSpace = ConvertHullToGridSpace (topHull);
+		List<Vector2> botHullInGridSpace = ConvertHullToGridSpace (botHull);
+
+		BulkAndFineHorizontalCutsPass (topHullInGridSpace, botHullInGridSpace, isSolid);
+		FineVerticalCutsPass (topHullInGridSpace, botHullInGridSpace, isSolid);
+	}
+
+	private List<Vector2> ConvertHullToGridSpace(List<Vector2> hull){
+		List<Vector2> hullInGridSpace = new List<Vector2> ();
+		Vector2 gridOffset = new Vector2 ((float)tileXSize / 2f, (float)tileYSize / 2f);
+		foreach (Vector2 vertice in hull) {
+			hullInGridSpace.Add(vertice + gridOffset);
+		}
+		return hullInGridSpace;
 	}
 
 	private void BulkAndFineHorizontalCutsPass(List<Vector2> topHull, List<Vector2> botHull, bool isSolid){

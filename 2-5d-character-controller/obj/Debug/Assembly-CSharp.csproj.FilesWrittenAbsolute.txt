@@ -1,0 +1,17 @@
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/UnityEngine.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/UnityEditor.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/UnityEngine.Analytics.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/UnityEngine.PlaymodeTestsRunner.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/UnityEngine.Networking.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/UnityEngine.UI.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/UnityEngine.HoloLens.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/UnityEngine.VR.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/Mono.Cecil.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/Unity.SerializationLogic.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/Unity.DataContract.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/ICSharpCode.NRefactory.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/Unity.UNetWeaver.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/Unity.UNetWeaver.dll.mdb
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/Unity.CecilTools.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/Mono.Cecil.Pdb.dll
+/Users/christopherj/Documents/unity/2-5d-character-controller/2-5d-character-controller/Temp/bin/Debug/Mono.Cecil.Mdb.dll

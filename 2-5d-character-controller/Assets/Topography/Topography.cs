@@ -46,6 +46,8 @@ public class Topography : MonoBehaviour {
 
 	private OreGrid oreGrid = null;
 
+	private StampCollection stampCollection;
+
 	// Use this for initialization
 	void Start () {
 
@@ -66,6 +68,11 @@ public class Topography : MonoBehaviour {
 		GameObject marchingGridGO = Instantiate (marchingGridPrefab, this.transform.position, Quaternion.identity) as GameObject;
 		marchingGrid = marchingGridGO.GetComponent<MarchingSquaresGrid> () as MarchingSquaresGrid;
 		marchingGrid.Initialise (worldSizeX, worldSizeY, vesselRadius);
+
+		stampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
+		if (stampCollection != null) { //May not have a stamp collection to apply to this topography
+			stampCollection.ApplyStamp (marchingGrid);
+		}
 
 		oreGrid = new OreGrid ();
 		oreGrid.GenerateMap (worldSizeX, worldSizeY);
