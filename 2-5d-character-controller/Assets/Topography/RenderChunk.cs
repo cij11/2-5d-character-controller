@@ -16,6 +16,8 @@ public class RenderChunk : MonoBehaviour {
 	private Coord chunkCoord;
 	private int numVerts = 0;
 	private int numTris = 0;
+
+	float borderWidth = 0.2f;
 	// Use this for initialization
 	void Start () {
 	
@@ -401,7 +403,7 @@ public class RenderChunk : MonoBehaviour {
 		//Quad goes from start, to start+normal, to end+normal, to end
 		Vector3 normalVec = new Vector3(-(endy - starty), (endx - startx));
 		normalVec.Normalize ();
-		normalVec = normalVec * 0.8f;
+		normalVec = normalVec * borderWidth;
 
 		//Rendering on the 0 level
 /*		AddFaceVert(new Vector3(startx, starty, 0f), borderColor);

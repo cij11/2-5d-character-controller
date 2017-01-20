@@ -5,10 +5,6 @@ using System.Collections.Generic;
 public class MarchingSquaresGrid : MonoBehaviour {
 	public int tileXSize = 10;
 	public int tileYSize = 10;
-	public float perlinResolution = 0.02f;
-	public float perlinThreshold = 0.4f;
-	public float perlinTunnelThreshold = 6f;
-	public float perimeterBuffer = 0.1f;
 
 	private int nodeXSize;
 	private int nodeYSize;
@@ -63,67 +59,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			InterpolateAllHorizontal ();
 			InterpolateAllVertical ();
 	}
-
-	//Treat the circle as a hemisphere, then normalise elevation to the radius of the hemisphere.
-	public void DigCircle(float cx, float cy, float radius, bool solid){
-		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 2, 0);
-		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 2, 0);
-		int xmax = (int)Mathf.Min ((int) cx + (int) radius + 2, nodeXSize-1);
-		int ymax = (int)Mathf.Min ((int) cy + (int) radius + 2, nodeYSize-1);
-
-		float radiusSquared = radius * radius;
-		for (int i = xmin; i < xmax; i++) {
-			for (int j = ymin; j < ymax; j++) {
-				float xDistFromCenter = cx - i;
-				float yDistFromCenter = cy - j;
-				//height of hemisphere at this point
-				float baseSquared = xDistFromCenter*xDistFromCenter + yDistFromCenter * yDistFromCenter;
-				if (baseSquared > radiusSquared){ //point is outside the hemisphere
-
-				}
-				else{
-					float hemisphereHeight = Mathf.Sqrt(radiusSquared - baseSquared);
-					float hemisphereHeightNormalised = hemisphereHeight/ radius;
-					//if (hemisphereHeight > 1) hemisphereHeight = 1f;
-					if (solid) {
-						nodeArray [i, j] = hemisphereHeightNormalised;
-					}
-					else {
-						nodeArray [i, j] = 1f - hemisphereHeightNormalised;
-					}
-				}
-			}
-		}
-	}
-
-	public void DigPerlinCaves(float res){
-		for(int i = 0; i < nodeXSize; i++){
-			for (int j = 0; j < nodeYSize; j++){
-				float perl = 1f-Mathf.PerlinNoise (i * res, j * res);
-				if ((perl < nodeArray [i, j] - 0.2f) && (perl < perlinThreshold))
-		//		if (perl < perlinThreshold)
-					nodeArray [i, j] = perl;
-			}
-		}
-	}
-
-	public void DigPerlinTunnels(float res){
-		for(int i = 0; i < nodeXSize; i++){
-			for (int j = 0; j < nodeYSize; j++){
-				float perl = Mathf.PerlinNoise (i * res, j * res);
-
-					//0.5 stays as 0.5
-					//0.4 and 0.6 become 0.
-					perl = Mathf.Abs(perl-0.5f);
-					perl = perl * perlinTunnelThreshold;
-
-				
-				if (perl < nodeArray [i, j] - 0.1f)	//If perl is less than the current node, but the current node is not on the border of a circle or otherwise at a gradient.
-					nodeArray [i, j] = perl;
-			}
-		}
-	}
-
+		
 	public void StampAxisAlignedRect(int startX, int startY, int width, int height, float elevation){
 		RecieveStamp (BuildRectStamp (width, height, elevation), startX, startX);
 	}

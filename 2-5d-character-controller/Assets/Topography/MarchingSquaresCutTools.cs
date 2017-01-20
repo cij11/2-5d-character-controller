@@ -8,6 +8,11 @@ public class MarchingSquaresCutTools {
 	int tileYSize;
 	float[,] nodeArray;
 
+	public float perlinResolution = 0.02f;
+	public float perlinThreshold = 0.4f;
+	public float perlinTunnelThreshold = 6f;
+	public float perimeterBuffer = 0.1f;
+
 	public MarchingSquaresCutTools(float[,] marchingSquaresNodeArray){
 		nodeArray = marchingSquaresNodeArray;
 		tileXSize = nodeArray.GetLength (0);
@@ -267,6 +272,70 @@ public class MarchingSquaresCutTools {
 					float xIntersect = topHull [botIndex].x + ((float)j - topHull [botIndex].y) / botGradient;
 					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, -1);
 				}
+			}
+		}
+	}
+
+	public void DigCircleFromWorld(Vector2 position, float radius, bool isSolid){
+		DigCircle (position.x + tileXSize / 2f - 0.5f, position.y + tileYSize / 2f - 0.5f, radius, isSolid);
+	}
+
+	//Treat the circle as a hemisphere, then normalise elevation to the radius of the hemisphere.
+	public void DigCircle(float cx, float cy, float radius, bool solid){
+		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 2, 0);
+		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 2, 0);
+		int xmax = (int)Mathf.Min ((int) cx + (int) radius + 2, tileXSize-1);
+		int ymax = (int)Mathf.Min ((int) cy + (int) radius + 2, tileYSize-1);
+
+		float radiusSquared = radius * radius;
+		for (int i = xmin; i < xmax; i++) {
+			for (int j = ymin; j < ymax; j++) {
+				float xDistFromCenter = cx - i;
+				float yDistFromCenter = cy - j;
+				//height of hemisphere at this point
+				float baseSquared = xDistFromCenter*xDistFromCenter + yDistFromCenter * yDistFromCenter;
+				if (baseSquared > radiusSquared){ //point is outside the hemisphere
+
+				}
+				else{
+					float hemisphereHeight = Mathf.Sqrt(radiusSquared - baseSquared);
+					float hemisphereHeightNormalised = hemisphereHeight/ radius;
+					//if (hemisphereHeight > 1) hemisphereHeight = 1f;
+					if (solid) {
+						nodeArray [i, j] = hemisphereHeightNormalised;
+					}
+					else {
+						nodeArray [i, j] = 1f - hemisphereHeightNormalised;
+					}
+				}
+			}
+		}
+	}
+
+	public void DigPerlinCaves(float res){
+		for(int i = 0; i < tileXSize; i++){
+			for (int j = 0; j < tileYSize; j++){
+				float perl = 1f-Mathf.PerlinNoise (i * res, j * res);
+				if ((perl < nodeArray [i, j] - 0.2f) && (perl < perlinThreshold))
+					//		if (perl < perlinThreshold)
+					nodeArray [i, j] = perl;
+			}
+		}
+	}
+
+	public void DigPerlinTunnels(float res){
+		for(int i = 0; i < tileXSize; i++){
+			for (int j = 0; j < tileYSize; j++){
+				float perl = Mathf.PerlinNoise (i * res, j * res);
+
+				//0.5 stays as 0.5
+				//0.4 and 0.6 become 0.
+				perl = Mathf.Abs(perl-0.5f);
+				perl = perl * perlinTunnelThreshold;
+
+
+				if (perl < nodeArray [i, j] - 0.1f)	//If perl is less than the current node, but the current node is not on the border of a circle or otherwise at a gradient.
+					nodeArray [i, j] = perl;
 			}
 		}
 	}
