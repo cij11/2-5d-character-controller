@@ -46,7 +46,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	//	DigPerlinTunnels (perlinResolution);
 	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
-	//	DigTestConvexHull(false);
+		DigTestConvexHull(false);
 
 
 			for (i = 0; i < tileXSize; i++){
@@ -172,12 +172,12 @@ public class MarchingSquaresGrid : MonoBehaviour {
 		for (int i = 0; i < 170; i += 10) {
 			QuadToHulls quadHulls = new QuadToHulls (new Vector2 (-20.01f + i*3, 100.5f), 0, 10f, 20f);
 			new MarchingSquaresCutTools (nodeArray).DigConvexHull (quadHulls.GetUpperHull (), quadHulls.GetLowerHull (), isSolid);
-		}
+		}*/
 
 		for (int i = 0; i < 170; i += 10) {
 			QuadToHulls quadHulls = new QuadToHulls (new Vector2 (-99.01f + i*3, 50.5f), i * 3, 10f, 20f);
-			new MarchingSquaresCutTools (nodeArray).DigConvexHull (quadHulls.GetUpperHull (), quadHulls.GetLowerHull (), isSolid);
-		}*/
+			new MarchingSquaresCutTools (nodeArray).DigConvexHullFromLocal (quadHulls.GetUpperHull (), quadHulls.GetLowerHull (), isSolid);
+		}
 	}
 
 	public float GetNode(int x, int y){

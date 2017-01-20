@@ -72,6 +72,7 @@ public class Topography : MonoBehaviour {
 		stampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
 		if (stampCollection != null) { //May not have a stamp collection to apply to this topography
 			stampCollection.ApplyStamp (marchingGrid);
+			marchingGrid.InterpolateAll ();
 		}
 
 		oreGrid = new OreGrid ();
