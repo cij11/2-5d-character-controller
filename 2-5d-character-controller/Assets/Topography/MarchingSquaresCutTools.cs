@@ -281,7 +281,13 @@ public class MarchingSquaresCutTools {
 	}
 
 	//Treat the circle as a hemisphere, then normalise elevation to the radius of the hemisphere.
-	public void DigCircle(float cx, float cy, float radius, bool solid){
+	public void DigCircle(float cx, float cy, float inputRadius, bool solid){
+
+		//making the cut at a spherical cap 0.525r high in the sphere, so increase the radius
+		//to make sure that the circle formed by the plane passing through the cap is of radius
+		//'input radius'.
+		float radius = (inputRadius / 0.525f) * 0.6f;
+
 		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 2, 0);
 		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 2, 0);
 		int xmax = (int)Mathf.Min ((int) cx + (int) radius + 2, tileXSize-1);
@@ -299,7 +305,9 @@ public class MarchingSquaresCutTools {
 				}
 				else{
 					float hemisphereHeight = Mathf.Sqrt(radiusSquared - baseSquared);
-					float hemisphereHeightNormalised = (hemisphereHeight/ radius);
+					float hemisphereHeightNormalised = hemisphereHeight - 0.525f*radius;
+					//hemisphereHeightNormalised = hemisphereHeightNormalised / radius;
+
 					//if (hemisphereHeight > 1) hemisphereHeight = 1f;
 					if (solid) {
 						if (nodeArray [i, j] <= 0.5f) { //Don't change nodes that are already at the correct elevation
