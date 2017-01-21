@@ -283,7 +283,7 @@ public class MarchingSquaresCutTools {
 		Vector2 gridOffset = new Vector2 ((float)tileXSize / 2f, (float)tileYSize / 2f);
 		Vector2 gridCoordBotLeftCorner = botLeftCorner + gridOffset;
 
-		StampAxisAlignedRect ((int)gridCoordBotLeftCorner.x, (int)gridCoordBotLeftCorner.y, (int)width, (int)height, elevation);
+		StampAxisAlignedRect ((int)gridCoordBotLeftCorner.x, (int)gridCoordBotLeftCorner.y, (int)width, (int)height, elevation, sharpCorners);
 	}
 
 	private float ElevationFromOpacityAndCorners(bool isSolid, bool sharpCorners){
@@ -300,7 +300,7 @@ public class MarchingSquaresCutTools {
 		return elevation;
 	}
 
-	public void StampAxisAlignedRect(int startX, int startY, int width, int height, float elevation){
+	public void StampAxisAlignedRect(int startX, int startY, int width, int height, float elevation, bool sharpCorners){
 		RecieveStamp (BuildRectStamp (width, height, elevation), startX, startY);
 	}
 
@@ -352,7 +352,11 @@ public class MarchingSquaresCutTools {
 		}
 	}
 
-
+	private void SetColumnSpanToElevation(int column, int botRow, int topRow, float elevation){
+			for (int j = botRow; j < topRow + 1; j++) {
+					nodeArray [column, j] = elevation;
+				}
+	}
 
 	public void DigCircleFromWorld(Vector2 position, float radius, bool isSolid){
 		DigCircle (position.x + tileXSize / 2f - 0.5f, position.y + tileYSize / 2f - 0.5f, radius, isSolid);
@@ -428,5 +432,22 @@ public class MarchingSquaresCutTools {
 					nodeArray [i, j] = perl;
 			}
 		}
+	}
+
+	private int BoundX(int xIn){
+		int xOut = xIn;
+		if (xIn < 0)
+			xOut = 0;
+		if (xIn > tileXSize - 1)
+			xOut = tileXSize - 1;
+		return xOut;
+	}
+	private int BoundY(int yIn){
+		int yOut = yIn;
+		if (yIn < 0)
+			yOut = 0;
+		if (yIn > tileYSize - 1)
+			yOut = tileYSize - 1;
+		return yOut;
 	}
 }
