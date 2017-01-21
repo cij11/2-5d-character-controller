@@ -17,7 +17,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	void Start () {
 
 	}
-	public void Initialise(int worldSizeX, int worldSizeY, float vesselRadius){
+	public void Initialise(int worldSizeX, int worldSizeY, bool isSolid){
 			tileXSize = worldSizeX;
 			tileYSize = worldSizeY;
 			nodeXSize = tileXSize+1;
@@ -27,7 +27,10 @@ public class MarchingSquaresGrid : MonoBehaviour {
 			horizInterpArray = new float[tileXSize, nodeYSize];
 			vertInterpArray = new float[nodeXSize, tileYSize];
 
-		float defaultElevation = 1f;
+
+		float defaultElevation = 0f;
+		if (isSolid)
+			defaultElevation = 1f;
 
 			int i = 0;
 			int j = 0;
@@ -58,45 +61,6 @@ public class MarchingSquaresGrid : MonoBehaviour {
 
 			InterpolateAllHorizontal ();
 			InterpolateAllVertical ();
-	}
-		
-	public void StampAxisAlignedRect(int startX, int startY, int width, int height, float elevation){
-		RecieveStamp (BuildRectStamp (width, height, elevation), startX, startX);
-	}
-
-	public float [,] BuildRectStamp(int width, int height, float elevation){
-		float[,] stampNodeArray = new float[width, height];
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				stampNodeArray [i, j] = elevation;
-			}
-		}
-		return stampNodeArray;
-	}
-
-	//Apply the source marching grid stamp to the destination marching grid
-	public void RecieveStamp(float[,] stampNodeArray, int startLeftX, int startBotY){
-		//Loop through the stamp from the bottom left (0, 0) to the top right (stampsizeX, stampsizeY)
-		//Loop through the marching squares grid from startinb point (startLeftX, startBottomY) to the
-		//top right (startLeftX + stampsizeX, startBottomY + stampSizeY)
-		int destStartX = startLeftX;
-		int destStartY = startBotY;
-		int destEndX = startLeftX + stampNodeArray.GetLength (0);
-		int destEndY = startBotY + stampNodeArray.GetLength (1);
-
-		//Limit bounds of stamping to the bounds of the marching squares grid
-		if (destEndX > nodeXSize) destEndX = nodeXSize;
-		if (destEndY > nodeYSize)
-			destEndY = nodeYSize;
-
-		for (int i = destStartX; i < destEndX; i++) {
-			for (int j = destStartY; j < destEndY; j++) {
-				int stampX = i - destStartX;
-				int stampY = j - destStartY;
-
-				nodeArray [i, j] = stampNodeArray [stampX, stampY];
-			}
-		}
 	}
 
 	//Test function. Construct a simple upper and lower hull. Call DigConvexHull.

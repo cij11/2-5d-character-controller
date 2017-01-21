@@ -16,6 +16,8 @@ public class Topography : MonoBehaviour {
 	int instantiatedChunkCount = 0;
 	int instantiatedCollisionChunkCount = 0;
 
+	public bool isSolid = false;
+
 	MarchingSquaresGrid marchingGrid;
 
 	private int worldSizeX;
@@ -67,7 +69,7 @@ public class Topography : MonoBehaviour {
 
 		GameObject marchingGridGO = Instantiate (marchingGridPrefab, this.transform.position, Quaternion.identity) as GameObject;
 		marchingGrid = marchingGridGO.GetComponent<MarchingSquaresGrid> () as MarchingSquaresGrid;
-		marchingGrid.Initialise (worldSizeX, worldSizeY, vesselRadius);
+		marchingGrid.Initialise (worldSizeX, worldSizeY, isSolid);
 
 		stampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
 		if (stampCollection != null) { //May not have a stamp collection to apply to this topography

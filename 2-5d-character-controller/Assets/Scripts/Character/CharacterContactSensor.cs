@@ -11,6 +11,9 @@ public class CharacterContactSensor : MonoBehaviour
     float width = 0.6f;
     float height = 0.9f;
 
+	float scaledWidth;
+	float scaledHeight;
+
     CollisionInfo collisions;
     RaycastOrigins raycastOrigins;
     float skinWidth = 0.01f;
@@ -43,12 +46,18 @@ public class CharacterContactSensor : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+		SetCharacterSizeFromTransform ();
         updateTimer = new UpdateTimer(updatePeriod);
         body = GetComponent<Rigidbody>();
         physCollider = GetComponent<Collider>();
         UpdateRaycastOrigins();
         CalculateRaySpacing();
     }
+
+	void SetCharacterSizeFromTransform(){
+		scaledHeight = this.transform.lossyScale.y * height;
+		scaledWidth = this.transform.lossyScale.x * width;
+	}
 
     // Update is called once per frame
     void FixedUpdate()
@@ -205,8 +214,8 @@ public class CharacterContactSensor : MonoBehaviour
     void UpdateRaycastOrigins()
     {
 
-        float xoffset = (width / 2f) - skinWidth;
-        float yoffset = (height / 2f) - skinWidth;
+        float xoffset = (scaledWidth / 2f) - skinWidth;
+        float yoffset = (scaledHeight / 2f) - skinWidth;
         float zpos = transform.position.z;
         raycastOrigins.bottomLeft = physCollider.transform.position + physCollider.transform.rotation * new Vector3(-xoffset, -yoffset, zpos) + body.transform.up * bottomSkinInset;
         raycastOrigins.bottomRight = physCollider.transform.position + physCollider.transform.rotation * new Vector3(xoffset, -yoffset, zpos) + body.transform.up * bottomSkinInset;
@@ -249,9 +258,9 @@ public class CharacterContactSensor : MonoBehaviour
 
     void CalculateRaySpacing()
     {
-        verticalRaySpacing = (width - skinWidth * 2f) / (verticalRayCount - 1);
+        verticalRaySpacing = (scaledWidth - skinWidth * 2f) / (verticalRayCount - 1);
         //Don't cast rays all the way to the ground (eg, height * 0.75f) to prevent 'wall grabbing' bumps in the road
-        horizontalRaySpacing = (height * 0.75f - skinWidth * 2f) / (horizontalRayCount - 1);
+        horizontalRaySpacing = (scaledHeight * 0.75f - skinWidth * 2f) / (horizontalRayCount - 1);
     }
 
     //Display raycast origins

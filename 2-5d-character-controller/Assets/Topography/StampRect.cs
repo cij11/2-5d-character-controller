@@ -21,7 +21,7 @@ public class StampRect : MonoBehaviour, IStampable {
 		QuadToHulls quad = new QuadToHulls (position, angle, width, height);
 	
 		new MarchingSquaresCutTools (marchingGrid.GetNodeArray()).DigConvexHullFromWorld (quad.GetUpperHull (), quad.GetLowerHull (), isSolid);
-		//Destroy (this.gameObject);
+		Destroy (this.gameObject);
 	}
 
 	private void TransformToRect(){

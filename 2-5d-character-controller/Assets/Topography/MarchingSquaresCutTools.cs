@@ -276,6 +276,84 @@ public class MarchingSquaresCutTools {
 		}
 	}
 
+	public void DigAxisAlignedRectFromWorld(Vector2 position, float width, float height, bool isSolid, bool sharpCorners){
+		float elevation = ElevationFromOpacityAndCorners (isSolid, sharpCorners);
+
+		Vector2 botLeftCorner = position - new Vector2 (width / 2f, height / 2f);
+		Vector2 gridOffset = new Vector2 ((float)tileXSize / 2f, (float)tileYSize / 2f);
+		Vector2 gridCoordBotLeftCorner = botLeftCorner + gridOffset;
+
+		StampAxisAlignedRect ((int)gridCoordBotLeftCorner.x, (int)gridCoordBotLeftCorner.y, (int)width, (int)height, elevation);
+	}
+
+	private float ElevationFromOpacityAndCorners(bool isSolid, bool sharpCorners){
+		float elevation = 0f;
+		if (sharpCorners) {
+			elevation = 0.49f;
+			if (isSolid) {
+				elevation = 0.51f;
+			}
+		} else {
+			if (isSolid)
+				elevation = 1f;
+		}
+		return elevation;
+	}
+
+	public void StampAxisAlignedRect(int startX, int startY, int width, int height, float elevation){
+		RecieveStamp (BuildRectStamp (width, height, elevation), startX, startY);
+	}
+
+	public float [,] BuildRectStamp(int width, int height, float elevation){
+		float interiorElevation = 0f;
+		if (elevation > 0.5f)
+			interiorElevation = 1f;
+		float edgeElevation = elevation;
+
+		float[,] stampNodeArray = new float[width, height];
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				if(i == 0 || i == width-1 || j == 0 || j == height-1){ //Only apply fractional elevations at the edge of the stamp.
+					stampNodeArray[i,j] = edgeElevation;
+				}
+				else {stampNodeArray [i, j] = interiorElevation;
+				}
+			}
+		}
+		return stampNodeArray;
+	}
+
+	//Apply the source marching grid stamp to the destination marching grid
+	public void RecieveStamp(float[,] stampNodeArray, int startLeftX, int startBotY){
+		//Loop through the stamp from the bottom left (0, 0) to the top right (stampsizeX, stampsizeY)
+		//Loop through the marching squares grid from startinb point (startLeftX, startBottomY) to the
+		//top right (startLeftX + stampsizeX, startBottomY + stampSizeY)
+		int destStartX = startLeftX;
+		int destStartY = startBotY;
+		int destEndX = startLeftX + stampNodeArray.GetLength (0);
+		int destEndY = startBotY + stampNodeArray.GetLength (1);
+
+		//Limit bounds of stamping to the bounds of the marching squares grid
+		if (destEndX >= tileXSize) destEndX = tileXSize-1;
+		if (destEndY >= tileYSize)
+			destEndY = tileYSize-1;
+		if (destStartX <= 0)
+			destStartX = 0;
+		if (destStartX <= 0)
+			destStartY = 0;
+
+		for (int i = destStartX; i < destEndX; i++) {
+			for (int j = destStartY; j < destEndY; j++) {
+				int stampX = i - destStartX;
+				int stampY = j - destStartY;
+
+				nodeArray [i, j] = stampNodeArray [stampX, stampY];
+			}
+		}
+	}
+
+
+
 	public void DigCircleFromWorld(Vector2 position, float radius, bool isSolid){
 		DigCircle (position.x + tileXSize / 2f - 0.5f, position.y + tileYSize / 2f - 0.5f, radius, isSolid);
 	}
@@ -286,7 +364,7 @@ public class MarchingSquaresCutTools {
 		//making the cut at a spherical cap 0.525r high in the sphere, so increase the radius
 		//to make sure that the circle formed by the plane passing through the cap is of radius
 		//'input radius'.
-		float radius = (inputRadius / 0.525f) * 0.6f;
+		float radius = (inputRadius / 0.525f) * 0.66f;
 
 		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 2, 0);
 		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 2, 0);
