@@ -27,7 +27,7 @@ public class StampRect : MonoBehaviour, IStampable {
 	private void TransformToRect(){
 		position = new Vector2 (this.transform.position.x - 0.5f, this.transform.position.y - 0.5f);
 		angle = this.transform.eulerAngles.z;
-		width = this.transform.localScale.x;
-		height = this.transform.localScale.y;
+		width = this.transform.lossyScale.x;
+		height = this.transform.lossyScale.y;
 	}
 }

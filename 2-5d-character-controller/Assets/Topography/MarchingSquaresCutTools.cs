@@ -124,7 +124,7 @@ public class MarchingSquaresCutTools {
 		if (direction == 1) {  //If the cut overshoots to the right
 			int column = Mathf.FloorToInt (intersection);
 			if (column > 0 && column < tileXSize-1) {
-				float overlap = intersection - column;
+				float overlap = intersection - (float)column;
 				SetNodesToAchieveTopography(column, row, column + 1, row, elevation, overlap);
 			}
 		} else {
@@ -223,7 +223,7 @@ public class MarchingSquaresCutTools {
 				endY = 0;
 
 			if (topGradient > 1) { //if this is steep
-				for (int j = startY; j < endY  + 1; j++) { //Advance from bottom to top
+				for (int j = startY; j < endY+1; j++) { //Advance from bottom to top
 					float xIntersect = topHull [topIndex].x + ((float)j - topHull [topIndex].y) / topGradient;
 					SetRowNodeToHorizontalOverlap (j, xIntersect, elevation, -1);
 				}
@@ -334,12 +334,12 @@ public class MarchingSquaresCutTools {
 		int destEndY = startBotY + stampNodeArray.GetLength (1);
 
 		//Limit bounds of stamping to the bounds of the marching squares grid
-		if (destEndX >= tileXSize) destEndX = tileXSize-1;
-		if (destEndY >= tileYSize)
+		if (destEndX >= tileXSize-1) destEndX = tileXSize-1;
+		if (destEndY >= tileYSize-1)
 			destEndY = tileYSize-1;
 		if (destStartX <= 0)
 			destStartX = 0;
-		if (destStartX <= 0)
+		if (destStartY <= 0)
 			destStartY = 0;
 
 		for (int i = destStartX; i < destEndX; i++) {

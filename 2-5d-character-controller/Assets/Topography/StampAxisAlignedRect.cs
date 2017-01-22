@@ -29,7 +29,7 @@ public class StampAxisAlignedRect : MonoBehaviour, IStampable {
 	private void TransformToRect(){
 		position = new Vector2 (this.transform.position.x, this.transform.position.y);
 		angle = this.transform.eulerAngles.z;
-		width = this.transform.localScale.x;
-		height = this.transform.localScale.y;
+		width = this.transform.lossyScale.x;
+		height = this.transform.lossyScale.y;
 	}
 }

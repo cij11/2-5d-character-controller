@@ -20,6 +20,6 @@ public class StampCircle : MonoBehaviour, IStampable {
 
 	private void TransformToCircle(){
 		position = new Vector2 (this.transform.position.x, this.transform.position.y);
-		radius = this.transform.localScale.x/2f;
+		radius = this.transform.lossyScale.x/2f;
 	}
 }

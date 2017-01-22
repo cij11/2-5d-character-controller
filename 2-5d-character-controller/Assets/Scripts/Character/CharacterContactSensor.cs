@@ -57,6 +57,8 @@ public class CharacterContactSensor : MonoBehaviour
 	void SetCharacterSizeFromTransform(){
 		scaledHeight = this.transform.lossyScale.y * height;
 		scaledWidth = this.transform.lossyScale.x * width;
+	//	detectionRayLengthSides *= scaledWidth;
+	//	detectionRayLengthGround *= scaledHeight;
 	}
 
     // Update is called once per frame
