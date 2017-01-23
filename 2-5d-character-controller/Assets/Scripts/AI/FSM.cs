@@ -5,8 +5,6 @@ using System.Collections.Generic;
 public class FSM : MonoBehaviour
 {
     private FSMState activeState;
-    private Dictionary<string, FSMState> states;
-    private FSM parentFSM = null;
 
     //Decision making information.
     private float timer;
@@ -16,61 +14,36 @@ public class FSM : MonoBehaviour
     //Horizontal and vertical directions pointing to the closest octant to the target
     int horOctant;
     int vertOctant;
+	private FSMLoader loader;
     private AIRaycastSensors raycastSensors;
     private AIMotorActions motorActions;
     private Transform parentTransform;
 
-    void Start(){
+	public GameObject FSMPrefab;
+
+	private FSM childFSM;
+
+	public void InitialiseFSM(string startingState, FSMLoader load, AIMotorActions aiM, AIRaycastSensors aiR, Transform parentT){
         timer = 0f;
-        states = new Dictionary<string, FSMState>();
-        LoadStates();
-        activeState = GetState("run_right");
+		loader = load;
+		activeState = loader.GetState(startingState);
 
-        motorActions = GetComponent<AIMotorActions>() as AIMotorActions;
-        raycastSensors = GetComponent<AIRaycastSensors>() as AIRaycastSensors;
-        parentTransform = this.transform.parent;
+		motorActions = aiM;
+		raycastSensors = aiR;
+		parentTransform = parentT;
+
+		targetObject = GameObject.FindGameObjectWithTag ("Player");
+
+		if (activeState.GetAction () == Action.RUN_SUB_FSM) {
+			SpawnFSMStartingWithState (activeState.GetStartingSubstate());
+		}
     }
 
-    //Data driven approach, so that hard coding can be replaced with
-    //loading from XML.
-    private void LoadStates()
-    {
-        FSMState state1 = new FSMState("run_right", Action.MOVERIGHT);
-        FSMTransition trans1 = new FSMTransition("aim_target");
-        trans1.AddExpression(Condition.TARGET_IN_OCTANT_BELOW, 2, true);
-        state1.AddTransition(trans1);
-        FSMTransition trans2 = new FSMTransition("run_left");
-        trans2.AddExpression(Condition.CLIFF_RIGHT, 0, true);
-        state1.AddTransition(trans2);
-        states.Add(state1.GetName(), state1);
-
-        FSMState state2 = new FSMState("run_left", Action.MOVELEFT);
-        FSMTransition trans3 = new FSMTransition("aim_target");
-        trans3.AddExpression(Condition.TARGET_IN_OCTANT_BELOW, 2, true);
-        state2.AddTransition(trans3);
-        FSMTransition trans4 = new FSMTransition("run_right");
-        trans4.AddExpression(Condition.CLIFF_LEFT, 0, true);
-        state2.AddTransition(trans4);
-        states.Add(state2.GetName(), state2);
-
-        FSMState state3 = new FSMState("aim_target", Action.AIMTARGET);
-        FSMTransition trans5 = new FSMTransition("shoot_target");
-        trans5.AddExpression(Condition.TIMER, 2, true);
-        state3.AddTransition(trans5);
-        states.Add(state3.GetName(), state3);
-
-        FSMState state4 = new FSMState("shoot_target", Action.RELEASEFIRETARGET);
-        FSMTransition trans6 = new FSMTransition("run_right");
-        trans6.AddExpression(Condition.TIMER, 0.1f, true);
-        state4.AddTransition(trans6);
-        states.Add(state4.GetName(), state4);
-    }
-
-    void Update()
+    public void FSMUpdate()
     {
         UpdateTimer();
         EvaluateTransitions();
-		motorActions.PerformAction (GetAction ());
+		PerformStateAction ();
     }
 
     private void UpdateTimer()
@@ -81,8 +54,6 @@ public class FSM : MonoBehaviour
 
     private void EvaluateTransitions()
     {
-        EvaluateParentTransitions(); //Check if a higher level FSM is changing state
-
         List<FSMTransition> transitions = activeState.GetTransitions();
         bool transitionTruth = false;
         string nextState = null;
@@ -98,12 +69,6 @@ public class FSM : MonoBehaviour
         if (transitionTruth)
         {
             ChangeToState(nextState);
-        }
-    }
-
-    private void EvaluateParentTransitions(){
-        if (parentFSM != null){
-            parentFSM.EvaluateTransitions();
         }
     }
 
@@ -182,21 +147,29 @@ public class FSM : MonoBehaviour
     void ChangeToState(string nextState)
     {
         timer = 0f;
-        activeState = GetState(nextState);
+        activeState = loader.GetState(nextState);
+		if (activeState.GetAction () == Action.RUN_SUB_FSM) { //If this state is parent to a sub fsm
+			SpawnFSMStartingWithState (activeState.GetStartingSubstate());
+		}
     }
 
-    private FSMState GetState(string stateName)
-    {
-        if (states.ContainsKey(stateName))
-        {
-            return states[stateName];
-        }
-        else
-        {
-            Debug.Log("A state with name " + stateName + " is not in FSM states dictionary.");
-            return null;
-        }
-    }
+	private void SpawnFSMStartingWithState (string startingSubstate){
+		if(childFSM != null)Destroy (childFSM.gameObject);
+
+		GameObject FSMObject = Instantiate (FSMPrefab, parentTransform.position, parentTransform.rotation);
+		FSMObject.transform.SetParent (this.transform.parent);
+		childFSM = FSMObject.GetComponent<FSM> () as FSM;
+		childFSM.InitialiseFSM(startingSubstate, loader, motorActions, raycastSensors, parentTransform);
+	}
+
+	void PerformStateAction(){
+		print ("Active state = " + activeState.GetName ());
+		if (childFSM != null) {
+			childFSM.FSMUpdate ();
+		} else {
+			motorActions.PerformAction (activeState.GetAction ());
+		}
+	}
 
     public Action GetAction(){
         return activeState.GetAction();

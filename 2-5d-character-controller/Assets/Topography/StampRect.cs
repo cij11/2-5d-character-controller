@@ -12,8 +12,6 @@ public class StampRect : MonoBehaviour, IStampable {
 
 
 	public void ApplyStamp(MarchingSquaresGrid marchingGrid){
-		print ("Apply stamp invoked in stamp");
-
 		TransformToRect ();
 	//	Vector2 position2d = new Vector2 (this.transform.position.x, this.transform.position.y);
 	//	QuadToHulls quad = new QuadToHulls(position2d, 0f, 20f, 20f);

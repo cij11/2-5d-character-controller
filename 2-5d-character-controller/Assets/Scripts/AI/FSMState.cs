@@ -5,11 +5,13 @@ using System.Collections.Generic;
 public class FSMState{
     
     string name;
+	string startingSubstate; //If this is a superstate, load startingSubstate as the first state in the child FSM.
     Action action;
     List<FSMTransition> transitions;
 
     public FSMState(string newName, Action maction){
         name = newName;
+		startingSubstate = "";
         action = maction;
         transitions = new List<FSMTransition>();
     }
@@ -32,4 +34,12 @@ public class FSMState{
     public Action GetAction(){
         return action;
     }
+
+	public void SetStartingSubstate(string start){
+		startingSubstate = start;
+	}
+
+	public string GetStartingSubstate(){
+		return startingSubstate;
+	}
 }

@@ -10,8 +10,6 @@ public class StampCircle : MonoBehaviour, IStampable {
 
 
 	public void ApplyStamp(MarchingSquaresGrid marchingGrid){
-		print ("Apply stamp invoked in circle stamp");
-
 		TransformToCircle ();
 
 		new MarchingSquaresCutTools (marchingGrid.GetNodeArray ()).DigCircleFromWorld (position, radius, isSolid);

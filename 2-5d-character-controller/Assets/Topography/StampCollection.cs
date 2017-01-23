@@ -6,7 +6,6 @@ using UnityEngine;
 public class StampCollection : MonoBehaviour, IStampable {
 
 	public void ApplyStamp(MarchingSquaresGrid marchingGrid){
-		print ("Apply stamp invoked in stamp collection");
 		IStampable[] stampables =  this.transform.GetComponentsInChildren<IStampable> ();
 		foreach (IStampable stampable in stampables) {
 			if (!stampable.Equals (this)) {
@@ -19,7 +18,6 @@ public class StampCollection : MonoBehaviour, IStampable {
 	//ones. Later stamps are pushed forward along the z axis, so that they are visible on top of the stamps they will override.
 	void Update(){
 		for (int i = 0; i < transform.childCount; i++) {
-			print ("Updating transform " + i);
 			Transform childTransform = transform.GetChild (i);
 			childTransform.position = new Vector3 (childTransform.position.x, childTransform.position.y, this.transform.position.z -i);
 		}
