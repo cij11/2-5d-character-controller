@@ -19,19 +19,19 @@ public class AIMotorActions : MonoBehaviour {
 				ResetController();
 				break;
 			}
-			case Action.MOVELEFT:{
+			case Action.MOVE_LEFT:{
 				MoveTowardsDirection(-1);
 				break;
 			}
-			case Action.MOVERIGHT:{
+			case Action.MOVE_RIGHT:{
 				MoveTowardsDirection(1);
 				break;
 			}
-			case Action.AIMTARGET:{
+			case Action.AIM_TARGET:{
 				AimAtObject(targetObject);
 				break;
 			}
-			case Action.RELEASEFIRETARGET:{
+			case Action.RELEASE_FIRE_TARGET:{
 				ReleaseFireAtObject(targetObject);
 				break;
 			}

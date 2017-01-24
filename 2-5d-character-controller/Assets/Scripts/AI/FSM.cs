@@ -52,6 +52,8 @@ public class FSM : MonoBehaviour
             timer += Time.deltaTime;
     }
 
+	//Check each transistion to see if state should change
+	//Each transition has a list of Expressions. Every expression in the transition must be true to take the transition.
     private void EvaluateTransitions()
     {
         List<FSMTransition> transitions = activeState.GetTransitions();
