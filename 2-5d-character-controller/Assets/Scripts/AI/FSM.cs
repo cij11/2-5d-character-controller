@@ -10,27 +10,22 @@ public class FSM : MonoBehaviour
     private float timer;
     private float maxTime = 315360000; //Limit states to ten years duration.
     
-    //Horizontal and vertical directions pointing to the closest octant to the target
-    int horOctant;
-    int vertOctant;
 	private FSMLoader loader;
-    private AIRaycastSensors raycastSensors;
     private AIMotorActions motorActions;
-	private AIGoals goals;
+	private AIConditionChecker conditionChecker;
     private Transform parentTransform;
 
 	public GameObject FSMPrefab;
 
 	private FSM childFSM;
 
-	public void InitialiseFSM(string startingState, FSMLoader load, AIMotorActions aiM, AIRaycastSensors aiR, AIGoals aiG, Transform parentT){
+	public void InitialiseFSM(string startingState, FSMLoader load, AIMotorActions aiM, AIConditionChecker aiC, Transform parentT){
         timer = 0f;
 		loader = load;
 		activeState = loader.GetState(startingState);
 
 		motorActions = aiM;
-		raycastSensors = aiR;
-		goals = aiG;
+		conditionChecker = aiC;
 		parentTransform = parentT;
 
 		if (activeState.GetAction () == Action.RUN_SUB_FSM) {
@@ -78,71 +73,10 @@ public class FSM : MonoBehaviour
     private bool TestTransition(FSMTransition transition){
         foreach(FSMExpression expression in transition.GetExpressions())
         {
-            bool conditionTruth = TestCondition(expression.condition, expression.param);
+            bool conditionTruth = conditionChecker.TestCondition(expression.condition, expression.param, timer);
             if(conditionTruth != expression.trueIfConditionTrue) return false;
         }
         return true;
-    }
-
-    private bool TestCondition(Condition condition, float param)
-    {
-        switch (condition)
-        {
-            case Condition.TIMER:
-                {
-                    if (timer > param) return true;
-                    break;
-                }
-            case Condition.TARGET_IN_RADIUS:
-            {
-				if(Vector3.Magnitude(goals.GetTargetObject().transform.position - parentTransform.position) < param) return true;
-                break;
-            }
-            case Condition.TARGET_OUTSIDE_RADIUS:
-            {
-				if(Vector3.Magnitude(goals.GetTargetObject().transform.position - parentTransform.position) > param) return true;
-                break;
-            }
-            case Condition.TARGET_IN_LOS:
-            {
-				if (raycastSensors.IsGameobjectInLOS(goals.GetTargetObject())) return true;
-                break;
-            }
-            case Condition.TARGET_IN_OCTANT_BELOW:
-            {
-                FindTargetOctant();
-                if(horOctant == 0f && vertOctant <0) return true;
-                break;
-            }
-            case Condition.TARGET_IN_OCTANT_ABOVE:
-            {
-                FindTargetOctant();
-                if(horOctant == 0f && vertOctant >0) return true;
-                break;
-            }
-            case Condition.TARGET_IN_HORIZONTAL_OCTANTS:
-            {
-                FindTargetOctant();
-                if(horOctant != 0f && vertOctant == 0) return true;
-                break;
-            }
-            case Condition.CLIFF_LEFT:
-            {
-                if(raycastSensors.GetLeftCliff()) return true;
-                break;
-            }
-            case Condition.CLIFF_RIGHT:
-            {
-                if(raycastSensors.GetRightCliff()) return true;
-                break;
-            }
-        }
-        return false;
-    }
-
-    void FindTargetOctant(){
-		Octant.PointsToOctant(parentTransform.position, goals.GetTargetObject().transform.position,
-                  parentTransform.right, parentTransform.up, out horOctant, out vertOctant);
     }
 
     void ChangeToState(string nextState)
@@ -160,7 +94,7 @@ public class FSM : MonoBehaviour
 		GameObject FSMObject = Instantiate (FSMPrefab, parentTransform.position, parentTransform.rotation);
 		FSMObject.transform.SetParent (this.transform.parent);
 		childFSM = FSMObject.GetComponent<FSM> () as FSM;
-		childFSM.InitialiseFSM(startingSubstate, loader, motorActions, raycastSensors, goals, parentTransform);
+		childFSM.InitialiseFSM(startingSubstate, loader, motorActions, conditionChecker, parentTransform);
 	}
 
 	void PerformStateAction(){

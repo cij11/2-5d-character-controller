@@ -7,9 +7,8 @@ public class FSMLoader : MonoBehaviour {
 	private Dictionary<string, FSMState> states;
 	private FSM rootFSM;
 
-	private AIRaycastSensors raycastSensors;
 	private AIMotorActions motorActions;
-	private AIGoals goals;
+	private AIConditionChecker conditionChecker;
 	private Transform parentTransform;
 
 	public GameObject FSMPrefab;
@@ -22,14 +21,13 @@ public class FSMLoader : MonoBehaviour {
 	//	LoadStates ();
 		SeriallyLoadStates();
 		motorActions = GetComponent<AIMotorActions>() as AIMotorActions;
-		raycastSensors = GetComponent<AIRaycastSensors>() as AIRaycastSensors;
-		goals = GetComponent<AIGoals> () as AIGoals;
+		conditionChecker = GetComponent<AIConditionChecker> () as AIConditionChecker;
 		parentTransform = this.transform.parent;
 
 		GameObject FSMObject = Instantiate (FSMPrefab, parentTransform.position, parentTransform.rotation);
 		FSMObject.transform.SetParent (this.transform.parent);
 		rootFSM = FSMObject.GetComponent<FSM> () as FSM;
-		rootFSM.InitialiseFSM("patrol", this, motorActions, raycastSensors, goals, parentTransform);
+		rootFSM.InitialiseFSM("patrol", this, motorActions, conditionChecker, parentTransform);
 	}
 
 	//Data driven approach, so that hard coding can be replaced with
