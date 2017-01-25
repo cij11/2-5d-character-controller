@@ -4,11 +4,13 @@ using System.Collections;
 public class AIMotorActions : MonoBehaviour {
 	AIVirtualController virtualController;
 	Transform parentTransform;
-	GameObject targetObject;
+
+	AIGoals goals;
 
 	// Use this for initialization
 	void Start () {
 		virtualController = GetComponent<AIVirtualController>() as AIVirtualController;
+		goals = GetComponent<AIGoals> () as AIGoals;
 		parentTransform = this.transform.parent;
 	}
 
@@ -28,11 +30,11 @@ public class AIMotorActions : MonoBehaviour {
 				break;
 			}
 			case Action.AIM_TARGET:{
-				AimAtObject(targetObject);
+				AimAtObject(goals.GetTargetObject());
 				break;
 			}
 			case Action.RELEASE_FIRE_TARGET:{
-				ReleaseFireAtObject(targetObject);
+				ReleaseFireAtObject(goals.GetTargetObject());
 				break;
 			}
 			default:
@@ -106,9 +108,4 @@ public class AIMotorActions : MonoBehaviour {
 		Vector3 vectorToPoint = point - this.transform.parent.position;
 		return Mathf.Sign(Vector3.Dot(vectorToPoint, this.transform.parent.up));
 	}
-
-	
-    public void SetTarget(GameObject target){
-        targetObject = target;
-    }
 }

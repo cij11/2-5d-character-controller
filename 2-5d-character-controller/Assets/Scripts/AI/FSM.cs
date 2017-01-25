@@ -9,7 +9,6 @@ public class FSM : MonoBehaviour
     //Decision making information.
     private float timer;
     private float maxTime = 315360000; //Limit states to ten years duration.
-    private GameObject targetObject;
     
     //Horizontal and vertical directions pointing to the closest octant to the target
     int horOctant;
@@ -17,22 +16,22 @@ public class FSM : MonoBehaviour
 	private FSMLoader loader;
     private AIRaycastSensors raycastSensors;
     private AIMotorActions motorActions;
+	private AIGoals goals;
     private Transform parentTransform;
 
 	public GameObject FSMPrefab;
 
 	private FSM childFSM;
 
-	public void InitialiseFSM(string startingState, FSMLoader load, AIMotorActions aiM, AIRaycastSensors aiR, Transform parentT){
+	public void InitialiseFSM(string startingState, FSMLoader load, AIMotorActions aiM, AIRaycastSensors aiR, AIGoals aiG, Transform parentT){
         timer = 0f;
 		loader = load;
 		activeState = loader.GetState(startingState);
 
 		motorActions = aiM;
 		raycastSensors = aiR;
+		goals = aiG;
 		parentTransform = parentT;
-
-		targetObject = GameObject.FindGameObjectWithTag ("Player");
 
 		if (activeState.GetAction () == Action.RUN_SUB_FSM) {
 			SpawnFSMStartingWithState (activeState.GetStartingSubstate());
@@ -96,17 +95,17 @@ public class FSM : MonoBehaviour
                 }
             case Condition.TARGET_IN_RADIUS:
             {
-                if(Vector3.Magnitude(targetObject.transform.position - parentTransform.position) < param) return true;
+				if(Vector3.Magnitude(goals.GetTargetObject().transform.position - parentTransform.position) < param) return true;
                 break;
             }
             case Condition.TARGET_OUTSIDE_RADIUS:
             {
-                if(Vector3.Magnitude(targetObject.transform.position - parentTransform.position) > param) return true;
+				if(Vector3.Magnitude(goals.GetTargetObject().transform.position - parentTransform.position) > param) return true;
                 break;
             }
             case Condition.TARGET_IN_LOS:
             {
-                if (raycastSensors.IsGameobjectInLOS(targetObject)) return true;
+				if (raycastSensors.IsGameobjectInLOS(goals.GetTargetObject())) return true;
                 break;
             }
             case Condition.TARGET_IN_OCTANT_BELOW:
@@ -142,7 +141,7 @@ public class FSM : MonoBehaviour
     }
 
     void FindTargetOctant(){
-                Octant.PointsToOctant(parentTransform.position, targetObject.transform.position,
+		Octant.PointsToOctant(parentTransform.position, goals.GetTargetObject().transform.position,
                   parentTransform.right, parentTransform.up, out horOctant, out vertOctant);
     }
 
@@ -161,7 +160,7 @@ public class FSM : MonoBehaviour
 		GameObject FSMObject = Instantiate (FSMPrefab, parentTransform.position, parentTransform.rotation);
 		FSMObject.transform.SetParent (this.transform.parent);
 		childFSM = FSMObject.GetComponent<FSM> () as FSM;
-		childFSM.InitialiseFSM(startingSubstate, loader, motorActions, raycastSensors, parentTransform);
+		childFSM.InitialiseFSM(startingSubstate, loader, motorActions, raycastSensors, goals, parentTransform);
 	}
 
 	void PerformStateAction(){
@@ -175,9 +174,5 @@ public class FSM : MonoBehaviour
 
     public Action GetAction(){
         return activeState.GetAction();
-    }
-
-    public void SetTarget(GameObject target){
-        targetObject = target;
     }
 }

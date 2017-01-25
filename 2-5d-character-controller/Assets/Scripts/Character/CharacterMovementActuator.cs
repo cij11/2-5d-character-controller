@@ -11,19 +11,21 @@ public class CharacterMovementActuator : MonoBehaviour
 	Collider physCollider;
 	CharacterContactSensor contactSensor;
 
+	public float maxAirSpeed = 12;
+	public float maxWalkSpeed = 12;
+	public float jumpSpeed = 10f;
+
 	//Speed the character walks at when left or right held
-	float maxWalkSpeed = 12;
+
 	//Time to attain walk velocity from stationary.
 	float landSpeedUpForce = 1500f;
 	float landBreakForce = 5000f;
 
-	float maxAirSpeed = 12;
 	float airSpeedUpForce = 600f;
 	float airBreakForce = 1500f;
 
 	float gravityForce = 900f;
 
-	float jumpSpeed = 10f;
 	float wallJumpClearanceSpeed = 3f;
 	bool isSlideCommandGiven = false;
 	float releaseSpeed = 2f;
