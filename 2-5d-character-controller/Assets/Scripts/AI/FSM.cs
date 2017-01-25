@@ -7,8 +7,8 @@ public class FSM : MonoBehaviour
     private FSMState activeState;
 
     //Decision making information.
-    private float timer;
-	private int frames;
+	private FSMCounter fsmCounter;
+
     private float maxTime = 315360000; //Limit states to ten years duration.
     
 	private FSMLoader loader;
@@ -21,13 +21,16 @@ public class FSM : MonoBehaviour
 	private FSM childFSM;
 
 	public void InitialiseFSM(string startingState, FSMLoader load, AIMotorActions aiM, AIConditionChecker aiC, Transform parentT){
-        timer = 0f;
 		loader = load;
 		activeState = loader.GetState(startingState);
 
 		motorActions = aiM;
 		conditionChecker = aiC;
 		parentTransform = parentT;
+
+		fsmCounter = new FSMCounter ();
+		fsmCounter.timer = 0f;
+		fsmCounter.frames = 0;
 
 		if (activeState.GetAction () == Action.RUN_SUB_FSM) {
 			SpawnFSMStartingWithState (activeState.GetStartingSubstate());
@@ -36,19 +39,23 @@ public class FSM : MonoBehaviour
 
     public void FSMUpdate()
     {
-        UpdateTimer();
-		UpdateFrames ();
+        UpdateCounter();
         EvaluateTransitions();
 		PerformStateAction ();
     }
 
+	public void UpdateCounter(){
+		UpdateTimer ();
+		UpdateFrames ();
+	}
+
     private void UpdateTimer()
     {
-        if (timer < maxTime)
-            timer += Time.deltaTime;
+        if (fsmCounter.timer < maxTime)
+			fsmCounter.timer += Time.deltaTime;
     }
 	private void UpdateFrames(){
-		frames++;
+		fsmCounter.frames++;
 	}
 
 	//Check each transistion to see if state should change
@@ -78,7 +85,7 @@ public class FSM : MonoBehaviour
     private bool TestTransition(FSMTransition transition){
         foreach(FSMExpression expression in transition.GetExpressions())
         {
-            bool conditionTruth = conditionChecker.TestCondition(expression.condition, expression.param, timer, frames);
+			bool conditionTruth = conditionChecker.TestCondition(expression.condition, expression.param, fsmCounter);
             if(conditionTruth != expression.trueIfConditionTrue) return false;
         }
         return true;
@@ -86,13 +93,17 @@ public class FSM : MonoBehaviour
 
     void ChangeToState(string nextState)
     {
-        timer = 0f;
-		frames = 0;
+		ZeroCounter ();
         activeState = loader.GetState(nextState);
 		if (activeState.GetAction () == Action.RUN_SUB_FSM) { //If this state is parent to a sub fsm
 			SpawnFSMStartingWithState (activeState.GetStartingSubstate());
 		}
     }
+
+	void ZeroCounter(){
+		fsmCounter.timer = 0f;
+		fsmCounter.frames = 0;
+	}
 
 	private void SpawnFSMStartingWithState (string startingSubstate){
 		if(childFSM != null)Destroy (childFSM.gameObject);

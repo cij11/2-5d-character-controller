@@ -5,29 +5,16 @@ using UnityEngine;
 public class FSMLoader : MonoBehaviour {
 
 	private Dictionary<string, FSMState> states;
-	private FSM rootFSM;
-
-	private AIMotorActions motorActions;
-	private AIConditionChecker conditionChecker;
-	private Transform parentTransform;
-
-	public GameObject FSMPrefab;
 
 	private FSMState latestState; //Add transitions to the most recently added state;
 	private FSMTransition latestTransition; //Add expressions to the most recently created transition
 
-	void Start () {
+	private string startingStateName;
+
+	public void InitialiseLoader(){
 		states = new Dictionary<string, FSMState> ();
-
 		SeriallyLoadStates();
-		motorActions = GetComponent<AIMotorActions>() as AIMotorActions;
-		conditionChecker = GetComponent<AIConditionChecker> () as AIConditionChecker;
-		parentTransform = this.transform.parent;
-
-		GameObject FSMObject = Instantiate (FSMPrefab, parentTransform.position, parentTransform.rotation);
-		FSMObject.transform.SetParent (this.transform.parent);
-		rootFSM = FSMObject.GetComponent<FSM> () as FSM;
-		rootFSM.InitialiseFSM("patrol", this, motorActions, conditionChecker, parentTransform);
+		startingStateName = "patrol";
 	}
 
 	protected virtual void SeriallyLoadStates(){
@@ -88,9 +75,8 @@ public class FSMLoader : MonoBehaviour {
 			return null;
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		rootFSM.FSMUpdate();
+
+	public string GetStartingStateName(){
+		return startingStateName;
 	}
 }

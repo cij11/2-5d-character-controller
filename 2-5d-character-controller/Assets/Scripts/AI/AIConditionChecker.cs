@@ -12,6 +12,11 @@ public class AIConditionChecker : MonoBehaviour {
 	//Horizontal and vertical directions pointing to the closest octant to the target
 	int horOctant;
 	int vertOctant;
+	float horDistance;
+	float vertDistance;
+
+	//How close the target needs to be to the line of the horizontal to be seen
+	float verticalSpottingHeight = 1f;
 
 	// Use this for initialization
 	void Start () {
@@ -21,18 +26,18 @@ public class AIConditionChecker : MonoBehaviour {
 		parentTransform = this.transform.parent;
 	}
 	
-	public bool TestCondition(Condition condition, float param, float timer, int frames)
+	public bool TestCondition(Condition condition, float param, FSMCounter counter)
 	{
 		switch (condition)
 		{
 		case Condition.TIMER:
 			{
-				if (timer > param) return true;
+				if (counter.timer > param) return true;
 				break;
 			}
 		case Condition.FRAMES:
 			{
-				if(frames >= (Mathf.CeilToInt(param))) return true;
+				if(counter.frames >= (Mathf.CeilToInt(param))) return true;
 				break;
 			}
 		case Condition.TARGET_IN_RADIUS:
@@ -68,6 +73,21 @@ public class AIConditionChecker : MonoBehaviour {
 				if(horOctant != 0f && vertOctant == 0) return true;
 				break;
 			}
+		case Condition.TARGET_IN_FRONT_OCTANT:
+			{
+				FindTargetOctant();
+				if(horOctant == goals.GetForwardDirection() && vertOctant == 0) return true;
+				break;
+			}
+		case Condition.TARGET_IN_FRONT_HORIZONTAL:
+			{
+				FindTargetDistances ();
+				if (Mathf.Sign (horDistance) == Mathf.Sign (goals.GetForwardDirection ())) {
+					if (Mathf.Abs (vertDistance) < verticalSpottingHeight)
+						return true;
+				}
+				break;
+			}
 		case Condition.CLIFF_LEFT:
 			{
 				if(raycastSensors.GetLeftCliff()) return true;
@@ -95,5 +115,10 @@ public class AIConditionChecker : MonoBehaviour {
 	void FindTargetOctant(){
 		Octant.PointsToOctant(parentTransform.position, goals.GetTargetObject().transform.position,
 			parentTransform.right, parentTransform.up, out horOctant, out vertOctant);
+	}
+
+	void FindTargetDistances(){
+		Octant.PointsToDistances(parentTransform.position, goals.GetTargetObject().transform.position,
+			parentTransform.right, parentTransform.up, out horDistance, out vertDistance);
 	}
 }

@@ -47,6 +47,21 @@ public class AIMotorActions : MonoBehaviour {
 				ReleaseFireAtObject(goals.GetTargetObject());
 				break;
 			}
+		case Action.JUMP:
+			{
+				TapJump ();
+				break;
+			}
+		case Action.PRESS_JUMP:
+			{
+				PressJump();
+				break;
+			}
+		case Action.RELEASE_JUMP:
+			{
+				ReleaseJump();
+				break;
+			}
 			default:
 				ResetController();
 				break;
@@ -100,6 +115,18 @@ public class AIMotorActions : MonoBehaviour {
 	void ReleaseFireAtPoint(Vector3 point){
 		PushBothAxisToOctant(point);
 		virtualController.ReleaseFire();
+	}
+
+	void TapJump(){
+		virtualController.TapJump ();
+	}
+
+	void PressJump(){
+		virtualController.PushJump();
+	}
+
+	void ReleaseJump(){
+		virtualController.ReleaseJump();
 	}
 
 	void ResetController(){

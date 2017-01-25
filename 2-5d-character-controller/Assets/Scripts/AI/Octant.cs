@@ -3,7 +3,13 @@ using System.Collections;
 
 public class Octant {
 
-	public static void PointsToOctant(Vector3 fromPoint, Vector3 toPoint, Vector3 right, Vector3 up, out int hor, out int vert){
+	public static void PointsToDistances(Vector3 fromPoint, Vector3 toPoint, Vector3 right, Vector3 up, out float horDist, out float vertDist){
+		Vector3 vectorToPoint = toPoint - fromPoint;
+		horDist = Vector3.Dot(vectorToPoint, right);
+		vertDist = Vector3.Dot(vectorToPoint, up);
+	}
+
+	public static void PointsToOctant(Vector3 fromPoint, Vector3 toPoint, Vector3 right, Vector3 up, out int horOct, out int vertOct){
 		Vector3 vectorToPoint = toPoint - fromPoint;
 		float horDist = Vector3.Dot(vectorToPoint, right);
 		float vertDist = Vector3.Dot(vectorToPoint, up);
@@ -12,16 +18,16 @@ public class Octant {
 		float angle = Mathf.Rad2Deg * radAngle;
 
 		if (angle < 22.5f){ //Horizontal octant
-			hor = (int)Mathf.Sign(horDist);
-			vert = 0;
+			horOct = (int)Mathf.Sign(horDist);
+			vertOct = 0;
 		}
 		else if (angle >= 22.5 && angle < 67.5){ //Diagonal octants
-			hor = (int)Mathf.Round(Mathf.Sign(horDist));
-			vert = (int)Mathf.Round(Mathf.Sign(vertDist));
+			horOct = (int)Mathf.Round(Mathf.Sign(horDist));
+			vertOct = (int)Mathf.Round(Mathf.Sign(vertDist));
 		}
 		else{ //Vertical octants
-			hor = 0;
-			vert = (int)(Mathf.Sign(vertDist));
+			horOct = 0;
+			vertOct = (int)(Mathf.Sign(vertDist));
 		}
 	}
 }
