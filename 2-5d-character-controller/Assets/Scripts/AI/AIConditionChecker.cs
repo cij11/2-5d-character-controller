@@ -21,13 +21,18 @@ public class AIConditionChecker : MonoBehaviour {
 		parentTransform = this.transform.parent;
 	}
 	
-	public bool TestCondition(Condition condition, float param, float timer)
+	public bool TestCondition(Condition condition, float param, float timer, int frames)
 	{
 		switch (condition)
 		{
 		case Condition.TIMER:
 			{
 				if (timer > param) return true;
+				break;
+			}
+		case Condition.FRAMES:
+			{
+				if(frames >= (Mathf.CeilToInt(param))) return true;
 				break;
 			}
 		case Condition.TARGET_IN_RADIUS:
@@ -71,6 +76,16 @@ public class AIConditionChecker : MonoBehaviour {
 		case Condition.CLIFF_RIGHT:
 			{
 				if(raycastSensors.GetRightCliff()) return true;
+				break;
+			}
+		case Condition.CLIFF_FORWARD:
+			{
+				if (goals.GetForwardDirection () == 1) {
+					if (raycastSensors.GetRightCliff ())
+						return true;
+				} else {
+					if(raycastSensors.GetLeftCliff()) return true;
+				}
 				break;
 			}
 		}

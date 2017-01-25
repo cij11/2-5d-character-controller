@@ -29,6 +29,16 @@ public class AIMotorActions : MonoBehaviour {
 				MoveTowardsDirection(1);
 				break;
 			}
+			case Action.MOVE_FORWARD:
+			{
+				MoveTowardsDirection (goals.GetForwardDirection ());
+				break;
+			}
+		case Action.CHANGE_DIRECTION:
+			{
+				goals.ToggleForwardDirection ();
+				break;
+			}
 			case Action.AIM_TARGET:{
 				AimAtObject(goals.GetTargetObject());
 				break;

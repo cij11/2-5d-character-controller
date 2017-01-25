@@ -8,6 +8,7 @@ public class FSM : MonoBehaviour
 
     //Decision making information.
     private float timer;
+	private int frames;
     private float maxTime = 315360000; //Limit states to ten years duration.
     
 	private FSMLoader loader;
@@ -36,6 +37,7 @@ public class FSM : MonoBehaviour
     public void FSMUpdate()
     {
         UpdateTimer();
+		UpdateFrames ();
         EvaluateTransitions();
 		PerformStateAction ();
     }
@@ -45,6 +47,9 @@ public class FSM : MonoBehaviour
         if (timer < maxTime)
             timer += Time.deltaTime;
     }
+	private void UpdateFrames(){
+		frames++;
+	}
 
 	//Check each transistion to see if state should change
 	//Each transition has a list of Expressions. Every expression in the transition must be true to take the transition.
@@ -73,7 +78,7 @@ public class FSM : MonoBehaviour
     private bool TestTransition(FSMTransition transition){
         foreach(FSMExpression expression in transition.GetExpressions())
         {
-            bool conditionTruth = conditionChecker.TestCondition(expression.condition, expression.param, timer);
+            bool conditionTruth = conditionChecker.TestCondition(expression.condition, expression.param, timer, frames);
             if(conditionTruth != expression.trueIfConditionTrue) return false;
         }
         return true;
@@ -82,6 +87,7 @@ public class FSM : MonoBehaviour
     void ChangeToState(string nextState)
     {
         timer = 0f;
+		frames = 0;
         activeState = loader.GetState(nextState);
 		if (activeState.GetAction () == Action.RUN_SUB_FSM) { //If this state is parent to a sub fsm
 			SpawnFSMStartingWithState (activeState.GetStartingSubstate());
