@@ -5,6 +5,7 @@ using UnityEngine;
 public class JumpAttackFSM : FSMLoader {
 
 	protected override void SeriallyLoadStates(){
+		//SuperFSM states
 		AddState ("patrol", Action.RUN_SUB_FSM, "start_patrol");
 		AddTransistion ("attack", Condition.TARGET_IN_FRONT_HORIZONTAL, 1, true);
 		AddExpression (Condition.TARGET_IN_RADIUS, 2, true); //By adding an expression to an existing transition, these two condtions are 'ANDed' together.
@@ -13,8 +14,9 @@ public class JumpAttackFSM : FSMLoader {
 	//	AddTransistion ("patrol", Condition.TARGET_IN_FRONT_HORIZONTAL, 1, false); //By adding two seperate transitions, these two conditions are 'ORed' together.
 		AddTransistion ("patrol", Condition.TARGET_IN_RADIUS, 3f, false);
 
+		//Patrol states
 		AddState ("start_patrol", Action.IDLE);
-		AddTransistion ("move_forward", Condition.TIMER, 1, true);
+		AddTransistion ("move_forward", Condition.TIMER, 0.1f, true);
 
 		AddState ("move_forward", Action.MOVE_FORWARD);
 		AddTransistion ("change_direction", Condition.CLIFF_FORWARD, 1, true);
@@ -22,6 +24,7 @@ public class JumpAttackFSM : FSMLoader {
 		AddState ("change_direction", Action.CHANGE_DIRECTION);
 		AddTransistion ("move_forward", Condition.FRAMES, 1, true);
 
+		//Jump attack states
 		AddState ("jump", Action.PRESS_JUMP);
 		AddTransistion ("stop_jump", Condition.FRAMES, 2, true);
 
