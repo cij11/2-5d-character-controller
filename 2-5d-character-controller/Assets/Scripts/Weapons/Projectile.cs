@@ -6,6 +6,7 @@ public abstract class Projectile : MonoBehaviour {
 	protected Weapon firingWeapon;
 	protected Character firingCharacter;
 	protected Vector3 worldLaunchVector;
+	protected Transform characterTransform;
 
 	protected float maxLifespan = 0.4f;
 
@@ -30,6 +31,7 @@ public abstract class Projectile : MonoBehaviour {
 	public void LoadLaunchParameters(Weapon firingWeapon, Character firingCharacter, Vector3 worldLaunch, int facingDirection){
 		this.firingWeapon = firingWeapon;
 		this.firingCharacter = firingCharacter;
+		characterTransform = firingCharacter.transform;
 		worldLaunchVector = worldLaunch;
 		direction = facingDirection;
 

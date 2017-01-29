@@ -79,7 +79,9 @@ public class MovementController : MonoBehaviour
     }
 
     public void Lunge(Vector3 lungeVector, float speed){
-        movementActuator.LungeCommand(lungeVector, speed);
+		if (contactSensor.GetContactState () != ContactState.WALLGRAB) {
+			movementActuator.LungeCommand (lungeVector, speed);
+		}
     }
     public void SetWalkingSpeed(float newSpeed)
     {

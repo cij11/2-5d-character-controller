@@ -20,10 +20,12 @@ public abstract class Weapon : MonoBehaviour
 	protected bool stationaryWindDown = true;
 
     private float cycleTimer = 0f;
-    private float windupPeriod = 0.2f;
-    private float firingPeriod = 0.2f;
-    private float winddownPeriod = 0.2f;
-    private float cooldownPeriod = 1f;
+    private float windupPeriod = 0.05f;
+    private float firingPeriod = 0.1f;
+    private float winddownPeriod = 0.01f;
+    private float cooldownPeriod = 0.1f;
+
+	bool windupQueued = false;
 
 	public Vector3 gripOffset = new Vector3(0.4f, 0.05f, 0f);
 
@@ -53,15 +55,29 @@ public abstract class Weapon : MonoBehaviour
     //If in wound up mode and fire released, fire weapon.
     public void WindupCommand()
     {
-        weaponState = WeaponState.WINDING_UP;
-        cycleTimer = windupPeriod;
+		if (weaponState == WeaponState.IDLE) {
+			weaponState = WeaponState.WINDING_UP;
+			cycleTimer = windupPeriod;
+		} else {
+			windupQueued = true;
+		}
     }
 
     // Update is called once per frame
     void Update()
     {
+		PerformQueuedWindups ();
         UpdateFiringCycle();
     }
+
+	void PerformQueuedWindups(){
+		if (windupQueued) {
+			if (weaponState == WeaponState.IDLE) {
+				WindupCommand ();
+				windupQueued = false;
+			}
+		}
+	}
 
     void UpdateFiringCycle()
     {
@@ -125,7 +141,7 @@ public abstract class Weapon : MonoBehaviour
         cycleTimer -= Time.deltaTime;
         if (cycleTimer <= 0f)
         {
-            TransitionToWindingDown();
+            TransitionToCoolingDown();
         }
     }
 
