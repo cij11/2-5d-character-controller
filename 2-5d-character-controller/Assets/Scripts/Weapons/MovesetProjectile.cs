@@ -16,7 +16,7 @@ public class MovesetProjectile : Projectile
 
     private void LaunchMoveset()
     {
-		this.transform.SetParent(firingWeapon.transform);
+		this.transform.SetParent(firingWeapon.transform.parent.parent);
     }
 
 	protected override void SetupSprite(){

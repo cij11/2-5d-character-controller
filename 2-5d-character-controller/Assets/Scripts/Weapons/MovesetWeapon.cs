@@ -8,10 +8,10 @@ public class MovesetWeapon : Weapon
     public GameObject sideAttack;
     public GameObject arialDownAttack;
 
-    Vector3 upSpawnOffset = new Vector3(0.5f, 0.5f, 0f);
-    Vector3 sideSpawnOffset = new Vector3(1f, 0f, 0f);
-    Vector3 downSpawnOffset = new Vector3(0, -0.5f, 0f);
-    Vector3 arialDownSpawnOffset = new Vector3(0f, -1f, 0f);
+    Vector3 upSpawnOffset = new Vector3(0.2f, 0.2f, 0f);
+    Vector3 sideSpawnOffset = new Vector3(0.4f, 0f, 0f);
+    Vector3 downSpawnOffset = new Vector3(0, -0.1f, 0f);
+    Vector3 arialDownSpawnOffset = new Vector3(0f, -0.1f, 0f);
 
 
     protected override void LoadWeaponParameters()

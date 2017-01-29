@@ -19,13 +19,13 @@ public class MeleeProjectile : Projectile {
 	}
 
 	void LaunchMelee(){
-		this.transform.SetParent(firingWeapon.transform);
+		this.transform.SetParent(firingWeapon.transform.parent.parent);
 		this.transform.position = this.transform.parent.position +  worldLaunchVector * reachRange;
 		AlignToLauncher();
 	}
 
 	void AlignToLauncher(){
-		Vector3 weaponToProjectile = this.transform.position - firingWeapon.transform.position;
+		Vector3 weaponToProjectile = this.transform.position - firingWeapon.transform.parent.parent.position;
 		this.transform.rotation = Quaternion.FromToRotation(this.transform.right, weaponToProjectile) * transform.rotation;
 	}
 
