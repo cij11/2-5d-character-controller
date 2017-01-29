@@ -5,85 +5,57 @@ using UnityEngine;
 public class Hand : MonoBehaviour {
 
 	AimingController aimingController;
+	CharacterContactSensor contactSensor;
 	SpriteRenderer handSprite;
 
-	float idleX = -0.2f;
-	float idleY = -0.1f;
-	float idleRotation = 10f;
+	float idleX = 0.05f;
+	float idleY = 0.05f;
+	float idleRotation = 0f;
+
+	float shoulderAttachmentXWallGrab = -0.1f;
 
 	float aimingDisplacement = 0.2f;
 	// Use this for initialization
 	void Start () {
 		aimingController = this.transform.parent.GetComponentInChildren<AimingController> () as AimingController;
+		contactSensor = this.transform.GetComponentInParent<CharacterContactSensor> () as CharacterContactSensor;
 		handSprite = GetComponent<SpriteRenderer>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
+	//	ResetIdle ();
 		PositionHand ();
 		RotateHand ();
 		FlipHand ();
 	}
 
-	void PositionHand(){
-		if (aimingController.GetIsAiming ()) {
-			this.transform.localPosition = aimingController.GetAimingVector () * aimingDisplacement;
-		} else {
-			this.transform.localPosition = new Vector3(idleX * (float)aimingController.GetFacingDirection(), idleY, 0f);
+	//Return hand to idle position and angle if character moves while not aiming.
+	void ResetIdle(){
+		if (!aimingController.GetIsAiming ()) {
+			if (aimingController.GetIsAnyAimingInput ()) {
+				this.transform.localPosition = new Vector3(idleX * (float)aimingController.GetFacingDirection(), idleY, 0f);
+			}
 		}
 	}
 
+	void PositionHand(){
+	//	if (aimingController.GetIsAiming ()) {
+		float shoulderOffset = idleX;
+		if (contactSensor.GetContactState () == ContactState.WALLGRAB) {
+			shoulderOffset = shoulderAttachmentXWallGrab;
+		}
+		this.transform.localPosition = aimingController.GetAimingVector () * aimingDisplacement + new Vector3(shoulderOffset, idleY, 0f);
+			
+		//}
+	}
+
 	void RotateHand(){
-		if(aimingController.GetIsAiming()){
-			float handAngle = 0f;
-
-			if (aimingController.GetHorizontalAiming () == 0) {
-				if (aimingController.GetVerticalAiming () == 1) {
-					if (aimingController.GetFacingDirection () == 1) {
-						handAngle = 90f;
-					} else {
-						handAngle = -90f;
-					}
-				} else {
-					if (aimingController.GetFacingDirection () == 1) {
-						handAngle = -90f;
-					} else {
-						handAngle = 90f;
-					}
-				}
-			} else if (aimingController.GetVerticalAiming () == 0) {
-				handAngle = 0f;
-			} else if ((aimingController.GetVerticalAiming () == 1)) {
-				if (aimingController.GetHorizontalAiming () == 1) {
-					handAngle = 45f;
-				} else {
-					handAngle = -45f;
-				}
-			} else { //All that's left is down left and down right
-				if(aimingController.GetHorizontalAiming() == 1){
-					handAngle = -45f;
-				}
-					else{
-						handAngle = 45f;
-					}
-			}
-			//90 straight up
-
-			//45 up right
-
-			//0 straight right
-
-			//-45 //dow right
-
-			//-90 straight down
-
-			//180 straight left
+	//	if(aimingController.GetIsAiming()){
+			float handAngle = HandAngleFromAimingController ();
 			this.transform.localEulerAngles = new Vector3(0f, 0f, handAngle);
-		}
-		else{
-			this.transform.localEulerAngles = new Vector3(0f, 0f, idleRotation * aimingController.GetFacingDirection());
-		}
+		//}
 	}
 
 	void FlipHand(){
@@ -92,5 +64,46 @@ public class Hand : MonoBehaviour {
 		} else {
 			handSprite.flipX = true;
 		}
+	}
+
+	private float HandAngleFromAimingController(){
+		float handAngle = 0f;
+
+		//If aiming straight up or down, angle depends on facing direction.
+		if (aimingController.GetHorizontalAiming () == 0) {
+			if (aimingController.GetVerticalAiming () == 1) {
+				if (aimingController.GetFacingDirection () == 1) {
+					handAngle = 90f;
+				} else {
+					handAngle = -90f;
+				}
+			} else {
+				if (aimingController.GetFacingDirection () == 1) {
+					handAngle = -90f;
+				} else {
+					handAngle = 90f;
+				}
+			}
+
+		//If aiming flat horizontally, angle is always level at 0 degrees
+		} else if (aimingController.GetVerticalAiming () == 0) {
+			handAngle = 0f;
+
+		//If aiming diagonally, top left and bot right have the same angle. Top right and bot left have the same angle.
+		} else if ((aimingController.GetVerticalAiming () == 1)) {
+			if (aimingController.GetHorizontalAiming () == 1) {
+				handAngle = 45f;
+			} else {
+				handAngle = -45f;
+			}
+		} else { //All that's left is down left and down right
+			if(aimingController.GetHorizontalAiming() == 1){
+				handAngle = -45f;
+			}
+			else{
+				handAngle = 45f;
+			}
+		}
+		return handAngle;
 	}
 }

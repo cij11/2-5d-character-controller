@@ -152,6 +152,19 @@ public class AimingController : MonoBehaviour
         {
             verticalAiming = verticalInput;
         }
+
+		//Character cannot aim at the wall they are grabbing
+		if (isWallGrabbing) {
+			if (verticalAiming != 0) {
+				if (horizontalAiming == -facingDirection) {
+					horizontalAiming = 0;
+				}
+			} else {
+				if (horizontalAiming == -facingDirection) {
+					horizontalAiming = facingDirection;
+				}
+			}
+		}
     }
 
     public Vector3 GetAimingVector()
@@ -200,4 +213,12 @@ public class AimingController : MonoBehaviour
     public int GetVerticalAiming(){
         return verticalAiming;
     }
+
+	public bool GetIsAnyAimingInput(){
+		if (!(horizontalInput == 0))
+			return true;
+		if (!(verticalInput == 0))
+			return true;
+		return false;
+	}
 }

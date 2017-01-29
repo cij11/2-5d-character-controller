@@ -6,6 +6,7 @@ public class AIConditionChecker : MonoBehaviour {
 
 	private AIRaycastSensors raycastSensors;
 	private AIMotorActions motorActions;
+	private CharacterContactSensor contactSensor;
 	private AIGoals goals;
 	private Transform parentTransform;
 
@@ -22,6 +23,7 @@ public class AIConditionChecker : MonoBehaviour {
 	void Start () {
 		motorActions = GetComponent<AIMotorActions>() as AIMotorActions;
 		raycastSensors = GetComponent<AIRaycastSensors>() as AIRaycastSensors;
+		contactSensor = GetComponentInParent<CharacterContactSensor> () as CharacterContactSensor;
 		goals = GetComponent<AIGoals> () as AIGoals;
 		parentTransform = this.transform.parent;
 	}
@@ -100,11 +102,14 @@ public class AIConditionChecker : MonoBehaviour {
 			}
 		case Condition.CLIFF_FORWARD:
 			{
-				if (goals.GetForwardDirection () == 1) {
-					if (raycastSensors.GetRightCliff ())
-						return true;
-				} else {
-					if(raycastSensors.GetLeftCliff()) return true;
+				if (contactSensor.GetContactState () != ContactState.AIRBORNE) { //Don't look for cliffs if already airborne...
+					if (goals.GetForwardDirection () == 1) {
+						if (raycastSensors.GetRightCliff ())
+							return true;
+					} else {
+						if (raycastSensors.GetLeftCliff ())
+							return true;
+					}
 				}
 				break;
 			}
