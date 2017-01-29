@@ -82,7 +82,11 @@ public class InputDispatcher : MonoBehaviour {
 
 	void WeaponChanging(){
 		if(abstractInput.GetSwapDown()){
-			weaponManager.CycleWieldable();
+			if (abstractInput.GetFire ()) {
+				weaponManager.ThrowWeapon ();
+			} else {
+				weaponManager.SwapWeapon ();
+			}
 		}
 	}
 }

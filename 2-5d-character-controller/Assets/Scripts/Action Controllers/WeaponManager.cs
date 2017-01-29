@@ -8,8 +8,6 @@ public class WeaponManager : MonoBehaviour {
 	FiringController firingController;
 	Hand hand;
 	int equipedSlotNumber = 0;
-
-	Vector3 gripOffset = new Vector3(0.3f, 0.05f, 0f);
 	
 	// Use this for initialization
 	void Start () {
@@ -26,8 +24,24 @@ public class WeaponManager : MonoBehaviour {
 		EquipWeapon(weapons[equipedSlotNumber]);
 	}
 
+	public void ThrowWeapon(){
+		Throwable throwable = currentWeapon.GetComponent<Throwable> () as Throwable;
+		if (throwable != null) {
+			throwable.Throw (this.transform.right, 5f);
+			currentWeapon.CancelFiring ();
+			CycleWieldable ();
+		} else {
+			SwapWeapon ();
+		}
+	}
+
+	public void SwapWeapon(){
+		DestroycurrentWeapon ();
+		CycleWieldable ();
+	}
+
+
 	void EquipWeapon(Weapon toWeild){
-		DestroycurrentWeapon();
 		currentWeapon = Instantiate(toWeild, this.transform.position, Quaternion.identity) as Weapon;
 		currentWeapon.name = toWeild.name;
 		currentWeapon.transform.parent = hand.transform;

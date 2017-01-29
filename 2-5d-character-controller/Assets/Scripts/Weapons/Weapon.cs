@@ -193,7 +193,7 @@ public abstract class Weapon : MonoBehaviour
         return false;
     }
 
-    protected void CancelFiring(){
+    public void CancelFiring(){
         weaponState = WeaponState.IDLE;
     }
 
