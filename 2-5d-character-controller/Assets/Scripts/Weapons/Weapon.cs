@@ -12,6 +12,7 @@ public abstract class Weapon : MonoBehaviour
     protected CharacterContactSensor contactSensor;
     protected Character character;
     protected MovementController movementController;
+	protected SpriteRenderer spriteRenderer;
 
     protected WeaponState weaponState = WeaponState.IDLE;
     protected bool stationaryWindup = true;
@@ -24,14 +25,17 @@ public abstract class Weapon : MonoBehaviour
     private float winddownPeriod = 0.2f;
     private float cooldownPeriod = 1f;
 
+	public Vector3 gripOffset = new Vector3(0.4f, 0.05f, 0f);
+
     // Use this for initialization
     void Start()
     {
-        aimingController = this.transform.parent.Find("ActionControllers").GetComponent<AimingController>();
-        firingController = this.transform.parent.Find("ActionControllers").GetComponent<FiringController>();
-        movementController = this.transform.parent.Find("ActionControllers").GetComponent<MovementController>();
-        character = this.transform.parent.GetComponent<Character>() as Character;
-        contactSensor = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
+        aimingController = this.transform.parent.parent.Find("ActionControllers").GetComponent<AimingController>();
+        firingController = this.transform.parent.parent.Find("ActionControllers").GetComponent<FiringController>();
+        movementController = this.transform.parent.parent.Find("ActionControllers").GetComponent<MovementController>();
+		spriteRenderer = this.transform.GetComponentInChildren<SpriteRenderer> () as SpriteRenderer;
+        character = this.transform.parent.parent.GetComponent<Character>() as Character;
+        contactSensor = this.transform.parent.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
         LoadWeaponParameters();
     }
 
@@ -176,4 +180,25 @@ public abstract class Weapon : MonoBehaviour
     protected void CancelFiring(){
         weaponState = WeaponState.IDLE;
     }
+
+	public SpriteRenderer GetSpriteRenderer(){
+		if (spriteRenderer != null) {
+			return spriteRenderer;
+		} else {
+			return null;
+		}
+	}
+
+	public virtual bool GetIsSwinging(){
+		return false;
+	}
+
+	public void EnableSprite(){
+		if(spriteRenderer != null)
+		spriteRenderer.enabled = true;
+	}
+	public void DisableSprite(){
+		if(spriteRenderer != null)
+		spriteRenderer.enabled = false;
+	}
 }

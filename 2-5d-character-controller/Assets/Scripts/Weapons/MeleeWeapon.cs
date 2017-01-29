@@ -38,4 +38,12 @@ public class MeleeWeapon : Weapon
         newProjectile.GetComponent<MeleeProjectile>().LoadLaunchParameters(this, this.character, aimingVectorWorldSpace, aimingController.GetFacingDirection());
         newProjectile.GetComponent<MeleeProjectile>().Launch();
     }
+
+	public override bool GetIsSwinging(){
+		if (weaponState == WeaponState.FIRING) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

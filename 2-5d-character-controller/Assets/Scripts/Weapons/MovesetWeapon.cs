@@ -59,4 +59,12 @@ public class MovesetWeapon : Weapon
         newProjectile.GetComponent<MovesetProjectile>().LoadLaunchParameters(this, this.character, spawnLocation, aimingController.GetFacingDirection());
         newProjectile.GetComponent<MovesetProjectile>().Launch();
     }
+
+	public override bool GetIsSwinging(){
+		if (weaponState == WeaponState.FIRING) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

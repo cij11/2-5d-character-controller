@@ -29,6 +29,8 @@ public class Hand : MonoBehaviour {
 		PositionHand ();
 		RotateHand ();
 		FlipHand ();
+		OrientHeldItem ();
+		DontRenderIfSwingingMelee ();
 	}
 
 	//Return hand to idle position and angle if character moves while not aiming.
@@ -42,7 +44,7 @@ public class Hand : MonoBehaviour {
 
 	void PositionHand(){
 	//	if (aimingController.GetIsAiming ()) {
-		float shoulderOffset = idleX;
+		float shoulderOffset = idleX * aimingController.GetFacingDirection();
 		if (contactSensor.GetContactState () == ContactState.WALLGRAB) {
 			shoulderOffset = shoulderAttachmentXWallGrab;
 		}
@@ -106,4 +108,49 @@ public class Hand : MonoBehaviour {
 		}
 		return handAngle;
 	}
+
+	void OrientHeldItem(){
+		Transform childTransform = this.transform.GetChild (0); 
+		if (childTransform != null) {
+			Weapon childWeapon = childTransform.GetComponent<Weapon> () as Weapon;
+			SpriteRenderer childSprite = childWeapon.GetSpriteRenderer ();
+
+			if (childSprite != null) {
+				if (aimingController.GetFacingDirection () == 1) {
+					childSprite.flipX = false;
+				} else {
+					childSprite.flipX = true;
+				}
+			}
+
+			if (aimingController.GetFacingDirection () == 1) {
+				childTransform.localPosition = childWeapon.gripOffset;
+			} else {
+				childTransform.localPosition = new Vector3 (-childWeapon.gripOffset.x, childWeapon.gripOffset.y, 0f);
+			}
+		}
+	}
+
+	void DontRenderIfSwingingMelee(){
+		Transform childTransform = this.transform.GetChild (0); 
+		if (childTransform != null) {
+			Weapon childWeapon = childTransform.GetComponent<Weapon> () as Weapon;
+			if (childWeapon.GetIsSwinging ()) {
+				childWeapon.DisableSprite ();
+				DisableSprite ();
+			} else {
+				childWeapon.EnableSprite ();
+				EnableSprite ();
+			}
+		}
+	}
+
+	void DisableSprite(){
+		handSprite.enabled = false;
+	}
+
+	void EnableSprite(){
+		handSprite.enabled = true;
+	}
+
 }

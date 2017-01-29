@@ -6,11 +6,15 @@ public class WeaponManager : MonoBehaviour {
 	public Weapon [] weapons;
 	Weapon currentWeapon;
 	FiringController firingController;
+	Hand hand;
 	int equipedSlotNumber = 0;
+
+	Vector3 gripOffset = new Vector3(0.3f, 0.05f, 0f);
 	
 	// Use this for initialization
 	void Start () {
 		firingController = this.transform.parent.FindChild("ActionControllers").GetComponent<FiringController>();
+		hand = this.transform.parent.GetComponentInChildren<Hand> () as Hand;
 		EquipWeapon(weapons[0]);
 	}
 
@@ -26,8 +30,8 @@ public class WeaponManager : MonoBehaviour {
 		DestroycurrentWeapon();
 		currentWeapon = Instantiate(toWeild, this.transform.position, Quaternion.identity) as Weapon;
 		currentWeapon.name = toWeild.name;
-		currentWeapon.transform.parent = this.transform.parent;
-		currentWeapon.transform.rotation = this.transform.parent.rotation;
+		currentWeapon.transform.parent = hand.transform;
+		currentWeapon.transform.rotation = hand.transform.rotation;
 		RegisterWieldableWithFiringController();
 	}
 
