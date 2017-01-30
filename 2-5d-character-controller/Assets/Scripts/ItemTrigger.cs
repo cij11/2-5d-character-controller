@@ -27,7 +27,7 @@ public class ItemTrigger : MonoBehaviour
 		print ("Exited trigger");
 		WeaponManager weaponManager = other.transform.GetComponentInChildren<WeaponManager> () as WeaponManager;
 		if (weaponManager != null) {
-			weaponManager.ForgetItem (weapon);
+			weaponManager.ForgetNearbyPickupItem (weapon);
 		}
 	}
 
@@ -36,7 +36,7 @@ public class ItemTrigger : MonoBehaviour
 		print ("Inside trigger");
 		WeaponManager weaponManager = other.transform.GetComponentInChildren<WeaponManager> () as WeaponManager;
 		if (weaponManager != null) {
-			weaponManager.RegisterItem (weapon);
+			weaponManager.RegisterNearbyPickupItem (weapon);
 		}
 	}
 
@@ -47,9 +47,17 @@ public class ItemTrigger : MonoBehaviour
 	}
 
 	public void EnableSphereCollider(){
+		EnsureSphereColliderSet ();
 		sphereCollider.enabled = true;
 	}
 	public void DisableSphereCollider(){
+		EnsureSphereColliderSet();
 		sphereCollider.enabled = false;
+	}
+
+	void EnsureSphereColliderSet(){
+		if (sphereCollider == null) {
+			sphereCollider = GetComponent<SphereCollider>() as SphereCollider;
+		}
 	}
 }

@@ -15,17 +15,19 @@ public class WeaponManager : MonoBehaviour {
 	float closestPickupDistance = 100f;
 
 	FiringController firingController;
+	AimingController aimingController;
 	CharacterMovementActuator movementActuator;
 	Hand hand;
 	int equipedSlotNumber = 0;
 	
 	// Use this for initialization
 	void Start () {
-		firingController = this.transform.parent.FindChild("ActionControllers").GetComponent<FiringController>();
+		firingController = this.transform.parent.GetComponentInChildren<FiringController> () as FiringController;
+		aimingController = this.transform.parent.GetComponentInChildren<AimingController>() as AimingController;
 		movementActuator = GetComponentInParent<CharacterMovementActuator> () as CharacterMovementActuator;
 		hand = this.transform.parent.GetComponentInChildren<Hand> () as Hand;
 
-		instantiatedDefault = Instantiate (defaultWeapon, this.transform.position, Quaternion.identity);
+		instantiatedDefault = Instantiate (defaultWeapon, this.transform.position, Quaternion.identity) as Weapon;
 		DrawWeapon (instantiatedDefault);
 		inventory = new List<Weapon>();
 		AddWeaponToInventory (instantiatedDefault);
@@ -52,13 +54,16 @@ public class WeaponManager : MonoBehaviour {
 		if (closestPickupItem != null) {
 			print ("Picking up item");
 			Item item = closestPickupItem.GetComponent<Item> () as Item;
-	
 			AddWeaponToInventory (item.GetComponent<Weapon> () as Weapon);
 			closestPickupDistance = 100f;
 			StowWeapon ();
 			DrawWeapon (closestPickupItem);
 			closestPickupItem = null;
 		}
+	}
+
+	public void PickupItem(Item item){
+
 	}
 
 	private void AddWeaponToInventory(Weapon pickedUpWeapon){
@@ -80,15 +85,17 @@ public class WeaponManager : MonoBehaviour {
 	}
 
 	public void ThrowWeapon(){
-		Item throwableItem = currentWeapon.GetComponent<Item> () as Item;
-		if (throwableItem != null) {
-			throwableItem.Throw (this.transform.right, 5f);
-			RemoveWeaponFromInventory(currentWeapon);
-			currentWeapon.CancelFiring ();
-			EquipDefault ();
-		} else {
-			StowWeapon();
-			EquipDefault();
+		if (currentWeapon != instantiatedDefault) {
+			Item throwableItem = currentWeapon.GetComponent<Item> () as Item;
+			if (throwableItem != null) {
+				throwableItem.ThrowItem (aimingController.GetAimingVectorWorldSpace(), 5f);
+				RemoveWeaponFromInventory (currentWeapon);
+				currentWeapon.CancelFiring ();
+				EquipDefault ();
+			} else {
+				StowWeapon ();
+				EquipDefault ();
+			}
 		}
 	}
 
@@ -99,7 +106,6 @@ public class WeaponManager : MonoBehaviour {
 	void DrawWeapon(Weapon toWeild){
 		currentWeapon = toWeild;
 		currentWeapon.gameObject.SetActive(true);
-		currentWeapon.name = toWeild.name;
 		currentWeapon.transform.parent = hand.transform;
 		currentWeapon.transform.rotation = hand.transform.rotation;
 		RegisterWieldableWithFiringController();
@@ -107,7 +113,7 @@ public class WeaponManager : MonoBehaviour {
 
 		Item weaponItem = currentWeapon.GetComponent<Item> () as Item;
 		if (weaponItem != null) {
-			weaponItem.PickUp ();
+			weaponItem.DrawItem ();
 		}
 	}
 
@@ -120,7 +126,7 @@ public class WeaponManager : MonoBehaviour {
 		firingController.RegisterWeapon(currentWeapon);
 	}
 
-	public void RegisterItem(Weapon pickupWeapon){
+	public void RegisterNearbyPickupItem(Weapon pickupWeapon){
 		Vector3 vectorToPickup = movementActuator.transform.position - pickupWeapon.transform.position;
 		float distanceToPickup = vectorToPickup.magnitude;
 
@@ -131,7 +137,7 @@ public class WeaponManager : MonoBehaviour {
 		}
 	}
 
-	public void ForgetItem(Weapon pickupWeapon){
+	public void ForgetNearbyPickupItem(Weapon pickupWeapon){
 		if (closestPickupItem == pickupWeapon) {
 			closestPickupItem = null;
 			closestPickupTransform = null;

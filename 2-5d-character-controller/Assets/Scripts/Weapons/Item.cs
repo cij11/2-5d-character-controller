@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Item : MonoBehaviour {
-	Rigidbody body;
-	ItemTrigger itemTrigger;
+	public Rigidbody body;
+	public ItemTrigger itemTrigger;
 	// Use this for initialization
 	void Start () {
-		body = this.GetComponent<Rigidbody>() as Rigidbody;
-		itemTrigger = GetComponentInChildren<ItemTrigger> () as ItemTrigger;
+
 	}
 	
 	// Update is called once per frame
@@ -16,7 +15,7 @@ public class Item : MonoBehaviour {
 		
 	}
 
-	public void Throw(Vector3 direction, float speed){
+	public void ThrowItem(Vector3 direction, float speed){
 		this.transform.parent = null;
 		body.isKinematic = false;
 		body.velocity = direction.normalized * speed;
@@ -24,7 +23,7 @@ public class Item : MonoBehaviour {
 		itemTrigger.EnableSphereCollider();
 	}
 
-	public void PickUp(){
+	public void DrawItem(){
 		body.isKinematic = true;
 		itemTrigger.DisableSphereCollider();
 		itemTrigger.enabled = false;
