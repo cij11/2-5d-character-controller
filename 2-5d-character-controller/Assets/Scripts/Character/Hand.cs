@@ -5,6 +5,7 @@ using UnityEngine;
 public class Hand : MonoBehaviour {
 
 	AimingController aimingController;
+	WeaponManager weaponManager;
 	CharacterContactSensor contactSensor;
 	SpriteRenderer handSprite;
 
@@ -19,6 +20,7 @@ public class Hand : MonoBehaviour {
 	void Start () {
 		aimingController = this.transform.parent.GetComponentInChildren<AimingController> () as AimingController;
 		contactSensor = this.transform.GetComponentInParent<CharacterContactSensor> () as CharacterContactSensor;
+		weaponManager = this.transform.parent.GetComponentInChildren<WeaponManager> () as WeaponManager;
 		handSprite = GetComponent<SpriteRenderer>();
 	}
 	
@@ -110,10 +112,9 @@ public class Hand : MonoBehaviour {
 	}
 
 	void OrientHeldItem(){
-		Transform childTransform = this.transform.GetChild (0); 
-		if (childTransform != null) {
-			Weapon childWeapon = childTransform.GetComponent<Weapon> () as Weapon;
-			SpriteRenderer childSprite = childWeapon.GetSpriteRenderer ();
+		Weapon currentWeapon = weaponManager.GetCurrentWeapon ();
+		Transform currentWeaponTransform = currentWeapon.transform;
+		SpriteRenderer childSprite = currentWeapon.GetSpriteRenderer ();
 
 			if (childSprite != null) {
 				if (aimingController.GetFacingDirection () == 1) {
@@ -124,11 +125,11 @@ public class Hand : MonoBehaviour {
 			}
 
 			if (aimingController.GetFacingDirection () == 1) {
-				childTransform.localPosition = childWeapon.gripOffset;
+			currentWeaponTransform.localPosition = currentWeapon.gripOffset;
 			} else {
-				childTransform.localPosition = new Vector3 (-childWeapon.gripOffset.x, childWeapon.gripOffset.y, 0f);
+			currentWeaponTransform.localPosition = new Vector3 (-currentWeapon.gripOffset.x, currentWeapon.gripOffset.y, 0f);
 			}
-		}
+
 	}
 
 	void DontRenderIfSwingingMelee(){

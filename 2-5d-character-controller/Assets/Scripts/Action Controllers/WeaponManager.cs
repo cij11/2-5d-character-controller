@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class WeaponManager : MonoBehaviour {
 
 	public Weapon defaultWeapon;
+	public Weapon instantiatedDefault;
 	public List<Weapon> inventory;
 	Weapon currentWeapon;
 	int maxEquipment = 4;
@@ -12,7 +13,6 @@ public class WeaponManager : MonoBehaviour {
 	Weapon closestPickupItem;
 	Transform closestPickupTransform;
 	float closestPickupDistance = 100f;
-	float pickupRadius = 2f;
 
 	FiringController firingController;
 	CharacterMovementActuator movementActuator;
@@ -24,36 +24,66 @@ public class WeaponManager : MonoBehaviour {
 		firingController = this.transform.parent.FindChild("ActionControllers").GetComponent<FiringController>();
 		movementActuator = GetComponentInParent<CharacterMovementActuator> () as CharacterMovementActuator;
 		hand = this.transform.parent.GetComponentInChildren<Hand> () as Hand;
-		EquipWeapon (defaultWeapon);
+
+		instantiatedDefault = Instantiate (defaultWeapon, this.transform.position, Quaternion.identity);
+		DrawWeapon (instantiatedDefault);
+		inventory = new List<Weapon>();
+		AddWeaponToInventory (instantiatedDefault);
 	}
-
-	void Update(){
-		EvaluateClosestPickups ();
-		print ("Distance to closest pickup is " + closestPickupDistance.ToString ());
-	}
-
-	void EvaluateClosestPickups(){
-
-	}
-
+		
 	public void EquipDefault(){
-		EquipWeapon (defaultWeapon);
+		DrawWeapon (instantiatedDefault);
 	}
 
+	public void SwapCommand(bool isFireHeld){
+		//If fire is held, throw the weapon
+		if (isFireHeld) {
+			ThrowWeapon ();
+		//Else pickup an item if one is close
+		} else if (closestPickupItem != null) {
+			PickupClosestItem ();
+		//Else change the currently selected weapon
+		} else {
+			CycleWieldable ();
+		}
+	}
+
+	public void PickupClosestItem(){
+		if (closestPickupItem != null) {
+			print ("Picking up item");
+			Item item = closestPickupItem.GetComponent<Item> () as Item;
+	
+			AddWeaponToInventory (item.GetComponent<Weapon> () as Weapon);
+			closestPickupDistance = 100f;
+			StowWeapon ();
+			DrawWeapon (closestPickupItem);
+			closestPickupItem = null;
+		}
+	}
+
+	private void AddWeaponToInventory(Weapon pickedUpWeapon){
+		inventory.Add (pickedUpWeapon);
+	}
+
+	private void RemoveWeaponFromInventory(Weapon discardedWeapon){
+		inventory.Remove (discardedWeapon);
+	}
 
 	public void CycleWieldable(){
 		equipedSlotNumber += 1;
 		if (equipedSlotNumber > inventory.Count - 1){
 			equipedSlotNumber = 0;
 		}
+		print ("Cycling wieldable to " + equipedSlotNumber.ToString());
 		StowWeapon ();
-		EquipWeapon(inventory[equipedSlotNumber]);
+		DrawWeapon(inventory[equipedSlotNumber]);
 	}
 
 	public void ThrowWeapon(){
-		Throwable throwable = currentWeapon.GetComponent<Throwable> () as Throwable;
-		if (throwable != null) {
-			throwable.Throw (this.transform.right, 5f);
+		Item throwableItem = currentWeapon.GetComponent<Item> () as Item;
+		if (throwableItem != null) {
+			throwableItem.Throw (this.transform.right, 5f);
+			RemoveWeaponFromInventory(currentWeapon);
 			currentWeapon.CancelFiring ();
 			EquipDefault ();
 		} else {
@@ -63,16 +93,22 @@ public class WeaponManager : MonoBehaviour {
 	}
 
 	public void StowWeapon(){
-		DestroycurrentWeapon ();
+		currentWeapon.gameObject.SetActive(false);
 	}
 
-	void EquipWeapon(Weapon toWeild){
-		currentWeapon = Instantiate(toWeild, this.transform.position, Quaternion.identity) as Weapon;
+	void DrawWeapon(Weapon toWeild){
+		currentWeapon = toWeild;
+		currentWeapon.gameObject.SetActive(true);
 		currentWeapon.name = toWeild.name;
 		currentWeapon.transform.parent = hand.transform;
 		currentWeapon.transform.rotation = hand.transform.rotation;
 		RegisterWieldableWithFiringController();
 		currentWeapon.RegisterCharacterComponentsWithWeapon ();
+
+		Item weaponItem = currentWeapon.GetComponent<Item> () as Item;
+		if (weaponItem != null) {
+			weaponItem.PickUp ();
+		}
 	}
 
 	void DestroycurrentWeapon(){
@@ -101,5 +137,9 @@ public class WeaponManager : MonoBehaviour {
 			closestPickupTransform = null;
 			closestPickupDistance = 100f;
 		}
+	}
+
+	public Weapon GetCurrentWeapon(){
+		return currentWeapon;
 	}
 }
