@@ -32,14 +32,17 @@ public abstract class Weapon : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        aimingController = this.transform.parent.parent.Find("ActionControllers").GetComponent<AimingController>();
-        firingController = this.transform.parent.parent.Find("ActionControllers").GetComponent<FiringController>();
-        movementController = this.transform.parent.parent.Find("ActionControllers").GetComponent<MovementController>();
-		spriteRenderer = this.transform.GetComponentInChildren<SpriteRenderer> () as SpriteRenderer;
-        character = this.transform.parent.parent.GetComponent<Character>() as Character;
-        contactSensor = this.transform.parent.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
         LoadWeaponParameters();
     }
+
+	public void RegisterCharacterComponentsWithWeapon(){
+		aimingController = this.transform.parent.parent.Find("ActionControllers").GetComponent<AimingController>();
+		firingController = this.transform.parent.parent.Find("ActionControllers").GetComponent<FiringController>();
+		movementController = this.transform.parent.parent.Find("ActionControllers").GetComponent<MovementController>();
+		spriteRenderer = this.transform.GetComponentInChildren<SpriteRenderer> () as SpriteRenderer;
+		character = this.transform.parent.parent.GetComponent<Character>() as Character;
+		contactSensor = this.transform.parent.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
+	}
 
     protected abstract void LoadWeaponParameters();
     protected void SetCooldown(float newCooldown)

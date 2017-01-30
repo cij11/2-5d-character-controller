@@ -115,7 +115,6 @@ public class FSM : MonoBehaviour
 	}
 
 	void PerformStateAction(){
-		print ("Active state = " + activeState.GetName ());
 		if (childFSM != null) {
 			childFSM.FSMUpdate ();
 		} else {
