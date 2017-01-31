@@ -9,6 +9,8 @@ public class Invokable : MonoBehaviour {
 	public float recurrentEffectPeriod = 1f;
 	public float recurrentEffectTimer = 0f;
 
+	public float cooldownPeriod = 0.3f;
+
 	// Use this for initialization
 	void Start () {
 		

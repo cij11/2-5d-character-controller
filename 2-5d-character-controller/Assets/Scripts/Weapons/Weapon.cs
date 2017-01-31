@@ -123,7 +123,7 @@ public abstract class Weapon : MonoBehaviour
     void UpdateWoundup()
     {
         //Leave Wound up state when fire button is no longer being pressed
-        if (!firingController.GetFireHeld())
+		if (!firingController.GetIsInvoking())
         {
             TransitionToFiring();
         }

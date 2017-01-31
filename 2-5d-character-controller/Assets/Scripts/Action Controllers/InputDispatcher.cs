@@ -33,7 +33,7 @@ public class InputDispatcher : MonoBehaviour {
 		Movement();
 		Aiming();
 		Firing();
-		WeaponChanging();
+		Items();
 	}
 
 	void UpdateAbstractInput(){
@@ -75,12 +75,10 @@ public class InputDispatcher : MonoBehaviour {
 			firingController.InitiateFire();
 		}
 
-		if(abstractInput.GetFireUp()){
-			firingController.ReleaseFire();
-		}
+		firingController.SetFireHeld (abstractInput.GetFire ());
 	}
 
-	void WeaponChanging(){
+	void Items(){
 		if(abstractInput.GetSwapDown()){
 			itemManager.SwapCommand (abstractInput.GetFire());
 		}
