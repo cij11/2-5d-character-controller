@@ -6,18 +6,18 @@ public class FiringController : MonoBehaviour
 {
 
 	bool fireHeld = false;
-    Weapon activeWeapon;
+    Invokable equipedInvokable;
 
-    public void RegisterWeapon(Weapon Weapon)
+	public void RegisterInvokable(Invokable invocable)
     {
-        activeWeapon = Weapon;
+		equipedInvokable = invocable;
     }
 
     public void InitiateFire()
     {
-        if (activeWeapon != null)
+		if (equipedInvokable != null)
         {
-            activeWeapon.WindupCommand();
+			equipedInvokable.StartInvoking();
         }
 		fireHeld = true;
     }
@@ -32,9 +32,9 @@ public class FiringController : MonoBehaviour
 	}
     public bool GetIsEncumbered()
     {
-        if (activeWeapon != null)
+		if (equipedInvokable != null)
         {
-            return activeWeapon.GetIsEncumbered();
+			return equipedInvokable.GetIsEncumbered();
         }
         return false;
     }

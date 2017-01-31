@@ -6,7 +6,7 @@ public class InputDispatcher : MonoBehaviour {
 	MovementController movementController;
 	AimingController aimingController;
 	FiringController firingController;
-	WeaponManager weaponManager;
+	ItemManager itemManager;
 
 	AbstractInput abstractInput;
 
@@ -20,7 +20,7 @@ public class InputDispatcher : MonoBehaviour {
 		movementController = actionControllers.GetComponent<MovementController>();
 		aimingController = actionControllers.GetComponent<AimingController>();
 		firingController = actionControllers.GetComponent<FiringController>();
-		weaponManager = actionControllers.GetComponent<WeaponManager>();
+		itemManager = actionControllers.GetComponent<ItemManager>();
 	}
 
 	public void SetControllingAbstractInput(AbstractInput controllingInput){
@@ -82,7 +82,7 @@ public class InputDispatcher : MonoBehaviour {
 
 	void WeaponChanging(){
 		if(abstractInput.GetSwapDown()){
-			weaponManager.SwapCommand (abstractInput.GetFire());
+			itemManager.SwapCommand (abstractInput.GetFire());
 		}
 	}
 }

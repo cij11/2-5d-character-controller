@@ -5,7 +5,7 @@ using UnityEngine;
 public class Hand : MonoBehaviour {
 
 	AimingController aimingController;
-	WeaponManager weaponManager;
+	ItemManager itemManager;
 	CharacterContactSensor contactSensor;
 	SpriteRenderer handSprite;
 
@@ -20,7 +20,7 @@ public class Hand : MonoBehaviour {
 	void Start () {
 		aimingController = this.transform.parent.GetComponentInChildren<AimingController> () as AimingController;
 		contactSensor = this.transform.GetComponentInParent<CharacterContactSensor> () as CharacterContactSensor;
-		weaponManager = this.transform.parent.GetComponentInChildren<WeaponManager> () as WeaponManager;
+		itemManager = this.transform.parent.GetComponentInChildren<ItemManager> () as ItemManager;
 		handSprite = GetComponent<SpriteRenderer>();
 	}
 	
@@ -32,7 +32,7 @@ public class Hand : MonoBehaviour {
 		RotateHand ();
 		FlipHand ();
 		OrientHeldItem ();
-		DontRenderIfSwingingMelee ();
+	//	DontRenderIfSwingingMelee ();
 	}
 
 	//Return hand to idle position and angle if character moves while not aiming.
@@ -112,9 +112,9 @@ public class Hand : MonoBehaviour {
 	}
 
 	void OrientHeldItem(){
-		Weapon currentWeapon = weaponManager.GetCurrentWeapon ();
-		Transform currentWeaponTransform = currentWeapon.transform;
-		SpriteRenderer childSprite = currentWeapon.GetSpriteRenderer ();
+		Item currentItem = itemManager.GetCurrentItem ();
+		Transform currentItemTransform = currentItem.transform;
+		SpriteRenderer childSprite = currentItem.GetSpriteRenderer ();
 
 			if (childSprite != null) {
 				if (aimingController.GetFacingDirection () == 1) {
@@ -125,33 +125,10 @@ public class Hand : MonoBehaviour {
 			}
 
 			if (aimingController.GetFacingDirection () == 1) {
-			currentWeaponTransform.localPosition = currentWeapon.gripOffset;
+			currentItemTransform.localPosition = currentItem.gripOffset;
 			} else {
-			currentWeaponTransform.localPosition = new Vector3 (-currentWeapon.gripOffset.x, currentWeapon.gripOffset.y, 0f);
+			currentItemTransform.localPosition = new Vector3 (-currentItem.gripOffset.x, currentItem.gripOffset.y, 0f);
 			}
 
 	}
-
-	void DontRenderIfSwingingMelee(){
-		Transform childTransform = this.transform.GetChild (0); 
-		if (childTransform != null) {
-			Weapon childWeapon = childTransform.GetComponent<Weapon> () as Weapon;
-			if (childWeapon.GetIsSwinging ()) {
-				childWeapon.DisableSprite ();
-				DisableSprite ();
-			} else {
-				childWeapon.EnableSprite ();
-				EnableSprite ();
-			}
-		}
-	}
-
-	void DisableSprite(){
-		handSprite.enabled = false;
-	}
-
-	void EnableSprite(){
-		handSprite.enabled = true;
-	}
-
 }

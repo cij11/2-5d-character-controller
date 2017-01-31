@@ -12,7 +12,6 @@ public abstract class Weapon : MonoBehaviour
     protected CharacterContactSensor contactSensor;
     protected Character character;
     protected MovementController movementController;
-	protected SpriteRenderer spriteRenderer;
 
     protected WeaponState weaponState = WeaponState.IDLE;
     protected bool stationaryWindup = true;
@@ -39,7 +38,7 @@ public abstract class Weapon : MonoBehaviour
 		aimingController = this.transform.parent.parent.Find("ActionControllers").GetComponent<AimingController>();
 		firingController = this.transform.parent.parent.Find("ActionControllers").GetComponent<FiringController>();
 		movementController = this.transform.parent.parent.Find("ActionControllers").GetComponent<MovementController>();
-		spriteRenderer = this.transform.GetComponentInChildren<SpriteRenderer> () as SpriteRenderer;
+
 		character = this.transform.parent.parent.GetComponent<Character>() as Character;
 		contactSensor = this.transform.parent.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
 	}
@@ -199,25 +198,8 @@ public abstract class Weapon : MonoBehaviour
     public void CancelFiring(){
         weaponState = WeaponState.IDLE;
     }
-
-	public SpriteRenderer GetSpriteRenderer(){
-		if (spriteRenderer != null) {
-			return spriteRenderer;
-		} else {
-			return null;
-		}
-	}
-
+		
 	public virtual bool GetIsSwinging(){
 		return false;
-	}
-
-	public void EnableSprite(){
-		if(spriteRenderer != null)
-		spriteRenderer.enabled = true;
-	}
-	public void DisableSprite(){
-		if(spriteRenderer != null)
-		spriteRenderer.enabled = false;
 	}
 }

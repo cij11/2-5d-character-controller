@@ -5,14 +5,14 @@ using UnityEngine;
 public class ItemTrigger : MonoBehaviour
 {
 
-	Weapon weapon;
-	Transform weaponTransform;
+	Item item;
+	Transform itemTransform;
 	SphereCollider sphereCollider;
 	// Use this for initialization
 	void Start ()
 	{
-		weapon = GetComponentInParent<Weapon> () as Weapon;
-		weaponTransform = weapon.transform;
+		item = GetComponentInParent<Item> () as Item;
+		itemTransform = item.transform;
 		sphereCollider = GetComponent<SphereCollider>() as SphereCollider;
 	}
 	
@@ -25,24 +25,24 @@ public class ItemTrigger : MonoBehaviour
 	void OnTriggerExit (Collider other)
 	{
 		print ("Exited trigger");
-		WeaponManager weaponManager = other.transform.GetComponentInChildren<WeaponManager> () as WeaponManager;
-		if (weaponManager != null) {
-			weaponManager.ForgetNearbyPickupItem (weapon);
+		ItemManager itemManager = other.transform.GetComponentInChildren<ItemManager> () as ItemManager;
+		if (itemManager != null) {
+			itemManager.ForgetNearbyPickupItem (item);
 		}
 	}
 
 	void OnTriggerStay (Collider other)
 	{
 		print ("Inside trigger");
-		WeaponManager weaponManager = other.transform.GetComponentInChildren<WeaponManager> () as WeaponManager;
-		if (weaponManager != null) {
-			weaponManager.RegisterNearbyPickupItem (weapon);
+		ItemManager itemManager = other.transform.GetComponentInChildren<ItemManager> () as ItemManager;
+		if (itemManager != null) {
+			itemManager.RegisterNearbyPickupItem (item);
 		}
 	}
 
 	public Transform GetWeaponTransform ()
 	{
-		return weaponTransform;
+		return itemTransform;
 	
 	}
 

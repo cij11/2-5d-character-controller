@@ -5,9 +5,12 @@ using UnityEngine;
 public class Item : MonoBehaviour {
 	public Rigidbody body;
 	public ItemTrigger itemTrigger;
+	public Vector3 gripOffset;
+	protected SpriteRenderer spriteRenderer;
+
 	// Use this for initialization
 	void Start () {
-
+		spriteRenderer = this.transform.GetComponentInChildren<SpriteRenderer> () as SpriteRenderer;
 	}
 	
 	// Update is called once per frame
@@ -27,5 +30,13 @@ public class Item : MonoBehaviour {
 		body.isKinematic = true;
 		itemTrigger.DisableSphereCollider();
 		itemTrigger.enabled = false;
+	}
+
+	public SpriteRenderer GetSpriteRenderer(){
+		if (spriteRenderer != null) {
+			return spriteRenderer;
+		} else {
+			return null;
+		}
 	}
 }
