@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Effect : MonoBehaviour {
-	public float SustainCooldown = 1f;
 	protected int castedCounter = 0;
 
 	// Use this for initialization

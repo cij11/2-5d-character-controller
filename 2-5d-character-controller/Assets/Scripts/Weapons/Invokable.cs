@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Invokable : MonoBehaviour {
-	public Effect[] StartEffects;
-	public Effect[] SustainEffects;
-	public Effect[] ReleaseEffects;
+	public Effect[] StartEffects;	//Cast once when item invoked
+	public Effect[] RecurrentEffects; //Cast at regular intervals while item invoked
+	public Effect[] ReleaseEffects; //Cast once when invocation released
+	public float recurrentEffectPeriod = 1f;
+	public float recurrentEffectTimer = 0f;
 
 	// Use this for initialization
 	void Start () {
@@ -19,10 +21,25 @@ public class Invokable : MonoBehaviour {
 
 	public void StartInvoking(){
 		CastEffectsInArray (StartEffects);
+		ResetRecurrentEffectTimer ();
+	}
+
+	void ResetRecurrentEffectTimer(){
+		recurrentEffectTimer = recurrentEffectPeriod;
 	}
 
 	public void SustainInvoking(){
-		CastEffectsInArray (SustainEffects);
+		UpdateRecurrentEffectTimer ();
+		if (recurrentEffectTimer <= 0f){
+			CastEffectsInArray (RecurrentEffects);
+			ResetRecurrentEffectTimer ();
+		}
+	}
+
+	void UpdateRecurrentEffectTimer(){
+		if (recurrentEffectTimer > 0) {
+			recurrentEffectTimer -= Time.deltaTime;
+		}
 	}
 
 	public void ReleaseInvoking(){

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SustainEffect : Effect {
+public class RecurrentEffect : Effect {
 
 	// Use this for initialization
 	void Start () {
@@ -16,6 +16,6 @@ public class SustainEffect : Effect {
 
 	public override void CastEffect(){
 		castedCounter++;
-		print ("Sustain effect " + castedCounter.ToString () + " times.");
+		print ("Recurrent effect " + castedCounter.ToString () + " times.");
 	}
 }
