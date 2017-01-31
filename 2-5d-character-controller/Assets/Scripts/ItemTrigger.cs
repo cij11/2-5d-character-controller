@@ -24,7 +24,6 @@ public class ItemTrigger : MonoBehaviour
 
 	void OnTriggerExit (Collider other)
 	{
-		print ("Exited trigger");
 		ItemManager itemManager = other.transform.GetComponentInChildren<ItemManager> () as ItemManager;
 		if (itemManager != null) {
 			itemManager.ForgetNearbyPickupItem (item);
@@ -33,7 +32,6 @@ public class ItemTrigger : MonoBehaviour
 
 	void OnTriggerStay (Collider other)
 	{
-		print ("Inside trigger");
 		ItemManager itemManager = other.transform.GetComponentInChildren<ItemManager> () as ItemManager;
 		if (itemManager != null) {
 			itemManager.RegisterNearbyPickupItem (item);

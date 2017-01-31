@@ -34,6 +34,7 @@ public class ItemManager : MonoBehaviour {
 	}
 		
 	public void EquipDefault(){
+		equipedSlotNumber = 0;
 		EquipItem (instantiatedDefault);
 	}
 

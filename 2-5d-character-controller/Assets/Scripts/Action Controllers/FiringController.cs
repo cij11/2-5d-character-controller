@@ -22,14 +22,30 @@ public class FiringController : MonoBehaviour
 		fireHeld = true;
     }
 
+	void Update(){
+		if (fireHeld) {
+			SustainFire ();
+		}
+	}
+
+	private void SustainFire(){
+		equipedInvokable.SustainInvoking ();
+	}
+
     public void ReleaseFire()
     {
 		fireHeld = false;
+		equipedInvokable.ReleaseInvoking ();
     }
+
+	public void CancelFire(){
+
+	}
 
 	public bool GetFireHeld(){
 		return fireHeld;
 	}
+
     public bool GetIsEncumbered()
     {
 		if (equipedInvokable != null)
