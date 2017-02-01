@@ -22,22 +22,6 @@ public class ItemTrigger : MonoBehaviour
 		
 	}
 
-	void OnTriggerExit (Collider other)
-	{
-		ItemManager itemManager = other.transform.GetComponentInChildren<ItemManager> () as ItemManager;
-		if (itemManager != null) {
-			itemManager.ForgetNearbyPickupItem (item);
-		}
-	}
-
-	void OnTriggerStay (Collider other)
-	{
-		ItemManager itemManager = other.transform.GetComponentInChildren<ItemManager> () as ItemManager;
-		if (itemManager != null) {
-			itemManager.RegisterNearbyPickupItem (item);
-		}
-	}
-
 	public Transform GetWeaponTransform ()
 	{
 		return itemTransform;

@@ -10,9 +10,8 @@ public class ItemManager : MonoBehaviour {
 	Item equipedItem;
 	int maxEquipment = 4;
 
-	Item closestPickupItem;
-	Transform closestPickupTransform;
-	float closestPickupDistance = 100f;
+	public LayerMask collisionMask;
+	float pickupRadius = 2f;
 
 	FiringController firingController;
 	AimingController aimingController;
@@ -38,32 +37,46 @@ public class ItemManager : MonoBehaviour {
 		EquipItem (instantiatedDefault);
 	}
 
+	private Item ClosestItemInReach(){
+		float closestItemDistance = Mathf.Infinity;
+		Collider[] hitColliders = Physics.OverlapSphere(movementActuator.transform.position, pickupRadius, collisionMask);
+		Collider closestCollider = null;
+		print (hitColliders.Length);
+		foreach (Collider collider in hitColliders) {
+			float separationDistance = (collider.transform.position - movementActuator.transform.position).magnitude;
+			if (separationDistance < closestItemDistance) {
+				closestCollider = collider;
+				closestItemDistance = separationDistance;
+			}
+		}
+
+		if (closestCollider == null) {
+			return null;
+		} else {
+			return closestCollider.gameObject.GetComponentInParent<Item> () as Item;
+		}
+	}
+
 	public void SwapCommand(bool isFireHeld){
+		Item closestPickupItem = ClosestItemInReach ();
 		//If fire is held, throw the weapon
 		if (isFireHeld) {
 			ThrowItem ();
 		//Else pickup an item if one is close
 		} else if (closestPickupItem != null) {
-			PickupClosestItem ();
+			print ("Pickup item found");
+			PickupItem (closestPickupItem);
 		//Else change the currently selected weapon
 		} else {
 			CycleWieldable ();
 		}
 	}
 
-	public void PickupClosestItem(){
-		if (closestPickupItem != null) {
-			print ("Picking up item");
-			AddItemToInventory (closestPickupItem);
-			closestPickupDistance = 100f;
-			StowItem ();
-			EquipItem (closestPickupItem);
-			closestPickupItem = null;
-		}
-	}
-
 	public void PickupItem(Item item){
-
+			print ("Picking up item");
+			AddItemToInventory (item);
+			StowItem ();
+			EquipItem (item);
 	}
 
 	private void AddItemToInventory(Item pickedUpItem){
@@ -128,25 +141,6 @@ public class ItemManager : MonoBehaviour {
 	}
 	void RegisterInvokableWithFiringController(Invokable equipedInvocable){
 		firingController.RegisterInvokable(equipedInvocable);
-	}
-
-	public void RegisterNearbyPickupItem(Item pickupItem){
-		Vector3 vectorToPickup = movementActuator.transform.position - pickupItem.transform.position;
-		float distanceToPickup = vectorToPickup.magnitude;
-
-		if (distanceToPickup < closestPickupDistance) {
-			closestPickupItem = pickupItem;
-			closestPickupTransform = pickupItem.transform;
-			closestPickupDistance = distanceToPickup;
-		}
-	}
-
-	public void ForgetNearbyPickupItem(Item pickupItem){
-		if (closestPickupItem == pickupItem) {
-			closestPickupItem = null;
-			closestPickupTransform = null;
-			closestPickupDistance = 100f;
-		}
 	}
 
 	public Item GetCurrentItem(){
