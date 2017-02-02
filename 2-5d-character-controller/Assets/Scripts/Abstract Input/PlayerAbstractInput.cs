@@ -42,5 +42,7 @@ public class PlayerAbstractInput : AbstractInput {
 		fireUp = Input.GetButtonUp("Fire1");
 
 		swapDown = Input.GetButtonDown("Fire2");
+		swap = Input.GetButton ("Fire2");
+		swapUp = Input.GetButtonUp ("Fire2");
 	}
 }

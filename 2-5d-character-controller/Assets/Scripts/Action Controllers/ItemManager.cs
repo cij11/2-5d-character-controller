@@ -13,6 +13,8 @@ public class ItemManager : MonoBehaviour {
 	public LayerMask collisionMask;
 	float pickupRadius = 2f;
 
+	bool isSwapping = false; //Set true by pressing swap, returned to false by picking up, throwing, or changing item.
+
 	FiringController firingController;
 	AimingController aimingController;
 	CharacterMovementActuator movementActuator;
@@ -57,18 +59,34 @@ public class ItemManager : MonoBehaviour {
 		}
 	}
 
-	public void SwapCommand(bool isFireHeld){
+	//Start swapping process.
+	//Swapping is completed by:
+	//Being over an item when swap is pressed (picking up the item)
+	//Pressing fire while swap is pressed (throwing the item)
+	//Releasing swap (swapping to the next item, or the appropriate item from the inventory wheel once implemented.
+	public void StartSwap(){
 		Item closestPickupItem = ClosestItemInReach ();
-		//If fire is held, throw the weapon
-		if (isFireHeld) {
-			ThrowItem ();
-		//Else pickup an item if one is close
-		} else if (closestPickupItem != null) {
+		if (closestPickupItem != null) {
 			print ("Pickup item found");
 			PickupItem (closestPickupItem);
-		//Else change the currently selected weapon
 		} else {
+			isSwapping = true;
+		}
+	}
+
+	//Fire has been pressed. If swap is held, throw the item
+	public void ThrowItemIfSwapping(){
+		if (isSwapping) {
+			ThrowItem ();
+			isSwapping = false;
+		}
+	}
+
+	//Swap has been released. Swap items, if an item hasn't already been picked up or thrown
+	public void DischargeSwap(){
+		if (isSwapping) {
 			CycleWieldable ();
+			isSwapping = false;
 		}
 	}
 

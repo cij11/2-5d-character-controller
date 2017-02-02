@@ -80,7 +80,15 @@ public class InputDispatcher : MonoBehaviour {
 
 	void Items(){
 		if(abstractInput.GetSwapDown()){
-			itemManager.SwapCommand (abstractInput.GetFire());
+			itemManager.StartSwap ();
+		}
+
+		if(abstractInput.GetFireDown()){
+			itemManager.ThrowItemIfSwapping();
+		}
+
+		if (abstractInput.GetSwapUp ()) {
+			itemManager.DischargeSwap ();
 		}
 	}
 }
