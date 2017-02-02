@@ -18,15 +18,21 @@ public class ItemManager : MonoBehaviour {
 	FiringController firingController;
 	AimingController aimingController;
 	CharacterMovementActuator movementActuator;
+	Character character;
 	Hand hand;
 	int equipedSlotNumber = 0;
+
+	CharacterComponentData componentData;
 	
 	// Use this for initialization
 	void Start () {
 		firingController = this.transform.parent.GetComponentInChildren<FiringController> () as FiringController;
 		aimingController = this.transform.parent.GetComponentInChildren<AimingController>() as AimingController;
 		movementActuator = GetComponentInParent<CharacterMovementActuator> () as CharacterMovementActuator;
+		character = GetComponentInParent<Character> () as Character;
 		hand = this.transform.parent.GetComponentInChildren<Hand> () as Hand;
+
+		componentData = new CharacterComponentData (character);
 
 		instantiatedDefault = Instantiate (defaultItem, this.transform.position, Quaternion.identity) as Item;
 		EquipItem (instantiatedDefault);
@@ -150,6 +156,7 @@ public class ItemManager : MonoBehaviour {
 	void SetupInvokable(){
 		Invokable equipedInvokable = equipedItem.GetComponent<Invokable> () as Invokable;
 		RegisterInvokableWithFiringController(equipedInvokable);
+		equipedInvokable.RegisterCharacterComponentsWithInvokable (componentData);
 	}
 
 	void DestroycurrentItem(){

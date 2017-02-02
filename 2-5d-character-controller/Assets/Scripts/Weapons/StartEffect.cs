@@ -14,7 +14,7 @@ public class StartEffect : Effect {
 		
 	}
 
-	public override void CastEffect(){
+	public override void CastEffect(CharacterComponentData compData){
 		castedCounter++;
 		print ("Start effect " + castedCounter.ToString () + " times.");
 	}

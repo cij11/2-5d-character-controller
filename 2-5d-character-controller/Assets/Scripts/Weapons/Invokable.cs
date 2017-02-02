@@ -51,12 +51,13 @@ public class Invokable : MonoBehaviour {
 	}
 
 	public void RegisterCharacterComponentsWithInvokable(CharacterComponentData charComponentData){
+		print ("Components registered with invokable");
 		componentData = charComponentData;
 	}
 
 	private void CastEffectsInArray(Effect[] effectArray){
 		foreach (Effect effect in effectArray) {
-			effect.CastEffect ();
+			effect.CastEffect (componentData);
 		}
 	}
 

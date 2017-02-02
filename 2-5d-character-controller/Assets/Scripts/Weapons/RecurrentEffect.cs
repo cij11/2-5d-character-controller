@@ -14,7 +14,7 @@ public class RecurrentEffect : Effect {
 		
 	}
 
-	public override void CastEffect(){
+	public override void CastEffect(CharacterComponentData charData){
 		castedCounter++;
 		print ("Recurrent effect " + castedCounter.ToString () + " times.");
 	}

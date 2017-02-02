@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Effect : MonoBehaviour {
 	protected int castedCounter = 0;
+	protected CharacterComponentData componentData;
 
 	// Use this for initialization
 	void Start () {
@@ -15,7 +16,8 @@ public class Effect : MonoBehaviour {
 		
 	}
 
-	public virtual void CastEffect(){
+	public virtual void CastEffect(CharacterComponentData charCompData){
+		componentData = charCompData;
 		castedCounter++;
 		print ("Casted effect " + castedCounter.ToString () + " times.");
 	}
