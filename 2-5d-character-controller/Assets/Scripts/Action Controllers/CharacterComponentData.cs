@@ -8,6 +8,7 @@ public class CharacterComponentData {
 	CharacterMovementActuator movementActuator;
 	AimingController aimingController;
 	FiringController firingController;
+	MovementController movementController;
 	Character character;
 	Transform characterTransform;
 
@@ -15,6 +16,7 @@ public class CharacterComponentData {
 		character = C;
 		aimingController = C.GetComponentInChildren<AimingController> () as AimingController;
 		firingController = C.GetComponentInChildren<FiringController> () as FiringController;
+		movementController = C.GetComponentInChildren<MovementController> () as MovementController;
 		movementActuator = C.GetComponent<CharacterMovementActuator> () as CharacterMovementActuator;
 		characterTransform = movementActuator.transform;
 	}
@@ -48,6 +50,15 @@ public class CharacterComponentData {
 			return null;
 		}
 	}
+
+	public MovementController GetMovementController(){
+		if (IsCharacterInsantiated()) {
+			return movementController;
+		} else {
+			return null;
+		}
+	}
+
 	public Character GetCharacter(){
 		if (IsCharacterInsantiated()) {
 			return character;
