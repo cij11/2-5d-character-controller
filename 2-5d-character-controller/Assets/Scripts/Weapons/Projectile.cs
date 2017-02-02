@@ -28,8 +28,7 @@ public abstract class Projectile : MonoBehaviour {
 
 	}
 
-	public void LoadLaunchParameters(Weapon firingWeapon, Character firingCharacter, Vector3 worldLaunch, int facingDirection){
-		this.firingWeapon = firingWeapon;
+	public void LoadLaunchParameters(Character firingCharacter, Vector3 worldLaunch, int facingDirection){
 		this.firingCharacter = firingCharacter;
 		characterTransform = firingCharacter.transform;
 		worldLaunchVector = worldLaunch;

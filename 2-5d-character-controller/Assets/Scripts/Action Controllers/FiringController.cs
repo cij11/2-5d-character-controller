@@ -16,11 +16,18 @@ public class FiringController : MonoBehaviour
 
 	bool fireHeld = false;
 
+	CharacterComponentData characterComponentData;
+
+	void Start(){
+		Character character = GetComponentInParent<Character>() as Character;
+		characterComponentData = new CharacterComponentData (character);
+	}
 
 	public void RegisterInvokable(Invokable invocable)
     {
 		equipedInvokable = invocable;
 		cooldownPeriod = invocable.cooldownPeriod;
+		invocable.RegisterCharacterComponentsWithInvokable (characterComponentData);
     }
 
 	public void SetFireHeld(bool held){

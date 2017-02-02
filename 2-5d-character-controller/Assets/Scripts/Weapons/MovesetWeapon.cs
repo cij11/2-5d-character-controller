@@ -56,7 +56,7 @@ public class MovesetWeapon : Weapon
     {
         Vector3 spawnLocation = new Vector3((float)aimingController.GetFacingDirection() * spawnOffset.x, spawnOffset.y, spawnOffset.z);
         GameObject newProjectile = (GameObject)Instantiate(fireProjectile, this.transform.position + spawnLocation, Quaternion.identity);
-        newProjectile.GetComponent<MovesetProjectile>().LoadLaunchParameters(this, this.character, spawnLocation, aimingController.GetFacingDirection());
+        newProjectile.GetComponent<MovesetProjectile>().LoadLaunchParameters(this.character, spawnLocation, aimingController.GetFacingDirection());
         newProjectile.GetComponent<MovesetProjectile>().Launch();
     }
 

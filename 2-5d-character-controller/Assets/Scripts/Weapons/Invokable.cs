@@ -11,6 +11,8 @@ public class Invokable : MonoBehaviour {
 
 	public float cooldownPeriod = 0.3f;
 
+	CharacterComponentData componentData;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -48,8 +50,8 @@ public class Invokable : MonoBehaviour {
 		CastEffectsInArray (ReleaseEffects);
 	}
 
-	public void RegisterCharacterComponentsWithInvokable(){
-
+	public void RegisterCharacterComponentsWithInvokable(CharacterComponentData charComponentData){
+		componentData = charComponentData;
 	}
 
 	private void CastEffectsInArray(Effect[] effectArray){

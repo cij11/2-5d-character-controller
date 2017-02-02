@@ -150,7 +150,6 @@ public class ItemManager : MonoBehaviour {
 	void SetupInvokable(){
 		Invokable equipedInvokable = equipedItem.GetComponent<Invokable> () as Invokable;
 		RegisterInvokableWithFiringController(equipedInvokable);
-		equipedInvokable.RegisterCharacterComponentsWithInvokable ();
 	}
 
 	void DestroycurrentItem(){

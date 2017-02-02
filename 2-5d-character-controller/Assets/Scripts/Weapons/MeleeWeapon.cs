@@ -35,7 +35,7 @@ public class MeleeWeapon : Weapon
     {
         Vector3 aimingVectorWorldSpace = aimingController.GetAimingVectorWorldSpace();
         GameObject newProjectile = (GameObject)Instantiate(launchableGO, this.transform.position + aimingVectorWorldSpace, Quaternion.identity);
-        newProjectile.GetComponent<MeleeProjectile>().LoadLaunchParameters(this, this.character, aimingVectorWorldSpace, aimingController.GetFacingDirection());
+        newProjectile.GetComponent<MeleeProjectile>().LoadLaunchParameters(this.character, aimingVectorWorldSpace, aimingController.GetFacingDirection());
         newProjectile.GetComponent<MeleeProjectile>().Launch();
     }
 

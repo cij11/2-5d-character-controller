@@ -112,9 +112,10 @@ public class Hand : MonoBehaviour {
 	}
 
 	public void OrientHeldItem(){
-		Item currentItem = itemManager.GetCurrentItem ();
-		Transform currentItemTransform = currentItem.transform;
-		SpriteRenderer childSprite = currentItem.GetSpriteRenderer ();
+		if (itemManager != null) { //Ignore this call until start has been run in hand
+			Item currentItem = itemManager.GetCurrentItem ();
+			Transform currentItemTransform = currentItem.transform;
+			SpriteRenderer childSprite = currentItem.GetSpriteRenderer ();
 
 			if (childSprite != null) {
 				if (aimingController.GetFacingDirection () == 1) {
@@ -125,10 +126,10 @@ public class Hand : MonoBehaviour {
 			}
 
 			if (aimingController.GetFacingDirection () == 1) {
-			currentItemTransform.localPosition = currentItem.gripOffset;
+				currentItemTransform.localPosition = currentItem.gripOffset;
 			} else {
-			currentItemTransform.localPosition = new Vector3 (-currentItem.gripOffset.x, currentItem.gripOffset.y, 0f);
+				currentItemTransform.localPosition = new Vector3 (-currentItem.gripOffset.x, currentItem.gripOffset.y, 0f);
 			}
-
+		}
 	}
 }
