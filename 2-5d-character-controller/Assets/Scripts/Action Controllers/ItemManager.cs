@@ -143,6 +143,7 @@ public class ItemManager : MonoBehaviour {
 		equipedItem.gameObject.SetActive(true);
 		equipedItem.transform.parent = hand.transform;
 		equipedItem.transform.rotation = hand.transform.rotation;
+		hand.OrientHeldItem (); //Call this now, to avoid a one frame delay until the hand is updated next.
 		equipedItem.DrawItem ();
 	}
 

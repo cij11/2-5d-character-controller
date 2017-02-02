@@ -111,7 +111,7 @@ public class Hand : MonoBehaviour {
 		return handAngle;
 	}
 
-	void OrientHeldItem(){
+	public void OrientHeldItem(){
 		Item currentItem = itemManager.GetCurrentItem ();
 		Transform currentItemTransform = currentItem.transform;
 		SpriteRenderer childSprite = currentItem.GetSpriteRenderer ();
