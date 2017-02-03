@@ -21,6 +21,6 @@ public class EffectLunge : Effect {
 	}
 
 	private void Lunge(){
-		componentData.GetMovementController ().Lunge (componentData.GetAimingController ().GetAimingVectorWorldSpace (), lungeSpeed);
+		componentData.GetMovementController ().Lunge (componentData.GetAimingController ().GetAimingVector (), lungeSpeed);
 	}
 }
