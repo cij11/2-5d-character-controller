@@ -2,25 +2,28 @@
 using System.Collections;
 
 public class CharacterCorpus : MonoBehaviour {
-
-	int startingHealth = 100;
-	int health;
+	HeartBank heartBank;
 
 	Rigidbody body;
+	bool isAlive = true;
 
 	void Start () {
-		health = startingHealth;
 		body = GetComponent<Rigidbody>() as Rigidbody;
+		heartBank = GetComponent<HeartBank> () as HeartBank;
 	}
 
 	public void TakeDamage(int damage){
-		health -= damage;
-		if (health <= 0){
-			Destroy(this.gameObject);
+		heartBank.TakeDamage (damage);
+		if (heartBank.GetIsOutOfHearts ()) {
+			isAlive = false;
 		}
 	}
 
 	public void TakeKnockback(Vector3 knockbackVector, float knockbackSpeed){
 		body.velocity = knockbackVector * knockbackSpeed;
+	}
+
+	public bool GetIsAlive(){
+		return isAlive;
 	}
 }
