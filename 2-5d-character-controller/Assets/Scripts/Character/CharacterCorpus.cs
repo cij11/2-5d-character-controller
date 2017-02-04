@@ -12,10 +12,17 @@ public class CharacterCorpus : MonoBehaviour {
 		heartBank = GetComponent<HeartBank> () as HeartBank;
 	}
 
+	void Die(){
+		//Disable input to player
+
+		//Change to death animation
+	}
+
 	public void TakeDamage(int damage){
 		heartBank.TakeDamage (damage);
 		if (heartBank.GetIsOutOfHearts ()) {
 			isAlive = false;
+			Die ();
 		}
 	}
 

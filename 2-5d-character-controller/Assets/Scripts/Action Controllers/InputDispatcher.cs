@@ -10,6 +10,8 @@ public class InputDispatcher : MonoBehaviour {
 
 	AbstractInput abstractInput;
 
+	CharacterCorpus corpus;
+
 	// Use this for initialization
 	void Start () {
 		RegisterControllers();
@@ -21,6 +23,7 @@ public class InputDispatcher : MonoBehaviour {
 		aimingController = actionControllers.GetComponent<AimingController>();
 		firingController = actionControllers.GetComponent<FiringController>();
 		itemManager = actionControllers.GetComponent<ItemManager>();
+		corpus = GetComponentInParent<CharacterCorpus> () as CharacterCorpus;
 	}
 
 	public void SetControllingAbstractInput(AbstractInput controllingInput){
@@ -29,11 +32,13 @@ public class InputDispatcher : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		UpdateAbstractInput();
-		Movement();
-		Aiming();
-		Firing();
-		Items();
+		if (corpus.GetIsAlive ()) {
+			UpdateAbstractInput ();
+			Movement ();
+			Aiming ();
+			Firing ();
+			Items ();
+		}
 	}
 
 	void UpdateAbstractInput(){

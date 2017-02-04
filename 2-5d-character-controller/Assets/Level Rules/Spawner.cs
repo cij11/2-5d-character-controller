@@ -7,9 +7,10 @@ public class Spawner : MonoBehaviour {
 
 	float spawnTimer = 0f;
 	public float spawnPeriod = 10f;
+	public float firstSpawnDelay = 2f;
 	// Use this for initialization
 	void Start () {
-	
+		spawnTimer = firstSpawnDelay;
 	}
 	
 	// Update is called once per frame
@@ -18,10 +19,10 @@ public class Spawner : MonoBehaviour {
 	}
 
 	void IncrementSpawnTimer(){
-		spawnTimer += Time.deltaTime;
-		if (spawnTimer > spawnPeriod){
-				SpawnRandomObject();
-				spawnTimer = 0;
+		spawnTimer -= Time.deltaTime;
+		if (spawnTimer <= 0){
+			SpawnRandomObject();
+			spawnTimer = spawnPeriod;
 		}
 	}
 
