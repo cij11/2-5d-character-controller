@@ -45,7 +45,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	//	DigPerlinTunnels (perlinResolution);
 	//	StampAxisAlignedRect ((int)worldSizeX/2, (int)worldSizeY/2, 35, 35, 0f);
 	//	DigPerlinCaves (perlinResolution);
-		DigTestConvexHull(false);
+	//	DigTestConvexHull(false);
 
 
 			for (i = 0; i < tileXSize; i++){
