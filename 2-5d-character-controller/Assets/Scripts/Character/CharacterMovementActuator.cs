@@ -464,7 +464,9 @@ public class CharacterMovementActuator : MonoBehaviour
 	{
 		if (contactSensor.GetHasContactStateChanged ()) {
 			if (contactSensor.GetContactState () == ContactState.WALLGRAB) {
+				if(contactSensor.GetIsWholeSideContactingWall()){
 				LimitWallClimbSpeed ();
+				}
 			}
 		}
 	}

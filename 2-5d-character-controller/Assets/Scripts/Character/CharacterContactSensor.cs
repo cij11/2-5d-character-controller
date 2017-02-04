@@ -163,7 +163,7 @@ public class CharacterContactSensor : MonoBehaviour
     void RaycastLeft()
     {
         float rayLength = detectionRayLengthSides;
-
+		bool allRaysHit = true;
         for (int i = 0; i < horizontalRayCount; i++)
         {
             Vector3 rayOrigin = raycastOrigins.topLeft;
@@ -178,14 +178,17 @@ public class CharacterContactSensor : MonoBehaviour
                 collisions.left = true;
                 collisions.leftSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
                 collisions.leftWallNormal = hit.normal;
-            }
+			} else {
+				allRaysHit = false; //If any rays don't hit, set this false.
+			}
+			collisions.allLeft = allRaysHit;
         }
     }
 
     void RaycastRight()
     {
         float rayLength = detectionRayLengthSides;
-
+		bool allRaysHit = true;
         for (int i = 0; i < horizontalRayCount; i++)
         {
             Vector3 rayOrigin = raycastOrigins.topRight;
@@ -195,12 +198,14 @@ public class CharacterContactSensor : MonoBehaviour
             Debug.DrawRay(rayOrigin, body.transform.right * rayLength, Color.red);
 
             //If any ray hits, register a collision below, and store the surface angle and normal
-            if (isHit)
-            {
-                collisions.right = true;
-                collisions.rightSurfaceAngle = Vector3.Angle(hit.normal, body.transform.up);
-                collisions.rightWallNormal = hit.normal;
-            }
+			if (isHit) {
+				collisions.right = true;
+				collisions.rightSurfaceAngle = Vector3.Angle (hit.normal, body.transform.up);
+				collisions.rightWallNormal = hit.normal;
+			} else {
+				allRaysHit = false; //If any rays don't hit, set this false.
+			}
+			collisions.allRight = allRaysHit;
         }
     }
 
@@ -229,6 +234,7 @@ public class CharacterContactSensor : MonoBehaviour
     {
         public bool below;
         public bool left, right;
+		public bool allLeft, allRight;
 
         public Vector3 groundNormal;
         public Vector3 leftWallNormal;
@@ -241,6 +247,7 @@ public class CharacterContactSensor : MonoBehaviour
         {
             below = false;
             left = right = false;
+			allLeft = allRight = false;
 
             groundNormal = new Vector3(0f, 0f, 0f);
             leftWallNormal = new Vector3(0f, 0f, 0f);
@@ -283,6 +290,14 @@ public class CharacterContactSensor : MonoBehaviour
     {
         return sideGrabbed;
     }
+
+	public bool GetIsWholeSideContactingWall(){
+		if (sideGrabbed == MovementDirection.LEFT) {
+			return collisions.allLeft;
+		} else {
+			return collisions.allRight;
+		}
+	}
 
     public float GetUphillDirection()
     {
