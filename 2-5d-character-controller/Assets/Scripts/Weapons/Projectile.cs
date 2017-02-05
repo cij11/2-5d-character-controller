@@ -10,7 +10,7 @@ public abstract class Projectile : MonoBehaviour {
 
 	protected float maxLifespan = 0.4f;
 
-	protected int damage = 4;
+	protected int damage = 50;
 	protected float knockbackSpeed = 30f;
 
 	protected Transform spriteTransform;

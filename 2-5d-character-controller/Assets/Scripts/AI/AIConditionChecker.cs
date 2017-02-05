@@ -44,12 +44,12 @@ public class AIConditionChecker : MonoBehaviour {
 			}
 		case Condition.TARGET_IN_RADIUS:
 			{
-				if(Vector3.Magnitude(goals.GetTargetObject().transform.position - parentTransform.position) < param) return true;
+				if(Vector3.Magnitude(goals.GetTargetPosition() - parentTransform.position) < param) return true;
 				break;
 			}
 		case Condition.TARGET_OUTSIDE_RADIUS:
 			{
-				if(Vector3.Magnitude(goals.GetTargetObject().transform.position - parentTransform.position) > param) return true;
+				if(Vector3.Magnitude(goals.GetTargetPosition() - parentTransform.position) > param) return true;
 				break;
 			}
 		case Condition.TARGET_IN_LOS:
@@ -118,12 +118,12 @@ public class AIConditionChecker : MonoBehaviour {
 	}
 
 	void FindTargetOctant(){
-		Octant.PointsToOctant(parentTransform.position, goals.GetTargetObject().transform.position,
+		Octant.PointsToOctant(parentTransform.position, goals.GetTargetPosition(),
 			parentTransform.right, parentTransform.up, out horOctant, out vertOctant);
 	}
 
 	void FindTargetDistances(){
-		Octant.PointsToDistances(parentTransform.position, goals.GetTargetObject().transform.position,
+		Octant.PointsToDistances(parentTransform.position, goals.GetTargetPosition(),
 			parentTransform.right, parentTransform.up, out horDistance, out vertDistance);
 	}
 }

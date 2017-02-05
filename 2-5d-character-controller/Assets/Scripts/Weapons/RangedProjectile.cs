@@ -5,6 +5,7 @@ public class RangedProjectile : Projectile {
 
 	float muzzleSpeed = 20f;
 	Vector3 velocityVector;
+
 	// Update is called once per frame
 	void Update () {
 		IncreaseAge();
@@ -20,6 +21,7 @@ public class RangedProjectile : Projectile {
 	}
 
 	void LaunchRanged(){
+		damage = 10;
 		velocityVector = worldLaunchVector;
 	//	this.GetComponent<Rigidbody>().velocity = velocityVector  * muzzleSpeed;
 	}
@@ -27,9 +29,8 @@ public class RangedProjectile : Projectile {
 	void OnTriggerEnter(Collider other) {
 		CharacterCorpus corpus = other.GetComponent<CharacterCorpus>() as CharacterCorpus;
 		if (corpus != null){
-			corpus.TakeDamage(40);
+			corpus.TakeDamage(damage);
+			Destroy(this.gameObject);
 		}
-
-		Destroy(this.gameObject);
     }
 }

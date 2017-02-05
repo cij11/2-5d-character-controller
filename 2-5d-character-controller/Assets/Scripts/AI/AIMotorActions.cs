@@ -40,11 +40,11 @@ public class AIMotorActions : MonoBehaviour {
 				break;
 			}
 			case Action.AIM_TARGET:{
-				AimAtObject(goals.GetTargetObject());
+				AimAtPoint(goals.GetTargetPosition());
 				break;
 			}
 			case Action.RELEASE_FIRE_TARGET:{
-				ReleaseFireAtObject(goals.GetTargetObject());
+				ReleaseFireAtPoint(goals.GetTargetPosition());
 				break;
 			}
 		case Action.JUMP:
