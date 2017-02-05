@@ -29,6 +29,10 @@ public class CharacterCorpus : MonoBehaviour {
 		}
 	}
 
+	public void RestoreHeart(){
+		heartBank.RestoreHeart ();
+	}
+
 	public void TakeKnockback(Vector3 knockbackVector, float knockbackSpeed){
 		body.velocity = knockbackVector * knockbackSpeed;
 	}

@@ -38,6 +38,13 @@ public class HeartBank : MonoBehaviour {
 		}
 	}
 
+	public void RestoreHeart(){
+		if (currentHearts < maxHearts) {
+			currentHearts++;
+		}
+		CreateNextTank ();
+	}
+
 	private void CreateNextTank(){
 		healthTank = new HealthTank ();
 	}
