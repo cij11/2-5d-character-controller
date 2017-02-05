@@ -119,23 +119,45 @@ public class RenderChunk : MonoBehaviour {
 			if (ore2 == ore3)
 				unique3 = false;
 
+			//Render the first ore across the entire tile, to prevent gaps
+			bool baseColorRendered = false;
 			//For each unique ore type, loop around the perimeter, flagging raised corners of that type, and edge nodes where the ore is different or the elevation changes.
 			//If a corner is the first instance of an ore type, parse its shape. Redundant ore type corners will be flagged in the first instance as part of this loop.
-			if (unique0)
-				botLeft = ParseShape (ore0, marchingGrid, oreGrid, x, y);
-			if (unique1)
-				topLeft = ParseShape (ore1, marchingGrid, oreGrid, x, y);
-			if (unique2)
-				topRight = ParseShape (ore2, marchingGrid, oreGrid, x, y);
-			if (unique3)
-				botRight = ParseShape (ore3, marchingGrid, oreGrid, x, y);
+			if (unique0) {
+				botLeft = ParseBaseShape(ore0, marchingGrid, oreGrid, x, y);
+				baseColorRendered = true;
+			//	botLeft = ParseShape (ore0, marchingGrid, oreGrid, x, y);
+			}
+			if (unique1) {
+				if (baseColorRendered) {
+					topLeft = ParseShape (ore1, marchingGrid, oreGrid, x, y);
+				} else {
+					baseColorRendered = true;
+					topLeft = ParseBaseShape (ore1, marchingGrid, oreGrid, x, y);
+				}
+			}
+			if (unique2) {
+				if (baseColorRendered) {
+					topRight = ParseShape (ore2, marchingGrid, oreGrid, x, y);
+				} else {
+					baseColorRendered = true;
+					topRight = ParseBaseShape (ore2, marchingGrid, oreGrid, x, y);
+				}
+			}
+			if (unique3) {
+				if (baseColorRendered) {
+					botRight = ParseShape (ore3, marchingGrid, oreGrid, x, y);
+				} else {
+					botRight = ParseBaseShape (ore3, marchingGrid, oreGrid, x, y);
+				}
+			}
 
 			//If a corner is the origin of a shape, render it.
 			if (botLeft > 0) { //if bot left needs to be rendered
 				mainColor = oreGrid.GetOreColor(ore0);
 				for (i = 0; i < 8; i++) {
 					if (  (botLeft & ((byte)1 << i)) > 0) {
-						AddFaceVert (GetTileVertPosition (i, x, y, marchingGrid) + vecOffset + new Vector3(0f, 0f, 0.1f), mainColor);
+						AddFaceVert (GetTileVertPosition (i, x, y, marchingGrid) + vecOffset + new Vector3(0f, 0f, -0.1f), mainColor);
 						shape0Nodes++;
 					}
 				}
@@ -153,7 +175,7 @@ public class RenderChunk : MonoBehaviour {
 				mainColor = oreGrid.GetOreColor(ore1);
 				for (i = 0; i < 8; i++) {
 					if (  (topLeft & ((byte)1 << i)) > 0) {
-						AddFaceVert (GetTileVertPosition (i, x, y, marchingGrid) + vecOffset+ new Vector3(0f, 0f, 0.2f), mainColor);
+						AddFaceVert (GetTileVertPosition (i, x, y, marchingGrid) + vecOffset+ new Vector3(0f, 0f, -0.2f), mainColor);
 						shape1Nodes++;
 					}
 				}
@@ -171,7 +193,7 @@ public class RenderChunk : MonoBehaviour {
 				mainColor = oreGrid.GetOreColor(ore2);
 				for (i = 0; i < 8; i++) {
 					if (  (topRight & ((byte)1 << i)) > 0) {
-						AddFaceVert (GetTileVertPosition (i, x, y, marchingGrid) + vecOffset+ new Vector3(0f, 0f, 0.3f), mainColor);
+						AddFaceVert (GetTileVertPosition (i, x, y, marchingGrid) + vecOffset+ new Vector3(0f, 0f, -0.3f), mainColor);
 						shape2Nodes++;
 					}
 				}
@@ -189,7 +211,7 @@ public class RenderChunk : MonoBehaviour {
 				mainColor = oreGrid.GetOreColor(ore3);
 				for (i = 0; i < 8; i++) {
 					if (  (botRight & ((byte)1 << i)) > 0) {
-						AddFaceVert (GetTileVertPosition (i, x, y, marchingGrid) + vecOffset+ new Vector3(0f, 0f, 0.4f), mainColor);
+						AddFaceVert (GetTileVertPosition (i, x, y, marchingGrid) + vecOffset+ new Vector3(0f, 0f, -0.4f), mainColor);
 						shape3Nodes++;
 					}
 				}
@@ -206,6 +228,30 @@ public class RenderChunk : MonoBehaviour {
 			//Add a lighter colour to the edge of the tile
 			BuildOutline (x, y, marchingGrid, borderColor);
 		}
+	}
+
+	//Base shape only cares about elevation, not ore type.
+	private byte ParseBaseShape(OreTypes ore, MarchingSquaresGrid marchingGrid, OreGrid oreGrid, int x, int y){
+		byte shape = 0;
+		for (int i = 0; i < 7; i += 2) {
+			if (  GetNode(i, x, y, marchingGrid)   > 0.5f) {
+				shape |= (byte)(1 << i);
+				int nextIndex = Mod (i + 2, 8);
+				int prevIndex = Mod (i - 2, 8);
+				int nextIntermediate = Mod (i + 1, 8);
+				int prevIntermediate = Mod (i - 1, 8);
+
+				//If the next node is a different type, or below the rendering threshold, add the intermediate node
+				if (GetNode (nextIndex, x, y, marchingGrid) < 0.5f) {
+					shape |= (byte)(1 << (nextIntermediate));
+				}
+				if (GetNode (prevIndex, x, y, marchingGrid) < 0.5f) {
+					shape |= (byte)(1 << (prevIntermediate));
+				}
+			}
+		}
+		return shape;
+		//	return (byte) 1 +( 1<< 1) + (1 << 7);
 	}
 
 	private byte ParseShape(OreTypes ore, MarchingSquaresGrid marchingGrid, OreGrid oreGrid, int x, int y){
