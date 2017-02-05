@@ -152,7 +152,6 @@ public class Topography : MonoBehaviour {
 
 	//Cull the renderered chunks to those near the player.
 	private void SpawnDespawnRenderChunksWithinRange(){
-	//	Vector3 playerPosition = renderFocus.transform.position + new Vector3 (worldSizeX / 2f, worldSizeY / 2f, 0f) + renderFocus.transform.position - hull.transform.position;
 		Vector3 playerPosition = renderFocus.transform.position + new Vector3 (worldSizeX / 2f, worldSizeY / 2f, 0f);
 		Coord playerCoord = new Coord ((int)playerPosition.x, (int)playerPosition.y);
 		Coord playerChunkCoord = playerCoord.ConvertTileCoordToChunkCoord (chunkSize);
@@ -233,7 +232,7 @@ public class Topography : MonoBehaviour {
 	}
 
 	//Chunks in this queue have been altered by the player, and are currently within the render radius.
-	//Only que if not already in queue
+	//Only queue if not already in queue
 	private void FlagRenderChunkForPriorityUpdate(RenderChunk renderChunkToUpdate){
 		if(!renderChunkPriorityUpdateQueue.Contains(renderChunkToUpdate))
 			renderChunkPriorityUpdateQueue.Enqueue (renderChunkToUpdate);
@@ -268,13 +267,9 @@ public class Topography : MonoBehaviour {
 		}
 
 	}
-
-
-
-
+		
 	//Cull the renderered chunks to those near the render focus.
 	private void SpawnDespawnCollisionChunksWithinRange(){
-		//Vector3 renderPosition = renderFocus.transform.position;
 		Vector3 renderPosition = renderFocus.transform.position + new Vector3 (worldSizeX / 2f, worldSizeY / 2f, 0f);;
 		Coord renderCoord = new Coord ((int)renderPosition.x, (int)renderPosition.y);
 		Coord renderChunkCoord = renderCoord.ConvertTileCoordToChunkCoord (chunkSize);
