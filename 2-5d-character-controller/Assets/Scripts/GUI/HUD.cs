@@ -28,7 +28,7 @@ public class HUD : MonoBehaviour {
 	}
 
 	private Color InterpolateColorFromGreenToRedFromRemainingHearts (){
-		float remainingHeartPercentage = (float)heartBank.GetCurrentHearts () / (float)heartBank.GetMaxHearts ();
+		float remainingHeartPercentage = ((float)heartBank.GetCurrentHearts () + 0.1f) / ((float)heartBank.GetMaxHearts () + 0.1f); //Add 0.1 avoid 0/0 division when character has no hearts.
 		return new Color ((1f - remainingHeartPercentage), remainingHeartPercentage, 0f, 1f);
 	}
 
