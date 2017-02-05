@@ -43,7 +43,7 @@ public class Topography : MonoBehaviour {
 
 	private float interiorZLayer = 0f;
 
-	private GameObject renderFocus = null;
+	private List<GameObject> renderFoci;
 	private GameObject playerUnitGO = null;
 
 	private OreGrid oreGrid = null;
@@ -94,6 +94,7 @@ public class Topography : MonoBehaviour {
 
 		this.interiorGO = Instantiate (interiorPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity) as GameObject;
 
+		renderFoci = new List<GameObject> ();
 	}
 
 	//Parent the renderChunkGO to the hull, and set its 0 poistion to -ve radius, -ve radius
@@ -117,17 +118,43 @@ public class Topography : MonoBehaviour {
 
 	// Update is called once per frame
 	void FixedUpdate () {
-		if (renderFocus == null) {
-			renderFocus = GameObject.FindGameObjectWithTag ("RenderFocus");
-		}
-	
-			SpawnDespawnRenderChunksWithinRange ();
-			UpdatePriorityRenderChunkQueue ();
-			UpdateRenderChunkQueue ();
+		RemoveNullsFromRenderFoci ();
 
-			SpawnDespawnCollisionChunksWithinRange ();
-			UpdatePriorityCollisionChunkQueue ();
-			UpdateCollisionChunkQueue ();
+		SpawnDespawnChunksNearFoci ();
+
+		UpdatePriorityRenderChunkQueue ();
+		UpdatePriorityCollisionChunkQueue ();
+	
+		UpdateRenderChunkQueue ();
+		UpdateCollisionChunkQueue ();
+	}
+
+	void RemoveNullsFromRenderFoci(){
+		for (int i = renderFoci.Count - 1; i >= 0; i--) {
+			if (renderFoci [i] == null || renderFoci [i].Equals (null)) {
+				renderFoci.RemoveAt (i);
+			}
+		}
+	}
+
+	void SpawnDespawnChunksNearFoci(){
+		foreach (GameObject focus in renderFoci) {
+			if (focus != null && !focus.Equals (null)) {
+				SpawnDespawnRenderChunksWithinRange (focus);
+				SpawnDespawnCollisionChunksWithinRange (focus);
+			}
+		}
+	}
+
+	//Can't garantee that topography has called start before render focus is trying to add.
+	//Return true for success, false for failure, so that render focus can retry.
+	public bool AddRenderFocus(GameObject newFocus){
+		if (renderFoci != null) {
+			renderFoci.Add (newFocus);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 	private void RefreshChunksInRange(int xTileMin, int yTileMin, int xTileMax, int yTileMax){
@@ -151,7 +178,7 @@ public class Topography : MonoBehaviour {
 	}
 
 	//Cull the renderered chunks to those near the player.
-	private void SpawnDespawnRenderChunksWithinRange(){
+	private void SpawnDespawnRenderChunksWithinRange(GameObject renderFocus){
 		Vector3 playerPosition = renderFocus.transform.position + new Vector3 (worldSizeX / 2f, worldSizeY / 2f, 0f);
 		Coord playerCoord = new Coord ((int)playerPosition.x, (int)playerPosition.y);
 		Coord playerChunkCoord = playerCoord.ConvertTileCoordToChunkCoord (chunkSize);
@@ -269,7 +296,7 @@ public class Topography : MonoBehaviour {
 	}
 		
 	//Cull the renderered chunks to those near the render focus.
-	private void SpawnDespawnCollisionChunksWithinRange(){
+	private void SpawnDespawnCollisionChunksWithinRange(GameObject renderFocus){
 		Vector3 renderPosition = renderFocus.transform.position + new Vector3 (worldSizeX / 2f, worldSizeY / 2f, 0f);;
 		Coord renderCoord = new Coord ((int)renderPosition.x, (int)renderPosition.y);
 		Coord renderChunkCoord = renderCoord.ConvertTileCoordToChunkCoord (chunkSize);
