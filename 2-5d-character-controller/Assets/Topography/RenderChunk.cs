@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class RenderChunk : MonoBehaviour {
+public class RenderChunk : Chunk {
 
 	private MeshFilter meshFilter;
 	private MeshRenderer meshRenderer;

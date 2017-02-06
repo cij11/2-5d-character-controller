@@ -137,6 +137,27 @@ public class Topography : MonoBehaviour {
 		}
 	}
 
+	public void DigCircle(Vector3 worldPosition){
+		//If the renderfocus is mounted on the hull of this topography
+		//Cheat for now: If the player is mounted on this hull
+		//Really, this should be called externally. Units and weapons should call 'dig this topography', rather
+		//than have the topography track the cutting tool.
+		float cuttingRadius = 2.5f;
+		//	Vector3 playerPosition = renderFocus.GetComponent<Rigidbody> ().position;
+		//	Vector3 playerDirection = renderFocus.GetComponent<Rigidbody> ().velocity;
+		//	playerDirection.Normalize ();
+		//	Vector3 digPosition = renderFocus.transform.position; //playerPosition + playerDirection * 3f;// - new Vector3 (5f, 5f, 0f);
+		Vector3 digPosition = worldPosition + new Vector3 (worldSizeX / 2f, worldSizeY / 2f, 0f);
+		Coord digCoord = new Coord ((int)digPosition.x, (int)digPosition.y);
+		//		tileGrid.BulkCutCircle (playerPosition.x, playerPosition.y, cuttingRadius, TileType.None);
+		//	tileGrid.PreciseCutCircle (digPosition.x, digPosition.y, cuttingRadius, TileType.None);
+		//	marchingGrid.DigCircle (digPosition.x, digPosition.y, cuttingRadius, false);
+		new MarchingSquaresCutTools (marchingGrid.GetNodeArray ()).DigCircle (digPosition.x, digPosition.y, cuttingRadius, false);
+		marchingGrid.InterpolateAllInRange (digCoord.X - (int)cuttingRadius - 5, digCoord.Y - (int)cuttingRadius - 5, digCoord.X + (int)cuttingRadius + 5, digCoord.Y + (int)cuttingRadius + 5);
+		RefreshChunksInRange (digCoord.X - (int)cuttingRadius, digCoord.Y - (int)cuttingRadius, digCoord.X + (int)cuttingRadius, digCoord.Y + (int)cuttingRadius);
+		digCooldown = digTimer;
+	}
+
 	void SpawnDespawnChunksNearFoci(){
 		foreach (GameObject focus in renderFoci) {
 			if (focus != null && !focus.Equals (null)) {

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class CollisionChunk : MonoBehaviour {
+public class CollisionChunk : Chunk {
 	private MeshFilter meshFilter;
 	private MeshCollider meshCollider;
 	private Mesh colMesh;
