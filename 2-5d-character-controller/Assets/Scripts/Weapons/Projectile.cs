@@ -4,7 +4,7 @@ using System.Collections;
 public abstract class Projectile : MonoBehaviour {
 
 	protected Weapon firingWeapon;
-	protected Character firingCharacter;
+	protected CharacterComponentData firingCharData;
 	protected Vector3 worldLaunchVector;
 	protected Transform characterTransform;
 
@@ -28,9 +28,9 @@ public abstract class Projectile : MonoBehaviour {
 
 	}
 
-	public void LoadLaunchParameters(Character firingCharacter, Vector3 worldLaunch, int facingDirection){
-		this.firingCharacter = firingCharacter;
-		characterTransform = firingCharacter.transform;
+	public void LoadLaunchParameters(CharacterComponentData charData, Vector3 worldLaunch, int facingDirection){
+		this.firingCharData = charData;
+		characterTransform = charData.GetCharacterTransform ();
 		worldLaunchVector = worldLaunch;
 		direction = facingDirection;
 

@@ -475,4 +475,8 @@ public class CharacterMovementActuator : MonoBehaviour
 	{
 		body.velocity = body.velocity + body.rotation * lungeVector * speed;
 	}
+
+	public Vector3 GetVelocity(){
+		return this.body.velocity;
+	}
 }

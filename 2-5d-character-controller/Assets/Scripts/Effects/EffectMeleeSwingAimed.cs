@@ -26,7 +26,7 @@ public class EffectMeleeSwingAimed : Effect {
 	{
 		Vector3 worldAimingVector = componentData.GetAimingController ().GetAimingVectorWorldSpace ();
 		GameObject newProjectile = (GameObject)Instantiate (projectile, componentData.GetCharacterTransform ().position + worldAimingVector, Quaternion.identity);
-		newProjectile.GetComponent<MeleeProjectile> ().LoadLaunchParameters (componentData.GetCharacter(), worldAimingVector, componentData.GetAimingController().GetFacingDirection ());
+		newProjectile.GetComponent<MeleeProjectile> ().LoadLaunchParameters (componentData, worldAimingVector, componentData.GetAimingController().GetFacingDirection ());
 		newProjectile.GetComponent<MeleeProjectile> ().Launch ();
 	}
 }

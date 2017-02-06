@@ -34,7 +34,7 @@ public class MovesetProjectile : Projectile
         if (corpus != null)
         {
             Character otherCharacter = other.gameObject.GetComponent<Character>() as Character;
-            if (!otherCharacter.Equals(firingCharacter))
+			if (!otherCharacter.Equals(firingCharData.GetCharacter()))
             {
                 corpus.TakeDamage(damage);
                 corpus.TakeKnockback(worldLaunchVector, knockbackSpeed);
