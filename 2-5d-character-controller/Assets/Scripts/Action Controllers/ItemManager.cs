@@ -71,12 +71,14 @@ public class ItemManager : MonoBehaviour {
 	//Pressing fire while swap is pressed (throwing the item)
 	//Releasing swap (swapping to the next item, or the appropriate item from the inventory wheel once implemented.
 	public void StartSwap(){
-		Item closestPickupItem = ClosestItemInReach ();
-		if (closestPickupItem != null) {
-			print ("Pickup item found");
-			PickupItem (closestPickupItem);
-		} else {
-			isSwapping = true;
+		if (!firingController.GetIsInvoking ()) { //If fire already held, disable swapping
+			Item closestPickupItem = ClosestItemInReach ();
+			if (closestPickupItem != null) {
+				print ("Pickup item found");
+				PickupItem (closestPickupItem);
+			} else {
+				isSwapping = true;
+			}
 		}
 	}
 
@@ -170,5 +172,9 @@ public class ItemManager : MonoBehaviour {
 
 	public Item GetCurrentItem(){
 		return equipedItem;
+	}
+
+	public bool GetIsSwapping(){
+		return isSwapping;
 	}
 }

@@ -6,6 +6,8 @@ public class FiringController : MonoBehaviour
 {
     Invokable equipedInvokable;
 
+	ItemManager itemManager;
+
 	public bool cancelCausesCooldown = false;  //For invocables that have a marked sustain effect, like rapid fire weapons, grav gun, or shields.
 	public float cooldownPeriod = 0f;
 
@@ -16,6 +18,9 @@ public class FiringController : MonoBehaviour
 
 	bool fireHeld = false;
 
+	void Start(){
+		itemManager = GetComponent<ItemManager> () as ItemManager;
+	}
 
 	public void RegisterInvokable(Invokable invocable)
     {
@@ -29,13 +34,15 @@ public class FiringController : MonoBehaviour
 
     public void InitiateFire()
     {
-		if (!isInvoking && !isCoolingDown) {
-			if (equipedInvokable != null) {
-				equipedInvokable.StartInvoking ();
-				isInvoking = true;
+		if (!itemManager.GetIsSwapping ()) { //isSwapping and isInvoking are mutually exclusive.
+			if (!isInvoking && !isCoolingDown) {
+				if (equipedInvokable != null) {
+					equipedInvokable.StartInvoking ();
+					isInvoking = true;
+				}
+			} else {
+				fireQueued = true;
 			}
-		} else {
-			fireQueued = true;
 		}
     }
 
