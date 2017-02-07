@@ -9,10 +9,10 @@ public class StampCircle : MonoBehaviour, IStampable {
 	float radius;
 
 
-	public void ApplyStamp(MarchingSquaresGrid marchingGrid){
+	public void ApplyStamp(MarchingSquaresGrid marchingGrid, OreGrid oreGrid){
 		TransformToCircle ();
 
-		new MarchingSquaresCutTools (marchingGrid.GetNodeArray ()).DigCircleFromWorld (position, radius, isSolid);
+		new MarchingSquaresCutTools (marchingGrid).DigCircleFromWorld (position, radius, isSolid);
 		Destroy (this.gameObject);
 	}
 

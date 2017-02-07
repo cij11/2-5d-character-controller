@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class StampPerlinTunnel :  MonoBehaviour, IStampable {
 
-	public void ApplyStamp(MarchingSquaresGrid marchingGrid){
+	public void ApplyStamp(MarchingSquaresGrid marchingGrid, OreGrid oreGrid){
 
-		new MarchingSquaresCutTools (marchingGrid.GetNodeArray ()).DigPerlinTunnels (0.02f);
+		new MarchingSquaresCutTools (marchingGrid).DigPerlinTunnels (0.02f);
 		Destroy (this.gameObject);
 	}
 }

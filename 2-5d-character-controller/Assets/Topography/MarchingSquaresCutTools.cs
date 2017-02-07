@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MarchingSquaresCutTools {
+public class MarchingSquaresCutTools : CutTools {
 
-	int tileXSize;
-	int tileYSize;
 	float[,] nodeArray;
 
 	public float perlinResolution = 0.02f;
@@ -13,11 +11,12 @@ public class MarchingSquaresCutTools {
 	public float perlinTunnelThreshold = 6f;
 	public float perimeterBuffer = 0.1f;
 
-	public MarchingSquaresCutTools(float[,] marchingSquaresNodeArray){
-		nodeArray = marchingSquaresNodeArray;
+	public MarchingSquaresCutTools(MarchingSquaresGrid marchingSquaresGrid){
+		nodeArray = (marchingSquaresGrid).GetNodeArray ();
 		tileXSize = nodeArray.GetLength (0);
 		tileYSize = nodeArray.GetLength (1);
 	}
+
 	//Step along an upper and lower hull of a convex shape. Set all the nodes between these two hulls
 	//equal to the given elevation.
 	public void DigConvexHullFromWorld(List<Vector2> topHull, List<Vector2> botHull, bool isSolid){
@@ -31,15 +30,6 @@ public class MarchingSquaresCutTools {
 	public void DigConvexHullFromLocal(List<Vector2> topHull, List<Vector2> botHull, bool isSolid){
 		BulkAndFineHorizontalCutsPass (topHull, botHull, isSolid);
 		FineVerticalCutsPass (topHull, botHull, isSolid);
-	}
-
-	private List<Vector2> ConvertHullToGridSpace(List<Vector2> hull){
-		List<Vector2> hullInGridSpace = new List<Vector2> ();
-		Vector2 gridOffset = new Vector2 ((float)tileXSize / 2f, (float)tileYSize / 2f);
-		foreach (Vector2 vertice in hull) {
-			hullInGridSpace.Add(vertice + gridOffset);
-		}
-		return hullInGridSpace;
 	}
 
 	private void BulkAndFineHorizontalCutsPass(List<Vector2> topHull, List<Vector2> botHull, bool isSolid){
@@ -77,18 +67,6 @@ public class MarchingSquaresCutTools {
 		}
 	}
 
-	private float HullSegmentGradient(List<Vector2> hull, int index){
-		return (hull [index + 1].y - hull [index].y) / (hull [index + 1].x - hull [index].x);
-	}
-
-	//Advance to the next index in the hull if the column index is past the end of the current line segment
-	private bool CheckLineEnd(List<Vector2> hull, int hullIndex, int columnIndex){
-		if (columnIndex > hull [hullIndex + 1].x) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 	void BulkFillColumnSpan(int column, float botOfSpan, float topOfSpan, float elevation){
 		int topNode = Mathf.FloorToInt (topOfSpan);

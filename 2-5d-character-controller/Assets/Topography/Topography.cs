@@ -71,14 +71,15 @@ public class Topography : MonoBehaviour {
 		marchingGrid = marchingGridGO.GetComponent<MarchingSquaresGrid> () as MarchingSquaresGrid;
 		marchingGrid.Initialise (worldSizeX, worldSizeY, isSolid);
 
-		stampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
-		if (stampCollection != null) { //May not have a stamp collection to apply to this topography
-			stampCollection.ApplyStamp (marchingGrid);
-			marchingGrid.InterpolateAll ();
-		}
-
 		oreGrid = new OreGrid ();
 		oreGrid.GenerateMap (worldSizeX, worldSizeY);
+
+
+		stampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
+		if (stampCollection != null) { //May not have a stamp collection to apply to this topography
+			stampCollection.ApplyStamp (marchingGrid, oreGrid);
+			marchingGrid.InterpolateAll ();
+		}
 
 		renderChunkPool = new Stack<RenderChunk> ();
 		renderChunkUpdateQueue = new Queue<RenderChunk> ();
@@ -152,7 +153,7 @@ public class Topography : MonoBehaviour {
 		//		tileGrid.BulkCutCircle (playerPosition.x, playerPosition.y, cuttingRadius, TileType.None);
 		//	tileGrid.PreciseCutCircle (digPosition.x, digPosition.y, cuttingRadius, TileType.None);
 		//	marchingGrid.DigCircle (digPosition.x, digPosition.y, cuttingRadius, false);
-		new MarchingSquaresCutTools (marchingGrid.GetNodeArray ()).DigCircle (digPosition.x, digPosition.y, cuttingRadius, solidity);
+		new MarchingSquaresCutTools (marchingGrid).DigCircle (digPosition.x, digPosition.y, cuttingRadius, solidity);
 		marchingGrid.InterpolateAllInRange (digCoord.X - (int)cuttingRadius - 5, digCoord.Y - (int)cuttingRadius - 5, digCoord.X + (int)cuttingRadius + 5, digCoord.Y + (int)cuttingRadius + 5);
 		RefreshChunksInRange (digCoord.X - (int)cuttingRadius, digCoord.Y - (int)cuttingRadius, digCoord.X + (int)cuttingRadius, digCoord.Y + (int)cuttingRadius);
 		digCooldown = digTimer;

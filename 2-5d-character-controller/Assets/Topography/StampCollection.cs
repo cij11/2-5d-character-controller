@@ -5,11 +5,11 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class StampCollection : MonoBehaviour, IStampable {
 
-	public void ApplyStamp(MarchingSquaresGrid marchingGrid){
+	public void ApplyStamp(MarchingSquaresGrid marchingGrid, OreGrid oreGrid){
 		IStampable[] stampables =  this.transform.GetComponentsInChildren<IStampable> ();
 		foreach (IStampable stampable in stampables) {
 			if (!stampable.Equals (this)) {
-				stampable.ApplyStamp (marchingGrid);
+				stampable.ApplyStamp (marchingGrid, oreGrid);
 			}
 		}
 	}

@@ -11,14 +11,14 @@ public class StampRect : MonoBehaviour, IStampable {
 	float height;
 
 
-	public void ApplyStamp(MarchingSquaresGrid marchingGrid){
+	public void ApplyStamp(MarchingSquaresGrid marchingGrid, OreGrid oreGrid){
 		TransformToRect ();
 	//	Vector2 position2d = new Vector2 (this.transform.position.x, this.transform.position.y);
 	//	QuadToHulls quad = new QuadToHulls(position2d, 0f, 20f, 20f);
 
 		QuadToHulls quad = new QuadToHulls (position, angle, width, height);
 	
-		new MarchingSquaresCutTools (marchingGrid.GetNodeArray()).DigConvexHullFromWorld (quad.GetUpperHull (), quad.GetLowerHull (), isSolid);
+		new MarchingSquaresCutTools (marchingGrid).DigConvexHullFromWorld (quad.GetUpperHull (), quad.GetLowerHull (), isSolid);
 		Destroy (this.gameObject);
 	}
 

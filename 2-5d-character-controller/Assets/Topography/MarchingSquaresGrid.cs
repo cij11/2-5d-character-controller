@@ -13,10 +13,6 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	private float[,] horizInterpArray;
 	private float[,] vertInterpArray;
 
-	// Use this for initialization
-	void Start () {
-
-	}
 	public void Initialise(int worldSizeX, int worldSizeY, bool isSolid){
 			tileXSize = worldSizeX;
 			tileYSize = worldSizeY;
@@ -75,7 +71,7 @@ public class MarchingSquaresGrid : MonoBehaviour {
 
 		for (int i = 0; i < 170; i += 10) {
 			QuadToHulls quadHulls = new QuadToHulls (new Vector2 (-99.01f + i*3, 50.5f), i * 3, 10f, 20f);
-			new MarchingSquaresCutTools (nodeArray).DigConvexHullFromLocal (quadHulls.GetUpperHull (), quadHulls.GetLowerHull (), isSolid);
+			new MarchingSquaresCutTools (this).DigConvexHullFromLocal (quadHulls.GetUpperHull (), quadHulls.GetLowerHull (), isSolid);
 		}
 	}
 
@@ -87,11 +83,6 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	}
 	public float GetVert(int x, int y){
 		return vertInterpArray [x, y];
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
 	}
 
 	private void InterpolateAllHorizontal(){

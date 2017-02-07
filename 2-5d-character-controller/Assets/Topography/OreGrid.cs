@@ -177,4 +177,8 @@ public class OreGrid {
 	public Color32 GetColorOfTile(int x, int y){
 		return GetOreColor (GetTile (x, y));
 	}
+
+	public int[,] GetTerrainMap(){
+		return terrainMap;
+	}
 }
