@@ -8,14 +8,18 @@ public abstract class Projectile : MonoBehaviour {
 	protected Vector3 worldLaunchVector;
 	protected Transform characterTransform;
 
-	protected float maxLifespan = 0.4f;
+	public float maxLifespan = 0.4f;
 
-	protected int damage = 50;
+	public int damage = 50;
 	protected float knockbackSpeed = 30f;
 
 	protected Transform spriteTransform;
 	protected int direction = 1;
 	float age;
+
+	public Effect[] DestroyEffects;	//Cast when the item is destroyed
+
+	public bool destroyOnContact = false;
 
 	// Use this for initialization
 	void Start () {
@@ -46,6 +50,7 @@ public abstract class Projectile : MonoBehaviour {
 	}
 
 	protected void DestroyProjectile(){
+		
 		Destroy(this.gameObject);
 	}
 
@@ -55,5 +60,15 @@ public abstract class Projectile : MonoBehaviour {
 
 	protected void ApplyDamage(CharacterCorpus damagedCharacter){
 		damagedCharacter.TakeDamage(damage);
+	}
+
+	protected void CastEffectsInArray(Effect[] effectArray){
+		foreach (Effect effect in effectArray) {
+			effect.CastEffect (firingCharData);
+		}
+	}
+
+	void OnDestroy(){
+		CastEffectsInArray (DestroyEffects);
 	}
 }

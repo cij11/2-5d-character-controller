@@ -33,9 +33,4 @@ public class RangedProjectile : Projectile {
 			Destroy (this.gameObject);
 		}
     }
-
-	void OnDestroy(){
-		Topography topography = (Topography)FindObjectOfType (typeof(Topography));
-		topography.DigCircle (this.transform.position);
-	}
 }
