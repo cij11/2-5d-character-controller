@@ -47,7 +47,6 @@ public class MarchingSquaresGrid : MonoBehaviour {
 	//	DigPerlinCaves (perlinResolution);
 	//	DigTestConvexHull(false);
 
-
 			for (i = 0; i < tileXSize; i++){
 				for (j = 0; j < nodeYSize; j++){
 					horizInterpArray [i, j] = 0.5f;

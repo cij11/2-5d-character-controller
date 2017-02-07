@@ -9,7 +9,7 @@ public class MarchingSquaresCutTools {
 	float[,] nodeArray;
 
 	public float perlinResolution = 0.02f;
-	public float perlinThreshold = 0.4f;
+	public float perlinThreshold = 0.45f;
 	public float perlinTunnelThreshold = 6f;
 	public float perimeterBuffer = 0.1f;
 
