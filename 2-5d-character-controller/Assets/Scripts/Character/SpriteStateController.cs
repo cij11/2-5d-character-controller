@@ -6,6 +6,7 @@ public class SpriteStateController : MonoBehaviour
     CharacterMovementActuator characterMovement;
     CharacterContactSensor characterContacts;
     AimingController aimingController;
+	CharacterCorpus corpus;
 
     Animator animator;
     SpriteRenderer spriteRenderer;
@@ -28,6 +29,7 @@ public class SpriteStateController : MonoBehaviour
         characterMovement = this.transform.parent.GetComponent<CharacterMovementActuator>() as CharacterMovementActuator;
         characterContacts = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
         aimingController = this.transform.parent.FindChild("ActionControllers").GetComponent<AimingController>() as AimingController;
+		corpus = GetComponentInParent<CharacterCorpus> () as CharacterCorpus;
     }
 
     // Update is called once per frame
@@ -57,9 +59,10 @@ public class SpriteStateController : MonoBehaviour
         previousAnimationState = currentAnimationState;
 
         //States
-        //0 ground/steep
+        //0 ground/steep  - Idle or moving animation then depends on horizontal speed.
         //1 airborn
         //2 wall grab
+		//3 dead
         if (characterContacts.GetContactState() == ContactState.FLATGROUND)
         {
             currentAnimationState = 0;
@@ -76,6 +79,9 @@ public class SpriteStateController : MonoBehaviour
         {
             currentAnimationState = 2;
         }
+		if (!corpus.GetIsAlive ()) {
+			currentAnimationState = 3;
+		}
 
         //Use this if rigging so all transitions come from any state
         //to prevent repeated triggering.

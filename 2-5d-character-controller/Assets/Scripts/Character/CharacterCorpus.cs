@@ -18,7 +18,7 @@ public class CharacterCorpus : MonoBehaviour {
 		//Change to death animation
 
 		//Remove game object after a cooldown
-		Destroy(this.gameObject, 1f);
+	//	Destroy(this.gameObject, 1f);
 	}
 
 	public void TakeDamage(int damage){
