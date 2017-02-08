@@ -6,11 +6,11 @@ public class Effect : MonoBehaviour {
 	protected int castedCounter = 0;
 	protected CharacterComponentData componentData;
 
-	public AudioSource castSound;
+	public AudioSource audioSource;
 
 	// Use this for initialization
 	void Start () {
-		
+
 	}
 	
 	// Update is called once per frame
@@ -27,9 +27,9 @@ public class Effect : MonoBehaviour {
 	}
 
 	void PlayCastSound(){
-		if (castSound != null) {
-			if (!castSound.isPlaying) {
-				castSound.Play ();
+		if (audioSource != null) {
+			if (audioSource.clip != null){
+				audioSource.PlayOneShot (audioSource.clip);
 			}
 		}
 	}
