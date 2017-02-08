@@ -77,6 +77,11 @@ public class CharacterMovementActuator : MonoBehaviour
 
 		ProcessPhasing ();
 		KillUpwardsVelocityOnStartWallgrab ();
+
+
+		if (this.gameObject.tag == "Player") {
+			print (contactSensor.GetContactState ().ToString());
+		}
 	}
 
 	void OrientToGravity ()

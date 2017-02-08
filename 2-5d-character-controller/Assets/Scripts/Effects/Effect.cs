@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Effect : MonoBehaviour {
-	protected int castedCounter = 0;
 	protected CharacterComponentData componentData;
 
 	public AudioSource audioSource;
@@ -20,8 +19,6 @@ public class Effect : MonoBehaviour {
 
 	public virtual void CastEffect(CharacterComponentData charCompData){
 		componentData = charCompData;
-		castedCounter++;
-		print ("Casted effect " + castedCounter.ToString () + " times.");
 
 		PlayCastSound ();
 	}

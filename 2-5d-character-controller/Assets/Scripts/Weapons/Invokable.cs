@@ -51,7 +51,6 @@ public class Invokable : MonoBehaviour {
 	}
 
 	public void RegisterCharacterComponentsWithInvokable(CharacterComponentData charComponentData){
-		print ("Components registered with invokable");
 		componentData = charComponentData;
 	}
 

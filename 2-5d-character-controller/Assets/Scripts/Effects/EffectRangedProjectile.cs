@@ -23,7 +23,6 @@ public class EffectRangedProjectile : Effect {
 	}
 
 	private void LaunchRangedProjectile(){
-		print ("Launching projectile");
 	//	if (componentData.IsCharacterInsantiated ()) {
 			Vector3 worldAimingVector = componentData.GetAimingController ().GetAimingVectorWorldSpace ();
 			GameObject newProjectile = (GameObject)Instantiate (projectile, componentData.GetCharacterTransform ().position + worldAimingVector * 0.7f, Quaternion.identity);

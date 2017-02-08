@@ -7,9 +7,16 @@ public class CharacterCorpus : MonoBehaviour {
 	Rigidbody body;
 	bool isAlive = true;
 
+	float reelingPeriod = 0.2f;
+	float reelingTimer = 0f;
+
 	void Start () {
 		body = GetComponent<Rigidbody>() as Rigidbody;
 		heartBank = GetComponent<HeartBank> () as HeartBank;
+	}
+
+	void Update(){
+		UpdateReeling ();
 	}
 
 	void Die(){
@@ -22,11 +29,25 @@ public class CharacterCorpus : MonoBehaviour {
 	}
 
 	public void TakeDamage(int damage){
+		reelingTimer = reelingPeriod;
 		heartBank.TakeDamage (damage);
 		if (heartBank.GetIsOutOfHearts ()) {
 			isAlive = false;
 			Die ();
 		}
+	}
+
+	private void UpdateReeling(){
+		if (reelingTimer > 0) {
+			reelingTimer -= Time.deltaTime;
+		}
+	}
+
+	public bool GetIsReeling(){
+		if (reelingTimer > 0) {
+			return true;
+		}
+		return false;
 	}
 
 	public void RestoreHeart(){

@@ -15,7 +15,6 @@ public class ReleaseEffect : Effect {
 	}
 
 	public override void CastEffect(CharacterComponentData charData){
-		castedCounter++;
-		print ("Release effect " + castedCounter.ToString () + " times.");
+
 	}
 }
