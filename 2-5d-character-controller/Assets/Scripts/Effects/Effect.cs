@@ -6,6 +6,8 @@ public class Effect : MonoBehaviour {
 	protected int castedCounter = 0;
 	protected CharacterComponentData componentData;
 
+	public AudioSource castSound;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -20,5 +22,15 @@ public class Effect : MonoBehaviour {
 		componentData = charCompData;
 		castedCounter++;
 		print ("Casted effect " + castedCounter.ToString () + " times.");
+
+		PlayCastSound ();
+	}
+
+	void PlayCastSound(){
+		if (castSound != null) {
+			if (!castSound.isPlaying) {
+				castSound.Play ();
+			}
+		}
 	}
 }
