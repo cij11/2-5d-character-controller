@@ -486,6 +486,6 @@ public class CharacterMovementActuator : MonoBehaviour
 	public void KillCommand(){
 		isDead = true;
 		physCollider.material = physicMaterials [(int)PhysicMatTypes.IDLE_STANDING];
-		print ("Movement actuator recieved kill command");
+		this.gameObject.layer = 9; // Go to the phasing layer, where only interact with obstacles.
 	}
 }
