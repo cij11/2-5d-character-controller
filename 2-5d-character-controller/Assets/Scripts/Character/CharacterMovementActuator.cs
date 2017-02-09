@@ -53,6 +53,8 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	bool isMoveHorizontalCommandGiven = false;
 
+	bool isDead = false;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -66,21 +68,17 @@ public class CharacterMovementActuator : MonoBehaviour
 	void FixedUpdate ()
 	{
 		OrientToGravity ();
-
 		ApplyGravity ();
-		LimitWallSlideSpeed ();
 
-		//Replace. Make idle material by default, then change to other materials as action dictates.
-		AssignPhysicMaterial ();
-		isMoveHorizontalCommandGiven = false;
-		isSlideCommandGiven = false;
+		if (!isDead) {
+			LimitWallSlideSpeed ();
 
-		ProcessPhasing ();
-		KillUpwardsVelocityOnStartWallgrab ();
+			AssignPhysicMaterial ();
+			isMoveHorizontalCommandGiven = false;
+			isSlideCommandGiven = false;
 
-
-		if (this.gameObject.tag == "Player") {
-			print (contactSensor.GetContactState ().ToString());
+			ProcessPhasing ();
+			KillUpwardsVelocityOnStartWallgrab ();
 		}
 	}
 
@@ -483,5 +481,11 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	public Vector3 GetVelocity(){
 		return this.body.velocity;
+	}
+
+	public void KillCommand(){
+		isDead = true;
+		physCollider.material = physicMaterials [(int)PhysicMatTypes.IDLE_STANDING];
+		print ("Movement actuator recieved kill command");
 	}
 }

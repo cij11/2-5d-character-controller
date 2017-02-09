@@ -132,4 +132,12 @@ public class Hand : MonoBehaviour {
 			}
 		}
 	}
+
+	public void SetHandAndWeaponVisibility(bool visibility){
+		handSprite.enabled = visibility;
+		Item currentItem = itemManager.GetCurrentItem ();
+		if (currentItem != null) {
+			currentItem.SetVisibility (visibility);
+		}
+	}
 }

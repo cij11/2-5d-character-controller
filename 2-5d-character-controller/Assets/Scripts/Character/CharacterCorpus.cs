@@ -5,6 +5,7 @@ public class CharacterCorpus : MonoBehaviour {
 	HeartBank heartBank;
 
 	Rigidbody body;
+	CharacterMovementActuator movementActuator;
 	bool isAlive = true;
 
 	float reelingPeriod = 0.2f;
@@ -13,6 +14,7 @@ public class CharacterCorpus : MonoBehaviour {
 	void Start () {
 		body = GetComponent<Rigidbody>() as Rigidbody;
 		heartBank = GetComponent<HeartBank> () as HeartBank;
+		movementActuator = GetComponent<CharacterMovementActuator> () as CharacterMovementActuator;
 	}
 
 	void Update(){
@@ -20,19 +22,14 @@ public class CharacterCorpus : MonoBehaviour {
 	}
 
 	void Die(){
-		//Disable input to player
-
-		//Change to death animation
-
-		//Remove game object after a cooldown
-	//	Destroy(this.gameObject, 1f);
+		isAlive = false;
+		movementActuator.KillCommand ();
 	}
 
 	public void TakeDamage(int damage){
 		reelingTimer = reelingPeriod;
 		heartBank.TakeDamage (damage);
 		if (heartBank.GetIsOutOfHearts ()) {
-			isAlive = false;
 			Die ();
 		}
 	}

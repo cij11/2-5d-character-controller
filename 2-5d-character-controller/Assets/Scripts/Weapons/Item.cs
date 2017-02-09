@@ -39,4 +39,8 @@ public class Item : MonoBehaviour {
 			return null;
 		}
 	}
+
+	public void SetVisibility(bool visible){
+		spriteRenderer.enabled = visible;
+	}
 }

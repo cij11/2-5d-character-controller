@@ -7,6 +7,7 @@ public class SpriteStateController : MonoBehaviour
     CharacterContactSensor characterContacts;
     AimingController aimingController;
 	CharacterCorpus corpus;
+	Hand hand;
 
     Animator animator;
     SpriteRenderer spriteRenderer;
@@ -32,6 +33,7 @@ public class SpriteStateController : MonoBehaviour
         characterContacts = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
         aimingController = this.transform.parent.FindChild("ActionControllers").GetComponent<AimingController>() as AimingController;
 		corpus = GetComponentInParent<CharacterCorpus> () as CharacterCorpus;
+		hand = this.transform.parent.GetComponentInChildren<Hand> () as Hand;
 
 		defaultColor = spriteRenderer.color;
     }
@@ -43,6 +45,7 @@ public class SpriteStateController : MonoBehaviour
         SetSpriteFlip();
         SetAnimatorState();
 		SetSpriteDamageColor ();
+		HandWeaponVisibility ();
     }
 
     void SetAnimatorSpeeds()
@@ -109,6 +112,14 @@ public class SpriteStateController : MonoBehaviour
 			spriteRenderer.color = new Color (1f, 1f, 1f, 1f);
 		} else {
 			spriteRenderer.color = defaultColor;
+		}
+	}
+
+	private void HandWeaponVisibility(){
+		if (currentAnimationState == 3) {
+			hand.SetHandAndWeaponVisibility (false);
+		} else {
+			hand.SetHandAndWeaponVisibility (true);
 		}
 	}
 }
