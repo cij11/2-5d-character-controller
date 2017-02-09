@@ -19,7 +19,7 @@ public class RangedProjectile : Projectile {
 		damage = 10;
 		body = GetComponent<Rigidbody> () as Rigidbody;
 		body.velocity = worldLaunchVector * muzzleSpeed + firingCharData.GetMovementActuator().GetVelocity();
-
+		Physics.IgnoreCollision(GetComponent<Collider>(), firingCharData.GetCharacter().GetComponent<Collider>());
 	//	this.GetComponent<Rigidbody>().velocity = velocityVector  * muzzleSpeed;
 	}
 

@@ -127,8 +127,10 @@ public class Hand : MonoBehaviour {
 
 			if (aimingController.GetFacingDirection () == 1) {
 				currentItemTransform.localPosition = currentItem.gripOffset;
+				currentItem.FlipBarrel (false);
 			} else {
 				currentItemTransform.localPosition = new Vector3 (-currentItem.gripOffset.x, currentItem.gripOffset.y, 0f);
+				currentItem.FlipBarrel (true);
 			}
 		}
 	}

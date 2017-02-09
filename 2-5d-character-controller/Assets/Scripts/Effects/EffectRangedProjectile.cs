@@ -25,7 +25,7 @@ public class EffectRangedProjectile : Effect {
 	private void LaunchRangedProjectile(){
 	//	if (componentData.IsCharacterInsantiated ()) {
 			Vector3 worldAimingVector = componentData.GetAimingController ().GetAimingVectorWorldSpace ();
-			GameObject newProjectile = (GameObject)Instantiate (projectile, componentData.GetCharacterTransform ().position + worldAimingVector * 0.7f, Quaternion.identity);
+		GameObject newProjectile = (GameObject)Instantiate (projectile, componentData.GetItemManager().GetCurrentItem().GetBarrelTransform().position, Quaternion.identity);
 			newProjectile.GetComponent<RangedProjectile> ().LoadLaunchParameters (componentData, worldAimingVector, componentData.GetAimingController().GetFacingDirection ());
 			newProjectile.GetComponent<RangedProjectile> ().Launch ();
 	//	}
