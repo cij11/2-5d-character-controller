@@ -49,7 +49,7 @@ public class MovementController : MonoBehaviour
 
 	void EndWallHug()
 	{
-		if (contactSensor.GetContactState () != ContactState.WALLGRAB) {
+		if (contactSensor.GetContactState () != ContactState.WALLADJACENT) {
 			movementActuator.SetWallHug (false);
 		}
 	}
@@ -79,15 +79,15 @@ public class MovementController : MonoBehaviour
     }
 
 	void HugWallIfMoveIntoIt(float direction){
-		if (contactSensor.GetContactState() == ContactState.WALLGRAB) {
-			if(Mathf.Sign(direction) == Mathf.Sign(contactSensor.GetSideGrabbedDirection())){
+		if (contactSensor.GetContactState() == ContactState.WALLADJACENT) {
+			if(Mathf.Sign(direction) == Mathf.Sign(contactSensor.GetSideAdjacentDirection())){
 				movementActuator.SetWallHug (true);
 			}
 		}
 	}
 
     public void Lunge(Vector3 lungeVector, float speed){
-		if (contactSensor.GetContactState () != ContactState.WALLGRAB) {
+		if (!movementActuator.GetIsHuggingWall()) {
 			movementActuator.LungeCommand (lungeVector, speed);
 		}
     }
@@ -108,7 +108,7 @@ public class MovementController : MonoBehaviour
         {
             EncumberedJump(hor);
         }
-        else if (vert < 0 && contactSensor.GetContactState() != ContactState.WALLGRAB)
+		else if (vert < 0 && !movementActuator.GetIsHuggingWall())
         {
             RollJump(hor);
         }
@@ -141,7 +141,7 @@ public class MovementController : MonoBehaviour
         {
             JumpAwayFromSlope();
         }
-        else if (contactSensor.GetContactState() == ContactState.WALLGRAB)
+		else if (contactSensor.GetContactState() == ContactState.WALLADJACENT) //Jump off wall, even if not technically hugging
         {
             WallJumpUpDownOrAway(hor, vert);
         }
@@ -170,7 +170,7 @@ public class MovementController : MonoBehaviour
 
     private void WallJumpUpDownOrAway(float hor, float vert)
     {
-        float propelDirection = (contactSensor.GetSideGrabbed() == MovementDirection.LEFT) ? 1f : -1f;
+        float propelDirection = (contactSensor.GetSideAdjacent() == MovementDirection.LEFT) ? 1f : -1f;
         if (vert < 0)
         {
             movementActuator.ReleaseWall(propelDirection);

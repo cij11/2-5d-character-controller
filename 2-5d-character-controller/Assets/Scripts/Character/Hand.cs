@@ -7,6 +7,7 @@ public class Hand : MonoBehaviour {
 	AimingController aimingController;
 	ItemManager itemManager;
 	CharacterContactSensor contactSensor;
+	CharacterMovementActuator movementActuator;
 	SpriteRenderer handSprite;
 
 	float idleX = 0.05f;
@@ -22,6 +23,7 @@ public class Hand : MonoBehaviour {
 		contactSensor = this.transform.GetComponentInParent<CharacterContactSensor> () as CharacterContactSensor;
 		itemManager = this.transform.parent.GetComponentInChildren<ItemManager> () as ItemManager;
 		handSprite = GetComponent<SpriteRenderer>();
+		movementActuator = GetComponentInParent<CharacterMovementActuator> () as CharacterMovementActuator;
 	}
 	
 	// Update is called once per frame
@@ -47,7 +49,7 @@ public class Hand : MonoBehaviour {
 	void PositionHand(){
 	//	if (aimingController.GetIsAiming ()) {
 		float shoulderOffset = idleX * aimingController.GetFacingDirection();
-		if (contactSensor.GetContactState () == ContactState.WALLGRAB) {
+		if (movementActuator.GetIsHuggingWall()) {
 			shoulderOffset = shoulderAttachmentXWallGrab;
 		}
 		this.transform.localPosition = aimingController.GetAimingVector () * aimingDisplacement + new Vector3(shoulderOffset, idleY, 0f);

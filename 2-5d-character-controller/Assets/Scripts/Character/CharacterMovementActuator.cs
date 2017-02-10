@@ -81,7 +81,6 @@ public class CharacterMovementActuator : MonoBehaviour
 			isSlideCommandGiven = false;
 
 			ProcessPhasing ();
-			KillUpwardsVelocityOnStartWallgrab ();
 		}
 	}
 
@@ -132,13 +131,10 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	void LimitWallClimbSpeed ()
 	{
-		if (contactSensor.GetContactState () == ContactState.WALLGRAB) {
-			float verticalSpeed = VerticalSpeed ();
-			if (verticalSpeed > terminalWallClimbSpeed) {
-				body.velocity = body.transform.up;
-			}
+		float verticalSpeed = VerticalSpeed ();
+		if (verticalSpeed > terminalWallClimbSpeed) {
+			body.velocity = body.transform.up;
 		}
-
 	}
 
 	//Assign physic material to idle, unless on a steep slope, a wall, or input given
@@ -149,7 +145,7 @@ public class CharacterMovementActuator : MonoBehaviour
 		physCollider.material = physicMaterials [(int)PhysicMatTypes.IDLE_STANDING];
 
 		//If grabbing adjacent to a wall set high static friction, unless holding down
-		if (contactSensor.GetContactState () == ContactState.WALLGRAB) {
+		if (huggingWall) {
 			if (isSlideCommandGiven) {
 				//If down is held, set the material to be smoother
 				physCollider.material = physicMaterials [(int)PhysicMatTypes.LOW_KINETIC_NO_STATIC];
@@ -175,6 +171,9 @@ public class CharacterMovementActuator : MonoBehaviour
 		//when head touching the underside of a surface, and allows movement
 		//if ground has not been detected (eg, if standing on peak)
 		if (contactSensor.GetContactState () == ContactState.AIRBORNE) {
+			physCollider.material = physicMaterials [(int)PhysicMatTypes.FRICTIONLESS];
+		}
+		if (contactSensor.GetContactState () == ContactState.WALLADJACENT && !huggingWall) {
 			physCollider.material = physicMaterials [(int)PhysicMatTypes.FRICTIONLESS];
 		}
 
@@ -474,17 +473,6 @@ public class CharacterMovementActuator : MonoBehaviour
 		maxWalkSpeed = newSpeed;
 	}
 
-	void KillUpwardsVelocityOnStartWallgrab ()
-	{
-		if (contactSensor.GetHasContactStateChanged ()) {
-			if (huggingWall) {
-				if(contactSensor.GetIsWholeSideContactingWall()){
-				LimitWallClimbSpeed ();
-				}
-			}
-		}
-	}
-
 	public void LungeCommand (Vector3 lungeVector, float speed)
 	{
 		body.velocity = body.velocity + body.rotation * lungeVector * speed;
@@ -502,6 +490,12 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	public void SetWallHug(bool hug){
 		huggingWall = hug;
+
+		if (huggingWall) {
+			if (contactSensor.GetHasContactStateChanged ()) {
+				LimitWallClimbSpeed ();
+			}
+		}
 	}
 
 	public bool GetIsHuggingWall(){

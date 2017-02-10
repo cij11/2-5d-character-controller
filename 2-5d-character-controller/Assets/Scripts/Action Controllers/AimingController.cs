@@ -9,7 +9,7 @@ public class AimingController : MonoBehaviour
     int horizontalInput;
     int verticalInput;
 
-    bool isWallGrabbing;
+    bool isWallAdjacent;
     MovementDirection wallSide;
     int facingDirection = 1;
 
@@ -30,7 +30,7 @@ public class AimingController : MonoBehaviour
         horizontalInput = 0;
         verticalInput = 0;
         isAiming = false;
-        isWallGrabbing = false;
+        isWallAdjacent = false;
         wallSide = MovementDirection.NEUTRAL;
 
         characterContact = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
@@ -40,7 +40,7 @@ public class AimingController : MonoBehaviour
     void Update()
     {
         UpdateGravityTimers();
-        CheckCharacterWallGrabbing();
+        CheckCharacterWallAdjacent();
         DetermineFacingDirection();
         UpdateAimingVector();
     }
@@ -51,22 +51,22 @@ public class AimingController : MonoBehaviour
         if(horizontalGravityTimer > 0) horizontalGravityTimer -= Time.deltaTime;
     }
 
-    void CheckCharacterWallGrabbing()
+    void CheckCharacterWallAdjacent()
     {
         if (characterContact != null)
         {
-            if (characterContact.GetContactState() == ContactState.WALLGRAB)
+			if (characterContact.GetContactState() == ContactState.WALLADJACENT)
             {
-                isWallGrabbing = true;
+                isWallAdjacent = true;
             }
             else
             {
-                isWallGrabbing = false;
+                isWallAdjacent = false;
             }
         }
-        if (isWallGrabbing)
+        if (isWallAdjacent)
         {
-            wallSide = characterContact.GetSideGrabbed();
+            wallSide = characterContact.GetSideAdjacent();
         }
         else
         {
@@ -77,7 +77,7 @@ public class AimingController : MonoBehaviour
     void DetermineFacingDirection()
     {
         //Wall grabbing takes precedence. Must face away from wall if wall grabbing
-        if (isWallGrabbing)
+        if (isWallAdjacent)
         {
             //Face right if grabbing left wall, otherwise face left.
             facingDirection = (wallSide == MovementDirection.LEFT) ? 1 : -1;
@@ -154,7 +154,7 @@ public class AimingController : MonoBehaviour
         }
 
 		//Character cannot aim at the wall they are grabbing
-		if (isWallGrabbing) {
+		if (isWallAdjacent) {
 			if (verticalAiming != 0) {
 				if (horizontalAiming == -facingDirection) {
 					horizontalAiming = 0;

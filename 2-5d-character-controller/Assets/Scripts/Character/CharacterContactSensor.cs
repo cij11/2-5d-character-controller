@@ -5,7 +5,7 @@ public class CharacterContactSensor : MonoBehaviour
 {
 
     ContactState contactState = ContactState.FLATGROUND;
-    MovementDirection sideGrabbed = MovementDirection.NEUTRAL;
+    MovementDirection sideAdjacent = MovementDirection.NEUTRAL;
     Rigidbody body;
     Collider physCollider;
     float width = 0.6f;
@@ -80,7 +80,7 @@ public class CharacterContactSensor : MonoBehaviour
     void DetermineContactState()
     {
         contactState = ContactState.FLATGROUND;
-        sideGrabbed = MovementDirection.NEUTRAL;
+        sideAdjacent = MovementDirection.NEUTRAL;
 
         //If there is a collision below, the character is either FLATGROUND, a steep slope, or a slanted wall
         if (collisions.below)
@@ -103,13 +103,13 @@ public class CharacterContactSensor : MonoBehaviour
         //grabbing the wall
         else if (collisions.left)
         {
-            contactState = ContactState.WALLGRAB;
-            sideGrabbed = MovementDirection.LEFT;
+			contactState = ContactState.WALLADJACENT;
+            sideAdjacent = MovementDirection.LEFT;
         }
         else if (collisions.right)
         {
-            contactState = ContactState.WALLGRAB;
-            sideGrabbed = MovementDirection.RIGHT;
+			contactState = ContactState.WALLADJACENT;
+            sideAdjacent = MovementDirection.RIGHT;
         }
         else
         {
@@ -286,13 +286,13 @@ public class CharacterContactSensor : MonoBehaviour
     {
         return this.contactState;
     }
-    public MovementDirection GetSideGrabbed()
+    public MovementDirection GetSideAdjacent()
     {
-        return sideGrabbed;
+        return sideAdjacent;
     }
 
-	public int GetSideGrabbedDirection(){
-		if (sideGrabbed == MovementDirection.LEFT) {
+	public int GetSideAdjacentDirection(){
+		if (sideAdjacent == MovementDirection.LEFT) {
 			return -1;
 		} else {
 			return 1;
@@ -300,7 +300,7 @@ public class CharacterContactSensor : MonoBehaviour
 	}
 
 	public bool GetIsWholeSideContactingWall(){
-		if (sideGrabbed == MovementDirection.LEFT) {
+		if (sideAdjacent == MovementDirection.LEFT) {
 			return collisions.allLeft;
 		} else {
 			return collisions.allRight;
@@ -342,7 +342,7 @@ public class CharacterContactSensor : MonoBehaviour
     {
         if (contactState == ContactState.FLATGROUND) return true;
         if (contactState == ContactState.STEEPSLOPE) return true;
-        if (contactState == ContactState.WALLGRAB) return true;
+		if (contactState == ContactState.WALLADJACENT) return true;
         return false;
     }
     public bool GetHasContactStateChanged(){
