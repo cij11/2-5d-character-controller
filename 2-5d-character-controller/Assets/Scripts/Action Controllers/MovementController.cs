@@ -11,7 +11,6 @@ public class MovementController : MonoBehaviour
     bool isTargetting;
     float hangtimePeriod = 1f;
     float hangtimeTimer = 0f;
-    bool hugsWalls = true;
 
     float jumpAfterFallingGracePeriod = 0.1f;
     float fallingTimer = 0f;
@@ -34,7 +33,7 @@ public class MovementController : MonoBehaviour
     void Update()
     {
         UpdateArialJumpingTrackers();
-        HugWallIfAdjacentAndGripsWalls();
+		EndWallHug ();
         AimingHang();
     }
 
@@ -48,13 +47,12 @@ public class MovementController : MonoBehaviour
         if (fallingTimer > 0) fallingTimer -= Time.deltaTime;
     }
 
-    void HugWallIfAdjacentAndGripsWalls()
-    {
-        if (hugsWalls && contactSensor.GetContactState() == ContactState.WALLGRAB)
-        {
-            movementActuator.ApplyWallHugForce();
-        }
-    }
+	void EndWallHug()
+	{
+		if (contactSensor.GetContactState () != ContactState.WALLGRAB) {
+			movementActuator.SetWallHug (false);
+		}
+	}
 
     void AimingHang()
     {
@@ -76,7 +74,17 @@ public class MovementController : MonoBehaviour
         {
             movementActuator.MoveHorizontalCommand(direction);
         }
+
+		HugWallIfMoveIntoIt (direction);
     }
+
+	void HugWallIfMoveIntoIt(float direction){
+		if (contactSensor.GetContactState() == ContactState.WALLGRAB) {
+			if(Mathf.Sign(direction) == Mathf.Sign(contactSensor.GetSideGrabbedDirection())){
+				movementActuator.SetWallHug (true);
+			}
+		}
+	}
 
     public void Lunge(Vector3 lungeVector, float speed){
 		if (contactSensor.GetContactState () != ContactState.WALLGRAB) {

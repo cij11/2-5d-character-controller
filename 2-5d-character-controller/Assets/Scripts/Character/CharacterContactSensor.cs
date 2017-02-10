@@ -291,6 +291,14 @@ public class CharacterContactSensor : MonoBehaviour
         return sideGrabbed;
     }
 
+	public int GetSideGrabbedDirection(){
+		if (sideGrabbed == MovementDirection.LEFT) {
+			return -1;
+		} else {
+			return 1;
+		}
+	}
+
 	public bool GetIsWholeSideContactingWall(){
 		if (sideGrabbed == MovementDirection.LEFT) {
 			return collisions.allLeft;

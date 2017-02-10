@@ -55,6 +55,8 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	bool isDead = false;
 
+	bool huggingWall = false;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -69,6 +71,7 @@ public class CharacterMovementActuator : MonoBehaviour
 	{
 		OrientToGravity ();
 		ApplyGravity ();
+		ApplyWallHug ();
 
 		if (!isDead) {
 			LimitWallSlideSpeed ();
@@ -120,14 +123,6 @@ public class CharacterMovementActuator : MonoBehaviour
 	float HorizontalSpeed ()
 	{
 		return Vector3.Dot (body.velocity, body.transform.right);
-	}
-
-	//If in a position to grab or slide down a wall, apply a small force towards the wall
-	public void ApplyWallHugForce ()
-	{
-		if (contactSensor.GetContactState () == ContactState.WALLGRAB) {
-			body.AddForce (-contactSensor.GetGrabbedWallNormal () * wallHugForce * Time.deltaTime);
-		}
 	}
 
 	void LimitWallSlideSpeed ()
@@ -420,15 +415,31 @@ public class CharacterMovementActuator : MonoBehaviour
 	void ApplyGravity ()
 	{
 		float verticalSpeed = GetVerticalSpeed ();
-		if (contactSensor.GetContactState () != ContactState.WALLGRAB) {
+		if (!huggingWall) {
 			if (verticalSpeed > terminalArialSpeed) {
 				body.AddForce (-this.transform.up * gravityForce * Time.deltaTime);
 			}
-		} else {
-			if (verticalSpeed > terminalWallSlideSpeed) {
-				body.AddForce (-this.transform.up * gravityForce * Time.deltaTime);
-			}
 		}
+	}
+
+	void ApplyWallHug(){
+		if(huggingWall){
+			ApplyAntiGravity ();
+			ApplyWallHugForce ();
+		}
+	}
+
+	void ApplyAntiGravity(){
+		float verticalSpeed = GetVerticalSpeed ();
+		if (verticalSpeed > terminalWallSlideSpeed) {
+			body.AddForce (-this.transform.up * gravityForce * Time.deltaTime);
+		}
+	}
+
+	//If in a position to grab or slide down a wall, apply a small force towards the wall
+	void ApplyWallHugForce ()
+	{
+		body.AddForce (-contactSensor.GetGrabbedWallNormal () * wallHugForce * Time.deltaTime);
 	}
 
 	//Use the dot product to find the scalar projection of the current velocity
@@ -466,7 +477,7 @@ public class CharacterMovementActuator : MonoBehaviour
 	void KillUpwardsVelocityOnStartWallgrab ()
 	{
 		if (contactSensor.GetHasContactStateChanged ()) {
-			if (contactSensor.GetContactState () == ContactState.WALLGRAB) {
+			if (huggingWall) {
 				if(contactSensor.GetIsWholeSideContactingWall()){
 				LimitWallClimbSpeed ();
 				}
@@ -487,5 +498,13 @@ public class CharacterMovementActuator : MonoBehaviour
 		isDead = true;
 		physCollider.material = physicMaterials [(int)PhysicMatTypes.IDLE_STANDING];
 		this.gameObject.layer = 9; // Go to the phasing layer, where only interact with obstacles.
+	}
+
+	public void SetWallHug(bool hug){
+		huggingWall = hug;
+	}
+
+	public bool GetIsHuggingWall(){
+		return huggingWall;
 	}
 }

@@ -83,7 +83,7 @@ public class SpriteStateController : MonoBehaviour
         {
             currentAnimationState = 1;
         }
-        if (characterContacts.GetContactState() == ContactState.WALLGRAB)
+		if (characterMovement.GetIsHuggingWall())
         {
             currentAnimationState = 2;
         }
