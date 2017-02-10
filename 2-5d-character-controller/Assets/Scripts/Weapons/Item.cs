@@ -64,10 +64,12 @@ public class Item : MonoBehaviour {
 	}
 
 	public void FlipBarrel(bool isFlipped){
-		if (!isFlipped) {
-			barrelTransform.localPosition = localBarrelPosition;
-		} else {
-			barrelTransform.localPosition = new Vector3 (-localBarrelPosition.x, localBarrelPosition.y, 0f);
+		if (barrelTransform != null) {
+			if (!isFlipped) {
+				barrelTransform.localPosition = localBarrelPosition;
+			} else {
+				barrelTransform.localPosition = new Vector3 (-localBarrelPosition.x, localBarrelPosition.y, 0f);
+			}
 		}
 	}
 }

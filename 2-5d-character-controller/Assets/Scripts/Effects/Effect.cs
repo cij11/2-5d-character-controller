@@ -5,11 +5,11 @@ using UnityEngine;
 public class Effect : MonoBehaviour {
 	protected CharacterComponentData componentData;
 
-	public AudioSource audioSource;
+	public AudioClip clip;
 
 	// Use this for initialization
 	void Start () {
-
+		
 	}
 	
 	// Update is called once per frame
@@ -24,10 +24,11 @@ public class Effect : MonoBehaviour {
 	}
 
 	void PlayCastSound(){
-		if (audioSource != null) {
-			if (audioSource.clip != null){
-				audioSource.PlayOneShot (audioSource.clip);
-			}
+		if (clip != null) {
+	//		if (audioSource.clip != null){
+	//			audioSource.PlayOneShot (audioSource.clip);
+	//		}
+			SoundEffectPlayer.instance.PlaySoundClip(clip);
 		}
 	}
 }
