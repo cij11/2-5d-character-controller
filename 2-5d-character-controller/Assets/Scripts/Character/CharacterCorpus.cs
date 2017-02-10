@@ -11,6 +11,8 @@ public class CharacterCorpus : MonoBehaviour {
 	float reelingPeriod = 0.2f;
 	float reelingTimer = 0f;
 
+	public AudioClip hitClip;
+
 	void Start () {
 		body = GetComponent<Rigidbody>() as Rigidbody;
 		heartBank = GetComponent<HeartBank> () as HeartBank;
@@ -29,6 +31,7 @@ public class CharacterCorpus : MonoBehaviour {
 	public void TakeDamage(int damage){
 		reelingTimer = reelingPeriod;
 		heartBank.TakeDamage (damage);
+		PlayImpactSound ();
 		if (heartBank.GetIsOutOfHearts ()) {
 			Die ();
 		}
@@ -49,6 +52,12 @@ public class CharacterCorpus : MonoBehaviour {
 
 	public void RestoreHeart(){
 		heartBank.RestoreHeart ();
+	}
+
+	private void PlayImpactSound(){
+		if (hitClip != null) {
+			SoundEffectPlayer.instance.PlaySoundClip (hitClip);
+		}
 	}
 
 	public void TakeKnockback(Vector3 knockbackVector, float knockbackSpeed){

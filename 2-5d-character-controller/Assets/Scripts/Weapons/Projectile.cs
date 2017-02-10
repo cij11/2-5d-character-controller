@@ -4,7 +4,7 @@ using System.Collections;
 public abstract class Projectile : MonoBehaviour {
 
 	protected Weapon firingWeapon;
-	protected CharacterComponentData firingCharData;
+	protected CharacterComponentData componentData;
 	protected Vector3 worldLaunchVector;
 	protected Transform characterTransform;
 
@@ -33,7 +33,7 @@ public abstract class Projectile : MonoBehaviour {
 	}
 
 	public void LoadLaunchParameters(CharacterComponentData charData, Vector3 worldLaunch, int facingDirection){
-		this.firingCharData = charData;
+		this.componentData = charData;
 		characterTransform = charData.GetCharacterTransform ();
 		worldLaunchVector = worldLaunch;
 		direction = facingDirection;
@@ -64,7 +64,7 @@ public abstract class Projectile : MonoBehaviour {
 
 	protected void CastEffectsInArray(Effect[] effectArray){
 		foreach (Effect effect in effectArray) {
-			effect.CastEffect (firingCharData);
+			effect.CastEffect (this.componentData);
 		}
 	}
 

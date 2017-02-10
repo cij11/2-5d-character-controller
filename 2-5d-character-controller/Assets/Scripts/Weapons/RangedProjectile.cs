@@ -17,8 +17,8 @@ public class RangedProjectile : Projectile {
 
 	void LaunchRanged(){
 		body = GetComponent<Rigidbody> () as Rigidbody;
-		body.velocity = worldLaunchVector * muzzleSpeed + firingCharData.GetMovementActuator().GetVelocity();
-		Physics.IgnoreCollision(GetComponent<Collider>(), firingCharData.GetCharacter().GetComponent<Collider>());
+		body.velocity = worldLaunchVector * muzzleSpeed + componentData.GetMovementActuator().GetVelocity();
+		Physics.IgnoreCollision(GetComponent<Collider>(), componentData.GetCharacter().GetComponent<Collider>());
 	//	this.GetComponent<Rigidbody>().velocity = velocityVector  * muzzleSpeed;
 	}
 

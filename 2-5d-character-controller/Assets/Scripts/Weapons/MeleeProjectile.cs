@@ -33,7 +33,7 @@ public class MeleeProjectile : Projectile {
 		CharacterCorpus corpus = other.GetComponent<CharacterCorpus>() as CharacterCorpus;
 		if (corpus != null){
 			Character otherCharacter = other.gameObject.GetComponent<Character>() as Character;
-			if(!otherCharacter.Equals(firingCharData.GetCharacter())){
+			if(!otherCharacter.Equals(componentData.GetCharacter())){
 				corpus.TakeDamage(damage);
 				corpus.TakeKnockback(worldLaunchVector, knockbackSpeed);
 			}

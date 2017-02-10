@@ -15,9 +15,9 @@ public class EffectRangedProjectile : Effect {
 		
 	}
 
-	public override void CastEffect (CharacterComponentData charCompData)
+	public override void CastEffect (CharacterComponentData importComponentData)
 	{
-		base.CastEffect (charCompData);
+		base.CastEffect (importComponentData);
 		LaunchRangedProjectile ();
 
 	}

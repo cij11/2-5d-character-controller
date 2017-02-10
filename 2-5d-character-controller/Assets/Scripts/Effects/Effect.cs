@@ -17,8 +17,8 @@ public class Effect : MonoBehaviour {
 		
 	}
 
-	public virtual void CastEffect(CharacterComponentData charCompData){
-		componentData = charCompData;
+	public virtual void CastEffect(CharacterComponentData importComponentData){
+		componentData = importComponentData;
 
 		PlayCastSound ();
 	}
