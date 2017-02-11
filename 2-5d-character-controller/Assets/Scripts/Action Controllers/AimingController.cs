@@ -206,6 +206,10 @@ public class AimingController : MonoBehaviour
         if (vert != 0) verticalGravityTimer = verticalGravityPeriod; //Only reset gravity timer when axis is perturbed.
     }
 
+	public int GetHorizontalInput(){
+		return horizontalInput;
+	}
+
     public int GetHorizontalAiming(){
         return horizontalAiming;
     }

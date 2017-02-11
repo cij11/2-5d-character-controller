@@ -13,6 +13,9 @@ public class Invokable : MonoBehaviour {
 
 	CharacterComponentData componentData;
 
+	public bool locksMovement = false;
+	public bool locksAiming = false;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -60,7 +63,11 @@ public class Invokable : MonoBehaviour {
 		}
 	}
 
-	public bool GetIsEncumbered(){
-		return false;
+	public bool GetLocksMovement(){
+		return locksMovement;
+	}
+
+	public bool GetLocksAiming(){
+		return locksAiming;
 	}
 }

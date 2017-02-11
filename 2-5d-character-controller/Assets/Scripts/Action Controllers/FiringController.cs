@@ -108,11 +108,12 @@ public class FiringController : MonoBehaviour
 	}
 
     public bool GetIsEncumbered()
-    {
-		if (equipedInvokable != null)
-        {
-			return equipedInvokable.GetIsEncumbered();
-        }
-        return false;
-    }
+	{
+		if (isInvoking) {
+			if (equipedInvokable.GetLocksMovement ()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

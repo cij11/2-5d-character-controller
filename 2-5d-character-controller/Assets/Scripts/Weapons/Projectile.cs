@@ -18,6 +18,7 @@ public abstract class Projectile : MonoBehaviour {
 	float age;
 
 	public Effect[] DestroyEffects;	//Cast when the item is destroyed
+	public ProjectileBehaviour[] behaviours;
 
 	public bool destroyOnContact = false;
 
