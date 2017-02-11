@@ -37,6 +37,7 @@ public class EffectRangedProjectile : Effect {
 	private void LaunchRangedProjectile(){
 		for (int i = 0; i < numberOfProjectiles; i++) {
 			float divergenceAngle = startingAngle + i * separationAngle;
+			divergenceAngle = divergenceAngle + Random.Range (0, sprayAngle);
 
 			//	if (componentData.IsCharacterInsantiated ()) {
 			Vector3 worldAimingVector = componentData.GetAimingController ().GetAimingVectorWorldSpace ();
