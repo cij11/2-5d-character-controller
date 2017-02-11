@@ -7,9 +7,11 @@ public class Invokable : MonoBehaviour {
 	public Effect[] RecurrentEffects; //Cast at regular intervals while item invoked
 	public Effect[] ReleaseEffects; //Cast once when invocation released
 	public float recurrentEffectPeriod = 1f;
-	public float recurrentEffectTimer = 0f;
+	private float recurrentEffectTimer = 0f;
+	private float minimumInvokingTimer = 0f;
 
 	public float cooldownPeriod = 0.3f;
+	public float windupPeriod = 0.3f; //Time until first recurrent effect happens
 
 	CharacterComponentData componentData;
 
@@ -28,9 +30,9 @@ public class Invokable : MonoBehaviour {
 
 	public void StartInvoking(){
 		CastEffectsInArray (StartEffects);
-		ResetRecurrentEffectTimer ();
+		recurrentEffectTimer = windupPeriod;
 	}
-
+		
 	void ResetRecurrentEffectTimer(){
 		recurrentEffectTimer = recurrentEffectPeriod;
 	}
@@ -69,5 +71,6 @@ public class Invokable : MonoBehaviour {
 
 	public bool GetLocksAiming(){
 		return locksAiming;
+
 	}
 }
