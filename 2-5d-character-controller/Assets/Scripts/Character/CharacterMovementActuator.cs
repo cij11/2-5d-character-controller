@@ -486,6 +486,16 @@ public class CharacterMovementActuator : MonoBehaviour
 		body.velocity = body.velocity + body.rotation * lungeVector * speed;
 	}
 
+	public void RecoilCommand(Vector3 recoilVector, float recoilSpeed, float maxRecoilSpeed){
+		Vector3 recoilKickVelocity = recoilVector * recoilSpeed;
+		Vector3 recoiledVelocity = body.velocity + recoilKickVelocity;
+		float velocityInRecoilDirection = Vector3.Dot (recoilKickVelocity, body.velocity);
+
+		if (velocityInRecoilDirection < maxRecoilSpeed) {
+			body.velocity = recoiledVelocity;
+		}
+	}
+
 	public Vector3 GetVelocity(){
 		return this.body.velocity;
 	}

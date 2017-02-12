@@ -5,6 +5,7 @@ public class AimingController : MonoBehaviour
 {
 
     CharacterContactSensor characterContact;
+	CharacterMovementActuator movementActuator;
 
     int horizontalInput;
     int verticalInput;
@@ -39,6 +40,7 @@ public class AimingController : MonoBehaviour
 		firingController = GetComponent<FiringController> () as FiringController;
 
         characterContact = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
+		movementActuator = GetComponentInParent<CharacterMovementActuator> () as CharacterMovementActuator;
     }
 
     // Update is called once per frame
@@ -63,7 +65,7 @@ public class AimingController : MonoBehaviour
     {
         if (characterContact != null)
         {
-			if (characterContact.GetContactState() == ContactState.WALLADJACENT)
+			if (movementActuator.GetIsHuggingWall())
             {
                 isWallAdjacent = true;
             }

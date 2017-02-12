@@ -73,9 +73,8 @@ public class MovementController : MonoBehaviour
         if (!firingController.GetIsEncumbered())
         {
             movementActuator.MoveHorizontalCommand(direction);
+			HugWallIfMoveIntoIt (direction);
         }
-
-		HugWallIfMoveIntoIt (direction);
     }
 
 	void HugWallIfMoveIntoIt(float direction){

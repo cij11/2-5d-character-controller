@@ -14,7 +14,7 @@ public class Hand : MonoBehaviour {
 	float idleY = 0.05f;
 	float idleRotation = 0f;
 
-	float shoulderAttachmentXWallGrab = -0.1f;
+	float shoulderAttachmentXWallGrab = 0f;
 
 	float aimingDisplacement = 0.2f;
 	// Use this for initialization
@@ -50,7 +50,7 @@ public class Hand : MonoBehaviour {
 	//	if (aimingController.GetIsAiming ()) {
 		float shoulderOffset = idleX * aimingController.GetFacingDirection();
 		if (movementActuator.GetIsHuggingWall()) {
-			shoulderOffset = shoulderAttachmentXWallGrab;
+			shoulderOffset = shoulderAttachmentXWallGrab * aimingController.GetFacingDirection();
 		}
 		this.transform.localPosition = aimingController.GetAimingVector () * aimingDisplacement + new Vector3(shoulderOffset, idleY, 0f);
 			
