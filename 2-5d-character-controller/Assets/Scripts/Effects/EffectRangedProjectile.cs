@@ -20,6 +20,8 @@ public class EffectRangedProjectile : Effect {
 
 	List<int> randomIntBag;
 
+	Vector3 castInstantWorldVector; //Save the aiming world vector at the time the effect was casted, so that all projectiles fire in the same direction if firing is spread out over time.
+
 	// Use this for initialization
 	void Start () {
 		if (numberOfProjectiles == 1) {
@@ -56,6 +58,7 @@ public class EffectRangedProjectile : Effect {
 		randomIntBag = FillRandomIntBag (numberOfProjectiles);
 		ithProjectile = numberOfProjectiles - 1;
 		for (int i = 0; i < numberOfProjectiles; i++) {
+			castInstantWorldVector = componentData.GetAimingController ().GetAimingVectorWorldSpace ();
 			float timeDelay = Random.Range (0f, sprayTime); //Launch projectiles at a random time spread
 			Invoke ("LaunchIthProjectile", timeDelay);
 		}
@@ -71,10 +74,14 @@ public class EffectRangedProjectile : Effect {
 	}
 
 	private int GetRandomIntFromBag(){
-		int randomIndex = Random.Range (0, randomIntBag.Count);
-		int randomInt = randomIntBag [randomIndex];
-		randomIntBag.RemoveAt (randomIndex);
-		return randomInt;
+		if (randomIntBag.Count > 0) {
+			int randomIndex = Random.Range (0, randomIntBag.Count);
+			int randomInt = randomIntBag [randomIndex];
+			randomIntBag.RemoveAt (randomIndex);
+			return randomInt;
+		} else {
+			return 0;
+		}
 	}
 
 
@@ -87,15 +94,12 @@ public class EffectRangedProjectile : Effect {
 		float divergenceLat = startingLatDistance + i * separationLatDistance;
 		divergenceLat = divergenceLat + Random.Range (-lateralSpray / 2f, lateralSpray / 2f);
 
-		//	if (componentData.IsCharacterInsantiated ()) {
-		Vector3 worldAimingVector = componentData.GetAimingController ().GetAimingVectorWorldSpace ();
-
-		Vector3 perpToAiming = new Vector3 (-worldAimingVector.y, worldAimingVector.x, 0f);
+		Vector3 perpToAiming = new Vector3 (-castInstantWorldVector.y, castInstantWorldVector.x, 0f);
 		Vector3 lateralOffset = perpToAiming * divergenceLat;
 
-		worldAimingVector = Quaternion.Euler (0f, 0f, divergenceAngle) * worldAimingVector;
+		castInstantWorldVector = Quaternion.Euler (0f, 0f, divergenceAngle) * castInstantWorldVector;
 		GameObject newProjectile = (GameObject)Instantiate (projectile, componentData.GetItemManager ().GetCurrentItem ().GetBarrelTransform ().position + lateralOffset, Quaternion.identity);
-		newProjectile.GetComponent<RangedProjectile> ().LoadLaunchParameters (componentData, worldAimingVector, componentData.GetAimingController ().GetFacingDirection ());
+		newProjectile.GetComponent<RangedProjectile> ().LoadLaunchParameters (componentData, castInstantWorldVector, componentData.GetAimingController ().GetFacingDirection ());
 		newProjectile.GetComponent<RangedProjectile> ().Launch ();
 	}
 }

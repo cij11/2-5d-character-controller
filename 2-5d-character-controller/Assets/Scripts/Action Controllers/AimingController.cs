@@ -23,6 +23,9 @@ public class AimingController : MonoBehaviour
     float verticalGravityPeriod = 0.15f;
     float horizontalGravityTimer = 0f;
     float horizontalGravityPeriod = 0.1f;
+
+	FiringController firingController;
+
     void Start()
     {
         horizontalAiming = 0;
@@ -33,6 +36,8 @@ public class AimingController : MonoBehaviour
         isWallAdjacent = false;
         wallSide = MovementDirection.NEUTRAL;
 
+		firingController = GetComponent<FiringController> () as FiringController;
+
         characterContact = this.transform.parent.GetComponent<CharacterContactSensor>() as CharacterContactSensor;
     }
 
@@ -41,8 +46,11 @@ public class AimingController : MonoBehaviour
     {
         UpdateGravityTimers();
         CheckCharacterWallAdjacent();
-        DetermineFacingDirection();
-        UpdateAimingVector();
+
+		if (!firingController.GetIsAimingLocked ()) {
+			DetermineFacingDirection();
+			UpdateAimingVector ();
+		}
     }
 
     void UpdateGravityTimers()

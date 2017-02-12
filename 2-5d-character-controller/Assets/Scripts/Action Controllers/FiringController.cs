@@ -116,4 +116,13 @@ public class FiringController : MonoBehaviour
 		}
 		return false;
 	}
+
+	public bool GetIsAimingLocked(){
+		if (isInvoking && !(isCoolingDown)) { //Can't retarget if invoking, unless it's just in the cooldown phase.
+			if (equipedInvokable.GetLocksAiming ()) {
+				return true;
+			}
+		}
+		return false;
+	}
 }

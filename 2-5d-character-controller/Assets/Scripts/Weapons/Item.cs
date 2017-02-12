@@ -60,6 +60,11 @@ public class Item : MonoBehaviour {
 		itemTrigger.enabled = false;
 	}
 
+	private void SetItemToDiscarded(){
+		itemState = ItemState.DISCARDED;
+		this.gameObject.layer = 9; //Add to phasing layer
+	}
+
 	public SpriteRenderer GetSpriteRenderer(){
 		if (spriteRenderer != null) {
 			return spriteRenderer;
@@ -95,12 +100,10 @@ public class Item : MonoBehaviour {
 			CharacterCorpus corpus = other.collider.GetComponent<CharacterCorpus> () as CharacterCorpus;
 			if (corpus != null) {
 				corpus.TakeDamage (throwDamage);
-				itemState = ItemState.DISCARDED;
-				this.gameObject.layer = 9; // Add to phasing layer
+				SetItemToDiscarded ();
 			}
 			if (other.gameObject.layer == 8) {
-				itemState = ItemState.DISCARDED;
-				this.gameObject.layer = 9; //Add to phasing layer
+				SetItemToDiscarded ();
 			}
 		}
 	}
