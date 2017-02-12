@@ -3,7 +3,7 @@ using System.Collections;
 
 public class CharacterMovementActuator : MonoBehaviour
 {
-
+	public bool localGravity = true;
 	public Vector3 radialGravityFocus = new Vector3 (0, 0, 0);
 	public Vector3 directionalGravityUp = new Vector3 (0f, -1f, 0f);
 	public bool radialGravity = false;
@@ -86,13 +86,21 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	void OrientToGravity ()
 	{
-		if (radialGravity) {
-			OrientToGravityFocus ();
+		if (!localGravity) {
+			OrientToDownVector (GravityManager.instance.GetDownVector (body.transform.position));
 		} else {
-			OrientToGravityDirection ();
+			if (radialGravity) {
+				OrientToGravityFocus ();
+			} else {
+				OrientToGravityDirection ();
+			}
 		}
 	}
 
+	void OrientToDownVector(Vector3 downVec){
+		body.transform.rotation = Quaternion.FromToRotation (-body.transform.up, downVec) * transform.rotation;
+		body.transform.rotation = Quaternion.FromToRotation (body.transform.forward, Vector3.forward) * transform.rotation; //Ensure character always facing towards the 'screen'
+	}
 
 	void OrientToGravityDirection ()
 	{

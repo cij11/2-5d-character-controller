@@ -51,7 +51,7 @@ public abstract class Projectile : MonoBehaviour {
 	}
 
 	protected void DestroyProjectile(){
-		
+		CastEffectsInArray (DestroyEffects);
 		Destroy(this.gameObject);
 	}
 
@@ -67,9 +67,5 @@ public abstract class Projectile : MonoBehaviour {
 		foreach (Effect effect in effectArray) {
 			effect.CastEffect (this.componentData);
 		}
-	}
-
-	void OnDestroy(){
-		CastEffectsInArray (DestroyEffects);
 	}
 }

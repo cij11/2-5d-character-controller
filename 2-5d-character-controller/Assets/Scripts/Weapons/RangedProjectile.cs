@@ -44,10 +44,12 @@ public class RangedProjectile : Projectile {
 		CharacterCorpus corpus = other.collider.GetComponent<CharacterCorpus>() as CharacterCorpus;
 		if (corpus != null){
 			corpus.TakeDamage(damage);
-			Destroy(this.gameObject);
+			DestroyProjectile ();
 		}
 		if (other.gameObject.layer == 8) {
-			Destroy (this.gameObject);
+			if (destroyOnContact) {
+				DestroyProjectile ();
+			}
 		}
     }
 }
