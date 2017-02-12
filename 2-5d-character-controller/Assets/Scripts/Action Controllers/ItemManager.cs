@@ -22,6 +22,8 @@ public class ItemManager : MonoBehaviour {
 	Hand hand;
 	int equipedSlotNumber = 0;
 
+	private float throwMuzzleSpeed = 20f;
+
 	CharacterComponentData componentData;
 	
 	// Use this for initialization
@@ -125,7 +127,7 @@ public class ItemManager : MonoBehaviour {
 
 	public void ThrowItem(){
 		if (equipedItem != instantiatedDefault) {
-			equipedItem.ThrowItem (aimingController.GetAimingVectorWorldSpace(), 5f);
+			equipedItem.ThrowItem (aimingController.GetAimingVectorWorldSpace(), throwMuzzleSpeed);
 			RemoveItemFromInventory (equipedItem);
 		//	currentItem.CancelInvoking ();
 			EquipDefault ();
