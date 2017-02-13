@@ -13,6 +13,8 @@ public class StampCircle : MonoBehaviour, IStampable {
 		TransformToCircle ();
 
 		new MarchingSquaresCutTools (marchingGrid).DigCircleFromWorld (position, radius, isSolid);
+	//	Topography topography = (Topography)FindObjectOfType (typeof(Topography));
+	//	topography.DigCircle (this.transform.position, radius, isSolid);
 		Destroy (this.gameObject);
 	}
 
