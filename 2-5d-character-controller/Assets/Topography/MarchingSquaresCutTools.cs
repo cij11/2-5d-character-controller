@@ -343,44 +343,64 @@ public class MarchingSquaresCutTools : CutTools {
 	//Treat the circle as a hemisphere, then normalise elevation to the radius of the hemisphere.
 	public void DigCircle(float cx, float cy, float inputRadius, bool solid){
 
-		//making the cut at a spherical cap 0.525r high in the sphere, so increase the radius
+		//making the cut at a spherical cap 0.5r high in the sphere, so increase the radius
 		//to make sure that the circle formed by the plane passing through the cap is of radius
 		//'input radius'.
-		float radius = (inputRadius / 0.525f) * 0.66f;
 
-		int xmin = (int)Mathf.Max ((int) cx - (int) radius - 2, 0);
-		int ymin = (int)Mathf.Max ((int) cy - (int) radius - 2, 0);
-		int xmax = (int)Mathf.Min ((int) cx + (int) radius + 2, tileXSize-1);
-		int ymax = (int)Mathf.Min ((int) cy + (int) radius + 2, tileYSize-1);
+		//Equation for Sphere height taken from here: mathworld.wolfram.com/sphericalcap.html
+		//a^2 = 2Rh - h^2.
+		//Taking h to be R/2 to slice the spherical cap at half a radius up the sphere, if we want a slice with
+		//radius of 'a', rearrange to find spherical radius R of R = 2a/(3^(1/2)).
+		float sphereRadius = (inputRadius * 2f) / 1.7321f;
 
-		float radiusSquared = radius * radius;
+		int xmin = (int)Mathf.Max ((int) cx - (int) sphereRadius - 2, 0);
+		int ymin = (int)Mathf.Max ((int) cy - (int) sphereRadius - 2, 0);
+		int xmax = (int)Mathf.Min ((int) cx + (int) sphereRadius + 2, tileXSize-1);
+		int ymax = (int)Mathf.Min ((int) cy + (int) sphereRadius + 2, tileYSize-1);
+
+		float radiusSquared = sphereRadius * sphereRadius;
 		for (int i = xmin; i < xmax; i++) {
 			for (int j = ymin; j < ymax; j++) {
 				float xDistFromCenter = cx - i;
 				float yDistFromCenter = cy - j;
-				//height of hemisphere at this point
-				float baseSquared = xDistFromCenter*xDistFromCenter + yDistFromCenter * yDistFromCenter;
-				if (baseSquared > radiusSquared){ //point is outside the hemisphere
+				//height of hemisphere at this point is (R^2 - x^2 - y^2)
 
-				}
-				else{
-					float hemisphereHeight = Mathf.Sqrt(radiusSquared - baseSquared);
-					float hemisphereHeightNormalised = hemisphereHeight - 0.525f*radius;
-					//hemisphereHeightNormalised = hemisphereHeightNormalised / radius;
+				float hemisphereHeightSquared = radiusSquared - xDistFromCenter * xDistFromCenter - yDistFromCenter * yDistFromCenter;
 
-					//if (hemisphereHeight > 1) hemisphereHeight = 1f;
+				float hemisphereHeight;
+
+				if (hemisphereHeightSquared > 0)
+					hemisphereHeight = Mathf.Sqrt (radiusSquared - xDistFromCenter * xDistFromCenter - yDistFromCenter * yDistFromCenter);
+				else
+					hemisphereHeight = 0f;
+				
+				float hemisphereHeightAbovePlane = hemisphereHeight - (sphereRadius / 2f);
+
+				//Smooth the data between -ve anything and 3. This is the data at the edge of the spherical cap that
+				//that we care about (eg, near the topographic line). Truncate everything higher than 3 to 1, and
+				//everything lower than 0 to 0.
+				if (hemisphereHeightAbovePlane >= 3f)
+					hemisphereHeightAbovePlane = 3f;
+				if (hemisphereHeightAbovePlane <= 0f)
+					hemisphereHeightAbovePlane = 0.0f;
+				hemisphereHeightAbovePlane = hemisphereHeightAbovePlane / 3f;
+				if (hemisphereHeightAbovePlane > 1f)
+					hemisphereHeightAbovePlane = 1f;
+		
 					if (solid) {
 						if (nodeArray [i, j] <= 0.5f) { //Don't change nodes that are already at the correct elevation
-							nodeArray [i, j] = hemisphereHeightNormalised;
+						nodeArray [i, j] = hemisphereHeightAbovePlane;
 						}
 					}
 					else {
 						if(nodeArray[i, j] >= 0.5f){
-						nodeArray [i, j] = 1f - hemisphereHeightNormalised;
+						nodeArray [i, j] = 1f - hemisphereHeightAbovePlane;
+						if ((1f - hemisphereHeightAbovePlane) < 0f)
+							nodeArray [i, j] = 0f;
 						}
 					}
 				}
-			}
+
 		}
 	}
 
