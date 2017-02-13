@@ -365,41 +365,41 @@ public class MarchingSquaresCutTools : CutTools {
 				float yDistFromCenter = cy - j;
 				//height of hemisphere at this point is (R^2 - x^2 - y^2)
 
-				float hemisphereHeightSquared = radiusSquared - xDistFromCenter * xDistFromCenter - yDistFromCenter * yDistFromCenter;
+				float flatDistanceSquared = xDistFromCenter * xDistFromCenter + yDistFromCenter * yDistFromCenter;
+				if (flatDistanceSquared < inputRadius * inputRadius) { //Only care about nodes inside the spherical cap plane (eg, input radius, not sphere radius)
+					float hemisphereHeightSquared = radiusSquared - flatDistanceSquared;
 
-				float hemisphereHeight;
+					float hemisphereHeight;
 
-				if (hemisphereHeightSquared > 0)
-					hemisphereHeight = Mathf.Sqrt (radiusSquared - xDistFromCenter * xDistFromCenter - yDistFromCenter * yDistFromCenter);
-				else
-					hemisphereHeight = 0f;
+					if (hemisphereHeightSquared > 0)
+						hemisphereHeight = Mathf.Sqrt (radiusSquared - xDistFromCenter * xDistFromCenter - yDistFromCenter * yDistFromCenter);
+					else
+						hemisphereHeight = 0f;
 				
-				float hemisphereHeightAbovePlane = hemisphereHeight - (sphereRadius / 2f);
+					float hemisphereHeightAbovePlane = hemisphereHeight - (sphereRadius / 2f);
 
-				//Smooth the data between -ve anything and 3. This is the data at the edge of the spherical cap that
-				//that we care about (eg, near the topographic line). Truncate everything higher than 3 to 1, and
-				//everything lower than 0 to 0.
-				if (hemisphereHeightAbovePlane >= 3f)
-					hemisphereHeightAbovePlane = 3f;
-				if (hemisphereHeightAbovePlane <= 0f)
-					hemisphereHeightAbovePlane = 0.0f;
-				hemisphereHeightAbovePlane = hemisphereHeightAbovePlane / 3f;
-				if (hemisphereHeightAbovePlane > 1f)
-					hemisphereHeightAbovePlane = 1f;
+					//Smooth the data between -ve anything and 3. This is the data at the edge of the spherical cap that
+					//that we care about (eg, near the topographic line). Truncate everything higher than 3 to 1, and
+					//everything lower than 0 to 0.
+					if (hemisphereHeightAbovePlane >= 3f)
+						hemisphereHeightAbovePlane = 3f;
+					if (hemisphereHeightAbovePlane <= 0f)
+						hemisphereHeightAbovePlane = 0.0f;
+					hemisphereHeightAbovePlane = hemisphereHeightAbovePlane / 3f;
+					if (hemisphereHeightAbovePlane > 1f)
+						hemisphereHeightAbovePlane = 1f;
 		
 					if (solid) {
 						if (nodeArray [i, j] <= 0.5f) { //Don't change nodes that are already at the correct elevation
-						nodeArray [i, j] = hemisphereHeightAbovePlane;
+							nodeArray [i, j] = hemisphereHeightAbovePlane;
 						}
-					}
-					else {
-						if(nodeArray[i, j] >= 0.5f){
-						nodeArray [i, j] = 1f - hemisphereHeightAbovePlane;
-						if ((1f - hemisphereHeightAbovePlane) < 0f)
-							nodeArray [i, j] = 0f;
+					} else {
+						if (nodeArray [i, j] >= 0.5f) {
+							nodeArray [i, j] = 1f - hemisphereHeightAbovePlane;
 						}
 					}
 				}
+			}
 
 		}
 	}
