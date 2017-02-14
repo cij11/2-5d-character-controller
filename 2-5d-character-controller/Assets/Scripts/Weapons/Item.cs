@@ -15,6 +15,8 @@ public class Item : MonoBehaviour {
 
 	private float gravityForce = 500f;
 
+	private Character throwingCharacter;
+
 	int throwDamage = 50;
 
 	// Use this for initialization
@@ -42,7 +44,8 @@ public class Item : MonoBehaviour {
 		body.AddForce (GravityManager.instance.GetDownVector (body.transform.position) * gravityForce * Time.deltaTime);
 	}
 
-	public void ThrowItem(Vector3 direction, float speed){
+	public void ThrowItem(Vector3 direction, float speed, Character thrower){
+		throwingCharacter = thrower;
 		itemState = ItemState.THROWN;
 		this.gameObject.layer = 13; //Add to projectile layer
 		this.transform.parent = null;
@@ -99,8 +102,11 @@ public class Item : MonoBehaviour {
 		if (itemState == ItemState.THROWN) {
 			CharacterCorpus corpus = other.collider.GetComponent<CharacterCorpus> () as CharacterCorpus;
 			if (corpus != null) {
-				corpus.TakeDamage (throwDamage);
-				SetItemToDiscarded ();
+				Character hitCharacter = other.collider.GetComponent<Character> () as Character;
+				if (hitCharacter != throwingCharacter) {
+					corpus.TakeDamage (throwDamage);
+					SetItemToDiscarded ();
+				}
 			}
 			if (other.gameObject.layer == 8) {
 				SetItemToDiscarded ();

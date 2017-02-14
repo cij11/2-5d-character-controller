@@ -24,6 +24,8 @@ public class SpriteStateController : MonoBehaviour
     int previousAnimationState = 0;
     bool hasAnimationStateChanged = false;
 
+	bool isSwinging = false;
+
     // Use this for initialization
     void Start()
     {
@@ -87,6 +89,9 @@ public class SpriteStateController : MonoBehaviour
         {
             currentAnimationState = 2;
         }
+		if (isSwinging) {
+			currentAnimationState = 5;
+		}
 		if (corpus.GetIsReeling ()) {
 			currentAnimationState = 4;
 		}
@@ -116,10 +121,19 @@ public class SpriteStateController : MonoBehaviour
 	}
 
 	private void HandWeaponVisibility(){
-		if (currentAnimationState == 3) {
+		if (currentAnimationState == 3 || currentAnimationState == 5) { //If character is dead or swinging melee weapon
 			hand.SetHandAndWeaponVisibility (false);
 		} else {
 			hand.SetHandAndWeaponVisibility (true);
 		}
+	}
+
+	public void TriggerSwingAnimation(){
+		isSwinging = true;
+		Invoke ("EndSwingingAnimation", 0.3f);
+	}
+
+	private void EndSwingingAnimation(){
+		isSwinging = false;
 	}
 }

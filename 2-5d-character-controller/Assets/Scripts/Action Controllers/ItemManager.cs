@@ -120,14 +120,13 @@ public class ItemManager : MonoBehaviour {
 		if (equipedSlotNumber > inventory.Count - 1){
 			equipedSlotNumber = 0;
 		}
-		print ("Cycling wieldable to " + equipedSlotNumber.ToString());
 		StowItem ();
 		EquipItem(inventory[equipedSlotNumber]);
 	}
 
 	public void ThrowItem(){
 		if (equipedItem != instantiatedDefault) {
-			equipedItem.ThrowItem (aimingController.GetAimingVectorWorldSpace(), throwMuzzleSpeed);
+			equipedItem.ThrowItem (aimingController.GetAimingVectorWorldSpace() + movementActuator.transform.up * 0.1f, throwMuzzleSpeed, character);
 			RemoveItemFromInventory (equipedItem);
 		//	currentItem.CancelInvoking ();
 			EquipDefault ();
