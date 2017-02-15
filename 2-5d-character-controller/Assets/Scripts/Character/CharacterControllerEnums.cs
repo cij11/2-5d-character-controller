@@ -3,7 +3,7 @@
 }
 
 public enum MovementDirection{
-	UP, DOWN, LEFT, RIGHT, NEUTRAL
+	UP, DOWN, LEFT, RIGHT, NEUTRAL, NE, NW, SE, SW
 }
 
 public enum PhysicMatTypes{

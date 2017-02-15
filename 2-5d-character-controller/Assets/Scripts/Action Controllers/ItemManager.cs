@@ -4,11 +4,11 @@ using System.Collections.Generic;
 
 public class ItemManager : MonoBehaviour {
 
-	public Item defaultItem;
-	public Item instantiatedDefault;
+	public Item defaultItemPrefab;
+	Item instantiatedDefault;
 	public List<Item> inventory;
 	Item equipedItem;
-	int maxEquipment = 4;
+	int maxEquipment = 9;
 
 	public LayerMask collisionMask;
 	float pickupRadius = 2f;
@@ -21,6 +21,10 @@ public class ItemManager : MonoBehaviour {
 	Character character;
 	Hand hand;
 	int equipedSlotNumber = 0;
+
+	int highlightedItem = 0;
+
+	ItemWheel itemWheel;
 
 	private float throwMuzzleSpeed = 20f;
 
@@ -36,10 +40,61 @@ public class ItemManager : MonoBehaviour {
 
 		componentData = new CharacterComponentData (character);
 
-		instantiatedDefault = Instantiate (defaultItem, this.transform.position, Quaternion.identity) as Item;
+		itemWheel = GetComponentInChildren <ItemWheel> () as ItemWheel;
+
+		instantiatedDefault = Instantiate (defaultItemPrefab, this.transform.position, Quaternion.identity) as Item;
 		EquipItem (instantiatedDefault);
 		inventory = new List<Item>();
 		AddItemToInventory (instantiatedDefault);
+	}
+
+	void Update(){
+		if (isSwapping) {
+			highlightedItem = HighlightFromAimingController (); //Select whichever octant (or neutral) the input is directed towards.
+			if (highlightedItem == 0 && equipedItem == instantiatedDefault) {		//Unless the input is neutral, and the default weapon is alread held.
+				if (inventory.Count > 1)
+					highlightedItem = 1;						//In that case, toggle to the first weapon in the inventory
+			}
+			itemWheel.HighlightIcon (highlightedItem);
+		}
+	}
+
+	private int HighlightFromAimingController(){
+		int highlighted = 0;
+		MovementDirection inputDirection = aimingController.GetInputDirection ();
+		switch (inputDirection) {
+		case MovementDirection.NEUTRAL:
+			highlighted = 0;
+			break;
+		case MovementDirection.UP:
+			highlighted = 1;
+			break;
+		case MovementDirection.NE:
+			highlighted = 2;
+			break;
+		case MovementDirection.RIGHT:
+			highlighted = 3;
+			break;
+		case MovementDirection.SE:
+			highlighted = 4;
+			break;
+		case MovementDirection.DOWN:
+			highlighted = 5;
+			break;
+		case MovementDirection.SW:
+			highlighted = 6;
+			break;
+		case MovementDirection.LEFT:
+			highlighted = 7;
+			break;
+		case MovementDirection.NW:
+			highlighted = 8;
+			break;
+		default:
+			highlighted = 0;
+			break;
+		}
+		return highlighted;
 	}
 		
 	public void EquipDefault(){
@@ -80,6 +135,8 @@ public class ItemManager : MonoBehaviour {
 				PickupItem (closestPickupItem);
 			} else {
 				isSwapping = true;
+				itemWheel.LoadSpritesIntoIcons (inventory);
+				itemWheel.ShowItemWheel();
 			}
 		}
 	}
@@ -89,22 +146,35 @@ public class ItemManager : MonoBehaviour {
 		if (isSwapping) {
 			ThrowItem ();
 			isSwapping = false;
+			itemWheel.HideItemWheel ();
 		}
 	}
 
 	//Swap has been released. Swap items, if an item hasn't already been picked up or thrown
 	public void DischargeSwap(){
 		if (isSwapping) {
-			CycleWieldable ();
+			EquipWieldableFromInventory (highlightedItem);
 			isSwapping = false;
+			itemWheel.HideItemWheel ();
+		}
+	}
+
+	private void EquipWieldableFromInventory(int slotNumber){
+		if (slotNumber > inventory.Count - 1) {
+			//Fail
+		} else {
+			equipedSlotNumber = slotNumber;
+			StowItem ();
+			EquipItem (inventory [slotNumber]);
 		}
 	}
 
 	public void PickupItem(Item item){
-			print ("Picking up item");
+		if (inventory.Count < maxEquipment) {
 			AddItemToInventory (item);
 			StowItem ();
 			EquipItem (item);
+		}
 	}
 
 	private void AddItemToInventory(Item pickedUpItem){
@@ -122,6 +192,7 @@ public class ItemManager : MonoBehaviour {
 		}
 		StowItem ();
 		EquipItem(inventory[equipedSlotNumber]);
+	//	itemWheel.HighlightIcon (equipedSlotNumber);
 	}
 
 	public void ThrowItem(){
@@ -148,7 +219,6 @@ public class ItemManager : MonoBehaviour {
 	}
 
 	void PlaceItemInHand(Item toWield){
-		equipedItem = toWield;
 		equipedItem.gameObject.SetActive(true);
 		equipedItem.transform.parent = hand.transform;
 		equipedItem.transform.rotation = hand.transform.rotation;

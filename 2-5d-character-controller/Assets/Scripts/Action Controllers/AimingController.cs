@@ -235,4 +235,31 @@ public class AimingController : MonoBehaviour
 			return true;
 		return false;
 	}
+
+	public MovementDirection GetInputDirection(){
+		if (horizontalInput == 1) {
+			if (verticalInput == 1)
+				return MovementDirection.NE;
+			if (verticalInput == 0)
+				return MovementDirection.RIGHT;
+			if (verticalInput == -1)
+				return MovementDirection.SE;
+		}
+
+		if (horizontalInput == -1) {
+			if (verticalInput == 1)
+				return MovementDirection.NW;
+			if (verticalInput == 0)
+				return MovementDirection.LEFT;
+			if (verticalInput == -1)
+				return MovementDirection.SW;
+		}
+
+		if (verticalInput == 1)
+			return MovementDirection.UP;
+		if (verticalInput == -1)
+			return MovementDirection.DOWN;
+
+		return MovementDirection.NEUTRAL;
+	}
 }
