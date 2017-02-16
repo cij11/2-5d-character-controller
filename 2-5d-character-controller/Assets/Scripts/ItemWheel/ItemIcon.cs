@@ -5,6 +5,8 @@ using UnityEngine;
 public class ItemIcon : MonoBehaviour {
 	SpriteRenderer spriteRenderer;
 	Color itemColor;
+	Sprite emptyIconSprite;
+
 	// Use this for initialization
 	void Start () {
 		InitialiseItemIcon ();
@@ -17,6 +19,7 @@ public class ItemIcon : MonoBehaviour {
 
 	public void InitialiseItemIcon(){
 		spriteRenderer = GetComponent<SpriteRenderer> () as SpriteRenderer;
+		emptyIconSprite = spriteRenderer.sprite;
 	}
 
 	public void HighlightIcon(){
@@ -30,6 +33,11 @@ public class ItemIcon : MonoBehaviour {
 	public void SetCopyIconSpriteAndColor(SpriteRenderer sourceSpriteRenderer){
 		SetSprite (sourceSpriteRenderer.sprite);
 		SetColor (sourceSpriteRenderer.color);
+	}
+
+	public void SetIconToBlank(){
+		SetSprite (emptyIconSprite);
+		SetColor(new Color(1f, 1f, 1f, 1f));
 	}
 
 	public void SetSprite(Sprite sprite){

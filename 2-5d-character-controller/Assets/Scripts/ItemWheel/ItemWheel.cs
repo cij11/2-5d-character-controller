@@ -41,6 +41,9 @@ public class ItemWheel : MonoBehaviour {
 			SpriteRenderer spriteRend = item.GetComponentInChildren<SpriteRenderer> ();
 			itemIcons [i].SetCopyIconSpriteAndColor (spriteRend);
 		}
+		for (int i = itemList.Count; i < 9; i++) {
+			itemIcons [i].SetIconToBlank ();
+		}
 	}
 
 	public void ShowItemWheel(){
