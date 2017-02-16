@@ -68,4 +68,23 @@ public abstract class Projectile : MonoBehaviour {
 			effect.CastEffect (this.componentData);
 		}
 	}
+
+	protected void ResolveCollision(GameObject other){
+		CharacterCorpus corpus = other.GetComponent<CharacterCorpus> () as CharacterCorpus;
+		Character character = other.GetComponent<Character> () as Character;
+		if (corpus != null){
+			if (character != null) {
+				if (character != this.componentData.GetCharacter ()) {
+					corpus.TakeDamage (damage);
+					corpus.TakeKnockback (worldLaunchVector, knockbackSpeed);
+					DestroyProjectile ();
+				}
+			}
+		}
+		if (other.gameObject.layer == 8) {
+			if (destroyOnContact) {
+				DestroyProjectile ();
+			}
+		}
+	}
 }
