@@ -50,6 +50,8 @@ public class Topography : MonoBehaviour {
 
 	private StampCollection stampCollection;
 
+	private int priorityCollisionChunksPerFrame = 2;
+
 	// Use this for initialization
 	void Start () {
 
@@ -409,7 +411,7 @@ public class Topography : MonoBehaviour {
 	}
 
 	private void UpdatePriorityCollisionChunkQueue(){
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < priorityCollisionChunksPerFrame; i++) {
 			if (collisionChunkPriorityUpdateQueue.Count > 0) {
 				CollisionChunk chunkToActivate = collisionChunkPriorityUpdateQueue.Dequeue ();
 				chunkToActivate.UpdateCollisionChunk (marchingGrid);
