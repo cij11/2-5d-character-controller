@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Invokable : MonoBehaviour {
+	public Effect[] EquipEffects; 	//Cast once the item is equiped to hand
 	public Effect[] StartEffects;	//Cast once when item invoked
 	public Effect[] RecurrentEffects; //Cast at regular intervals while item invoked
 	public Effect[] ReleaseEffects; //Cast once when invocation released
+	public Effect[] DeEquipEffects; //Cast once the item is stowed.
+
 	public float recurrentEffectPeriod = 1f;
 	private float recurrentEffectTimer = 0f;
 	private float minimumInvokingTimer = 0f;
@@ -26,6 +29,10 @@ public class Invokable : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+
+	public void CastEquipEffects(){
+		CastEffectsInArray (EquipEffects);
 	}
 
 	public void StartInvoking(){

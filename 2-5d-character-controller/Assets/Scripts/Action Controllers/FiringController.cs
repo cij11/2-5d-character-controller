@@ -25,8 +25,13 @@ public class FiringController : MonoBehaviour
 	public void RegisterInvokable(Invokable invocable)
     {
 		equipedInvokable = invocable;
+		Invoke("CastEquipEffects", 0.05f);
 		cooldownPeriod = invocable.cooldownPeriod;
     }
+
+	private void CastEquipEffects(){
+		equipedInvokable.CastEquipEffects ();
+	}
 
 	public void SetFireHeld(bool held){
 		fireHeld = held;
@@ -124,5 +129,9 @@ public class FiringController : MonoBehaviour
 			}
 		}
 		return false;
+	}
+
+	public Invokable GetEquipedInvokable(){
+		return equipedInvokable;
 	}
 }

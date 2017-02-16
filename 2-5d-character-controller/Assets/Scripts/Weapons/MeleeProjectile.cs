@@ -5,10 +5,6 @@ public class MeleeProjectile : Projectile {
 	
 	float reachRange = 0.7f;
 	// Update is called once per frame
-	void Update () {
-		IncreaseAge();
-	}
-
 
 	protected override void SetupSprite(){
 		BoxCollider boxCollider = GetComponent<BoxCollider>() as BoxCollider;

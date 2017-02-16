@@ -5,12 +5,6 @@ public class RangedProjectile : Projectile {
 
 	public float muzzleSpeed = 20f;
 	Rigidbody body;
-
-	// Update is called once per frame
-	void Update () {
-		IncreaseAge();
-		RunProjectileBehaviours ();
-	}
 		
 	public override void Launch(){
 		LaunchRanged();
@@ -34,22 +28,7 @@ public class RangedProjectile : Projectile {
 		body.velocity = worldLaunchVector * muzzleSpeed + movingTowardsFireBoost;
 	}
 
-	void RunProjectileBehaviours(){
-		foreach (ProjectileBehaviour behaviour in behaviours) {
-			behaviour.PerformBehaviour (componentData);
-		}
-	}
-
 	void OnCollisionEnter(Collision other) {
-		CharacterCorpus corpus = other.collider.GetComponent<CharacterCorpus>() as CharacterCorpus;
-		if (corpus != null){
-			corpus.TakeDamage(damage);
-			DestroyProjectile ();
-		}
-		if (other.gameObject.layer == 8) {
-			if (destroyOnContact) {
-				DestroyProjectile ();
-			}
-		}
+		ResolveCollision (other.gameObject);
     }
 }
