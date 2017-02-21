@@ -519,4 +519,8 @@ public class CharacterMovementActuator : MonoBehaviour
 	public bool GetIsHuggingWall(){
 		return huggingWall;
 	}
+
+	public void BounceCommand(float bounceSpeed){
+		body.velocity =body.transform.up * bounceSpeed;
+	}
 }

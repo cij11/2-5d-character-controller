@@ -27,6 +27,8 @@ public abstract class Projectile : MonoBehaviour {
 	public bool boundToReticule = false;
 	public bool boundToFeet = false;
 	public bool hasLifespan = true;
+	public bool bounceCasterOnHit = false;
+	public bool deflectsProjectiles = false;
 
 	// Use this for initialization
 	void Start () {
@@ -44,6 +46,10 @@ public abstract class Projectile : MonoBehaviour {
 			this.transform.position = componentData.GetAimingController ().GetAimingVectorWorldSpace () + componentData.GetCharacterTransform ().position;
 		}
 
+		if (boundToFeet) {
+			this.transform.position = componentData.GetCharacterTransform ().position - componentData.GetCharacterTransform ().up * 0.5f;
+		}
+
 		if (destroyOnWeaponChange) {
 			CheckWeaponChangeAndDestroy ();
 		}
@@ -56,7 +62,10 @@ public abstract class Projectile : MonoBehaviour {
 	}
 
 	private void CheckWeaponChangeAndDestroy(){
-		if (componentData.GetFiringController().GetEquipedInvokable() != this.firingInvokable) {
+		if (componentData.GetCharacter () == null) {
+			DestroyProjectile ();
+		}
+		else if (componentData.GetFiringController().GetEquipedInvokable() != this.firingInvokable) {
 			DestroyProjectile ();
 		}
 	}
@@ -100,17 +109,49 @@ public abstract class Projectile : MonoBehaviour {
 		if (corpus != null){
 			if (character != null) {
 				if (character != this.componentData.GetCharacter ()) {
-					corpus.TakeDamage (damage);
-					corpus.TakeKnockback (worldLaunchVector, knockbackSpeed);
+
+
+					if (bounceCasterOnHit) {
+						CharacterMovementActuator castingAcuator = componentData.GetMovementActuator ();
+						if (castingAcuator != null) {
+							if (castingAcuator.GetVerticalSpeed () < -1f) {
+								if (castingAcuator.transform.position.y > corpus.transform.position.y) {
+									castingAcuator.BounceCommand (8f);
+									corpus.TakeDamage (damage);
+									corpus.TakeKnockback (worldLaunchVector, knockbackSpeed);
+								}
+							}
+						}
+					} else {
+						corpus.TakeDamage (damage);
+						corpus.TakeKnockback (worldLaunchVector, knockbackSpeed);
+					}
+
 					if (destroyOnCharacterContact) {
 						DestroyProjectile ();
 					}
 				}
 			}
 		}
-		if (other.gameObject.layer == 8) {
+		if (other.gameObject.layer == 8) { //If other is terrain
 			if (destroyOnTerrainContact) {
 				DestroyProjectile ();
+			}
+		}
+
+		if (deflectsProjectiles) {
+			if (other.gameObject.layer == 13) { //If other is a projectile(ranged)
+				Rigidbody body = other.GetComponent<Rigidbody>() as Rigidbody;
+				if (body != null) {
+					Transform castingTransform = componentData.GetCharacterTransform ();
+					if (castingTransform != null) {
+						Vector3 toOtherProj = other.transform.position - castingTransform.position;
+						toOtherProj.Normalize ();
+						float otherProjSpeed = body.velocity.magnitude;
+
+						body.velocity = otherProjSpeed * toOtherProj;
+					}
+				}
 			}
 		}
 	}
