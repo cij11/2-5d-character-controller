@@ -107,10 +107,6 @@ public class MovementController : MonoBehaviour
         {
             EncumberedJump(hor);
         }
-		else if (vert < 0 && !movementActuator.GetIsHuggingWall())
-        {
-            RollJump(hor);
-        }
         else
         {
             StandardJump(hor, vert);
