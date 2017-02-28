@@ -5,6 +5,7 @@ using UnityEngine;
 public class MarchingSquaresCutTools : CutTools {
 
 	float[,] nodeArray;
+	bool[,] destructableArray;
 
 	public float perlinResolution = 0.02f;
 	public float perlinThreshold = 0.45f;
@@ -15,6 +16,29 @@ public class MarchingSquaresCutTools : CutTools {
 		nodeArray = (marchingSquaresGrid).GetNodeArray ();
 		tileXSize = nodeArray.GetLength (0);
 		tileYSize = nodeArray.GetLength (1);
+
+		destructableArray = null;
+	}
+
+	public MarchingSquaresCutTools(MarchingSquaresGrid marchingSquaresGrid, bool[,] destructArray){
+		nodeArray = (marchingSquaresGrid).GetNodeArray ();
+		tileXSize = nodeArray.GetLength (0);
+		tileYSize = nodeArray.GetLength (1);
+
+		destructableArray = destructArray;
+	}
+
+	//Some cut functions (initiall just the cut circle functions) check if a node is destructable before modifying it
+	//This check requires that the cut tool has been initialised with a constructor that hands in a destructable bitmap
+	//as the destructableArray.
+	//If this has not been handed in, assume all nodes are destructable. Otherwise, return the destructable
+	//value of that node.
+	private bool IsNodeDestructable(int x, int y){
+		//
+		if (destructableArray == null) {
+			return true;
+		}
+		return destructableArray [x, y];
 	}
 
 	//Step along an upper and lower hull of a convex shape. Set all the nodes between these two hulls
@@ -336,12 +360,12 @@ public class MarchingSquaresCutTools : CutTools {
 				}
 	}
 
-	public void DigCircleFromWorld(Vector2 position, float radius, bool isSolid){
-		DigCircle (position.x + tileXSize / 2f - 0.5f, position.y + tileYSize / 2f - 0.5f, radius, isSolid);
+	public void DigCircleFromWorld(Vector2 position, float radius, bool isSolid, bool ignoreDestructability = true){
+		DigCircle (position.x + tileXSize / 2f - 0.5f, position.y + tileYSize / 2f - 0.5f, radius, isSolid, ignoreDestructability);
 	}
 
 	//Treat the circle as a hemisphere, then normalise elevation to the radius of the hemisphere.
-	public void DigCircle(float cx, float cy, float inputRadius, bool solid){
+	public void DigCircle(float cx, float cy, float inputRadius, bool solid, bool ignoreDestructability = true){
 
 		//making the cut at a spherical cap 0.5r high in the sphere, so increase the radius
 		//to make sure that the circle formed by the plane passing through the cap is of radius
@@ -395,7 +419,9 @@ public class MarchingSquaresCutTools : CutTools {
 						}
 					} else {
 						if (nodeArray [i, j] >= 0.5f) {
-							nodeArray [i, j] = 1f - hemisphereHeightAbovePlane;
+							if (IsNodeDestructable (i, j) || ignoreDestructability) {
+								nodeArray [i, j] = 1f - hemisphereHeightAbovePlane;
+							}
 						}
 					}
 				}

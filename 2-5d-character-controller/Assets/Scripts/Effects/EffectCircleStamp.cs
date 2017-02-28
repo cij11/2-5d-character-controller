@@ -23,6 +23,6 @@ public class EffectCircleStamp : Effect {
 
 	void CircleStamp(){
 		Topography topography = (Topography)FindObjectOfType (typeof(Topography));
-		topography.DigCircle (this.transform.position, stampSize, isSolid);
+		topography.DigCircle (this.transform.position, stampSize, isSolid, false);
 	}
 }
