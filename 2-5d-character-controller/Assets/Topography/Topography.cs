@@ -47,6 +47,7 @@ public class Topography : MonoBehaviour {
 	private GameObject playerUnitGO = null;
 
 	private OreGrid oreGrid = null;
+	private bool[,] destructableArray;
 
 	private StampCollection stampCollection;
 
@@ -75,6 +76,8 @@ public class Topography : MonoBehaviour {
 
 		oreGrid = new OreGrid ();
 		oreGrid.GenerateMap (worldSizeX, worldSizeY);
+
+		destructableArray = oreGrid.GetDestructableArray ();
 
 
 		stampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
@@ -112,6 +115,7 @@ public class Topography : MonoBehaviour {
 		renderChunkGO.transform.localPosition = gridOffset;
 	}
 
+	//Make the collision chunks children of the 'interior' object, to group them in the inspector.
 	private void BindCollisionToInterior(GameObject collisionChunkGO){
 		//	renderChunkGO.transform.position = new Vector3 (-vesselRadius, -vesselRadius, 0f);
 		collisionChunkGO.transform.position = new Vector3(-worldSizeX/2f, -worldSizeY/2f, interiorZLayer);
@@ -132,6 +136,7 @@ public class Topography : MonoBehaviour {
 		UpdateCollisionChunkQueue ();
 	}
 
+	//Loop through render foci, removing any that have been destroyed.
 	void RemoveNullsFromRenderFoci(){
 		for (int i = renderFoci.Count - 1; i >= 0; i--) {
 			if (renderFoci [i] == null || renderFoci [i].Equals (null)) {
@@ -140,6 +145,9 @@ public class Topography : MonoBehaviour {
 		}
 	}
 
+	//Give a vector in world space, a radius, and if this should be solid (adding terrain) or not (removing terrain)
+	//Optional final parameter can be set 'false' in order to take destructability of terrain into account.
+	//Currently, terrain of int type 2 (OreType.Iron) is indestructable.
 	public void DigCircle(Vector3 worldPosition, float radius, bool solidity, bool ignoreDestructability = true){
 		//If the renderfocus is mounted on the hull of this topography
 		//Cheat for now: If the player is mounted on this hull
@@ -155,7 +163,7 @@ public class Topography : MonoBehaviour {
 		//		tileGrid.BulkCutCircle (playerPosition.x, playerPosition.y, cuttingRadius, TileType.None);
 		//	tileGrid.PreciseCutCircle (digPosition.x, digPosition.y, cuttingRadius, TileType.None);
 		//	marchingGrid.DigCircle (digPosition.x, digPosition.y, cuttingRadius, false);
-		new MarchingSquaresCutTools (marchingGrid).DigCircle (digPosition.x, digPosition.y, cuttingRadius, solidity, ignoreDestructability);
+		new MarchingSquaresCutTools (marchingGrid, destructableArray).DigCircle (digPosition.x, digPosition.y, cuttingRadius, solidity, ignoreDestructability);
 		marchingGrid.InterpolateAllInRange (digCoord.X - (int)cuttingRadius - 5, digCoord.Y - (int)cuttingRadius - 5, digCoord.X + (int)cuttingRadius + 5, digCoord.Y + (int)cuttingRadius + 5);
 		RefreshChunksInRange (digCoord.X - (int)cuttingRadius, digCoord.Y - (int)cuttingRadius, digCoord.X + (int)cuttingRadius, digCoord.Y + (int)cuttingRadius);
 		digCooldown = digTimer;

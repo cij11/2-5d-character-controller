@@ -181,4 +181,18 @@ public class OreGrid {
 	public int[,] GetTerrainMap(){
 		return terrainMap;
 	}
+
+	public bool[,] GetDestructableArray(){
+		bool [,] destructableArray = new bool[width,height];
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				if (terrainMap [i, j] == (int)OreTypes.Iron) {
+					destructableArray [i, j] = false;
+				} else {
+					destructableArray [i, j] = true;
+				}
+			}
+		}
+		return destructableArray;
+	}
 }
