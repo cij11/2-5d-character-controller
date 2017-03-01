@@ -73,7 +73,7 @@ public class Topography : MonoBehaviour {
 		GameObject marchingGridGO = Instantiate (marchingGridPrefab, this.transform.position, Quaternion.identity) as GameObject;
 		marchingGrid = marchingGridGO.GetComponent<MarchingSquaresGrid> () as MarchingSquaresGrid;
 		marchingGrid.Initialise (worldSizeX, worldSizeY, isSolid);
-
+		 
 		oreGrid = new OreGrid ();
 		oreGrid.GenerateMap (worldSizeX, worldSizeY);
 
@@ -81,11 +81,7 @@ public class Topography : MonoBehaviour {
 
 
 		stampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
-		if (stampCollection != null) { //May not have a stamp collection to apply to this topography
-			stampCollection.ApplyStamp (marchingGrid, oreGrid);
-			destructableArray = oreGrid.GetDestructableArray ();  //Refresh the stored destructable array
-			marchingGrid.InterpolateAll ();
-		}
+		ApplyStampCollection (stampCollection);
 
 		renderChunkPool = new Stack<RenderChunk> ();
 		renderChunkUpdateQueue = new Queue<RenderChunk> ();
@@ -102,6 +98,14 @@ public class Topography : MonoBehaviour {
 		this.interiorGO = Instantiate (interiorPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity) as GameObject;
 
 		renderFoci = new List<GameObject> ();
+	}
+
+	public void ApplyStampCollection(StampCollection stampCollection){
+		if (stampCollection != null) { //May not have a stamp collection to apply to this topography
+			stampCollection.ApplyStamp (marchingGrid, oreGrid);
+			destructableArray = oreGrid.GetDestructableArray ();  //Refresh the stored destructable array
+			marchingGrid.InterpolateAll ();
+		}
 	}
 
 	//Parent the renderChunkGO to the hull, and set its 0 poistion to -ve radius, -ve radius
