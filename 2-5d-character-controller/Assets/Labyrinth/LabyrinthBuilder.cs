@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class LabyrinthBuilder : MonoBehaviour {
 	public float WorldRadius = 100f;
-	public float roomDiameter = 5f;
-	public float roomSeparation = 2f;
+	public float roomDiameter = 8f;
+	public float roomSeparation = 12f;
 	public GameObject roomBoundryPrefab;
 
 	List<LabyrinthRoom> unfinishedRoomList;
@@ -26,7 +26,7 @@ public class LabyrinthBuilder : MonoBehaviour {
 		BuildRoom (new Vector3 (1f, 0f, 0f));
 
 		//While there are unfinished rooms
-		while (unfinishedRoomList.Count != 0 && finishedRoomList.Count < 20) {
+		while (unfinishedRoomList.Count != 0 && finishedRoomList.Count < 200) {
 			int nextRoomIndex = Random.Range (0, unfinishedRoomList.Count);
 			LabyrinthRoom testingRoom = unfinishedRoomList [nextRoomIndex];
 			print ("Testing room number " + nextRoomIndex.ToString());
@@ -37,7 +37,9 @@ public class LabyrinthBuilder : MonoBehaviour {
 				Vector3 exploringVector = testingRoom.DirectionToVector (exploringDirection);
 
 				Vector3 proposedLocation = testingRoom.GetPosition () + exploringVector * roomSeparation;
-				BuildRoom (proposedLocation);
+				if (TestProposedLocation (proposedLocation)) {
+					BuildRoom (proposedLocation);
+				}
 
 			} else { //Otherwise, add to finished room list, and remove from unfinished room list.
 				finishedRoomList.Add (testingRoom);
@@ -46,9 +48,33 @@ public class LabyrinthBuilder : MonoBehaviour {
 		}
 	}
 
+
+	bool TestProposedLocation(Vector3 proposedLocation){
+		if (proposedLocation.magnitude > WorldRadius) {
+			return false;
+		}
+
+		foreach (LabyrinthRoom existingRoom in unfinishedRoomList) {
+			float distanceBetweenExistingAndProposed = (existingRoom.GetPosition () - proposedLocation).magnitude;
+			if (distanceBetweenExistingAndProposed < roomSeparation) {
+				return false;
+			}
+		}
+
+		foreach (LabyrinthRoom existingRoom in finishedRoomList) {
+			float distanceBetweenExistingAndProposed = (existingRoom.GetPosition () - proposedLocation).magnitude;
+			if (distanceBetweenExistingAndProposed < roomSeparation) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	void BuildRoom(Vector3 location){
 		LabyrinthRoom newRoom = new LabyrinthRoom (location);
 		unfinishedRoomList.Add (newRoom);
 		GameObject newRoomBoundry = Instantiate (roomBoundryPrefab, location, Quaternion.identity);
+		newRoomBoundry.transform.localScale = new Vector3 (roomDiameter, roomDiameter, 1f);
 	}
 }
