@@ -8,7 +8,9 @@ public class LabyrinthBuilder : MonoBehaviour {
 	public float roomSeparation = 12f;
 	public float diamaterVariation = 4f;
 	public float separationVariation = 8f;
+	public float overlapAllowance = 1f;
 	public GameObject roomBoundryPrefab;
+	public GameObject corridorPrefab;
 
 	List<LabyrinthRoom> unfinishedRoomList;
 	List<LabyrinthRoom> finishedRoomList;
@@ -42,6 +44,7 @@ public class LabyrinthBuilder : MonoBehaviour {
 				float proposedDiameter = roomDiameter + Random.Range (0f, diamaterVariation);
 				if (TestProposedLocation (proposedLocation, proposedDiameter)) {
 					BuildRoom (proposedLocation, proposedDiameter);
+					BuildCorridor (proposedLocation, testingRoom.GetPosition());
 				}
 
 			} else { //Otherwise, add to finished room list, and remove from unfinished room list.
@@ -57,7 +60,8 @@ public class LabyrinthBuilder : MonoBehaviour {
 			return false;
 		}
 
-		Collider[] overlappingRooms = (Physics.OverlapSphere (proposedLocation, proposedDiameter / 2f));
+		//Make the overlap sphere slightly smaller than the room, so that rooms can touch/merge
+		Collider[] overlappingRooms = (Physics.OverlapSphere (proposedLocation, (proposedDiameter-overlapAllowance) / 2f));
 		if (overlappingRooms.Length != 0){
 			return false;
 		}
@@ -84,5 +88,13 @@ public class LabyrinthBuilder : MonoBehaviour {
 		unfinishedRoomList.Add (newRoom);
 		GameObject newRoomBoundry = Instantiate (roomBoundryPrefab, location, Quaternion.identity);
 		newRoomBoundry.transform.localScale = new Vector3 (diameter, diameter, 1f);
+	}
+
+	void BuildCorridor(Vector3 start, Vector3 end){
+		Vector3 corridorPosition = (start + end) / 2f;
+		float corridorLength = (start - end).magnitude;
+		GameObject newCorridor = Instantiate (corridorPrefab, corridorPosition, Quaternion.identity);
+		newCorridor.transform.localScale = new Vector3 (1f, corridorLength, 1f);
+		newCorridor.transform.rotation = Quaternion.LookRotation (transform.forward, (start - end));
 	}
 }
