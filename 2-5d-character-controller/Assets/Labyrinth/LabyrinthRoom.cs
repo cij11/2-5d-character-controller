@@ -129,4 +129,8 @@ public class LabyrinthRoom {
 	public float GetDiameter(){
 		return diameter;
 	}
+
+	public Vector3 GetUpVector(){
+		return upVec;
+	}
 }

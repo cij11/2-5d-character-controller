@@ -20,6 +20,8 @@ public class LabyrinthBuilder : MonoBehaviour {
 
 	List<LabyrinthTunnel> tunnelList;
 
+	ArenaCollection arenaCollection;
+
 	// Use this for initialization
 	void Start () {
 
@@ -125,12 +127,16 @@ public class LabyrinthBuilder : MonoBehaviour {
 	}
 
 	void ConvertLabyrinthToStampCollection(){
+		arenaCollection = GetComponent<ArenaCollection> () as ArenaCollection;
+
 		StampCollection rootStampCollection = this.transform.parent.GetComponentInChildren<StampCollection> () as StampCollection;
 
 		foreach (LabyrinthRoom room in finishedRoomList) {
-			GameObject newCircleStamp = Instantiate (circleHoleStampPrefab, room.GetPosition(), Quaternion.identity);
-			newCircleStamp.transform.localScale = new Vector3 (room.GetDiameter(), room.GetDiameter (), 1f);
-			rootStampCollection.AddChildStamp (newCircleStamp);
+			//GameObject newCircleStamp = Instantiate (circleHoleStampPrefab, room.GetPosition(), Quaternion.identity);
+			GameObject newArenaStamp = Instantiate(arenaCollection.GetRandomArena(), room.GetPosition(), Quaternion.identity);
+			newArenaStamp.transform.localScale = new Vector3 (room.GetDiameter(), room.GetDiameter (), 1f);
+			newArenaStamp.transform.rotation = Quaternion.LookRotation (transform.forward, room.GetUpVector ());
+			rootStampCollection.AddChildStamp (newArenaStamp);
 		}
 
 		foreach (LabyrinthTunnel tunnel in tunnelList) {
