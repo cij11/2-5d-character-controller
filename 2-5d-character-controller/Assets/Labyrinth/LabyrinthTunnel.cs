@@ -14,7 +14,7 @@ public class LabyrinthTunnel {
 		this.end = end;
 
 		this.position = (start + end) / 2f;
-		this.length = (start - end).magnitude;
+		this.length = (start - end).magnitude + 2f;
 	}
 
 	public Vector3 GetStart(){

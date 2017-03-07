@@ -32,6 +32,7 @@ public class LabyrinthBuilder : MonoBehaviour {
 
 		BuildLabyrinth ();
 		ConvertLabyrinthToStampCollection ();
+		Destroy (this.gameObject);
 	}
 
 	//Build a labyrinth room by room. Pick a random room, and explore a random direction from that room.
@@ -52,8 +53,16 @@ public class LabyrinthBuilder : MonoBehaviour {
 				print ("Testing direction " + exploringDirection.ToString ());
 				Vector3 exploringVector = testingRoom.DirectionToVector (exploringDirection);
 
-				Vector3 proposedLocation = testingRoom.GetPosition () + exploringVector * (roomSeparation + Random.Range(0f, separationVariation));
 				float proposedDiameter = roomDiameter + Random.Range (0f, diamaterVariation);
+
+				//Ensure that the separation radius is always sufficient to prevent the new room overlapping the current room.
+				float randomRoomSeparation = (roomSeparation + Random.Range(0f, separationVariation));
+				if (randomRoomSeparation < (proposedDiameter / 2f + testingRoom.GetRadius())){
+					randomRoomSeparation = (proposedDiameter / 2f + testingRoom.GetRadius () + 2f);
+				}
+
+				Vector3 proposedLocation = testingRoom.GetPosition () + exploringVector * randomRoomSeparation;
+				
 				if (TestProposedLocation (proposedLocation, proposedDiameter)) {
 					LabyrinthRoom newRoom = BuildRoom (proposedLocation, proposedDiameter);
 					BuildCorridor (newRoom.GetIncomingConnectionPoint(exploringDirection), testingRoom.GetOutgoingConnectionPoint(exploringDirection));
@@ -100,6 +109,7 @@ public class LabyrinthBuilder : MonoBehaviour {
 		unfinishedRoomList.Add (newRoom);
 		GameObject newRoomBoundry = Instantiate (roomBoundryPrefab, location, Quaternion.identity);
 		newRoomBoundry.transform.localScale = new Vector3 (diameter, diameter, 1f);
+		newRoomBoundry.transform.parent = this.transform;
 		return newRoom;
 	}
 
@@ -110,6 +120,8 @@ public class LabyrinthBuilder : MonoBehaviour {
 		GameObject newCorridor = Instantiate (corridorPrefab, newTunnel.GetPosition(), Quaternion.identity);
 		newCorridor.transform.localScale = new Vector3 (1f, newTunnel.GetLength(), 1f);
 		newCorridor.transform.rotation = Quaternion.LookRotation (transform.forward, (start - end));
+
+		newCorridor.transform.parent = this.transform;
 	}
 
 	void ConvertLabyrinthToStampCollection(){
@@ -122,7 +134,10 @@ public class LabyrinthBuilder : MonoBehaviour {
 		}
 
 		foreach (LabyrinthTunnel tunnel in tunnelList) {
-			
+			GameObject newRectStamp = Instantiate (rectHoleStampPrefab, tunnel.GetPosition (), Quaternion.identity);
+			newRectStamp.transform.localScale = new Vector3 (3f, tunnel.GetLength(), 1f);
+			newRectStamp.transform.rotation = Quaternion.LookRotation (transform.forward, (tunnel.GetStart() - tunnel.GetEnd()));
+			rootStampCollection.AddChildStamp (newRectStamp);
 		}
 	}
 }
