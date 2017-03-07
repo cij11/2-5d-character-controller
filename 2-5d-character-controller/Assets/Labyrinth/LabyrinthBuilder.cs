@@ -12,14 +12,26 @@ public class LabyrinthBuilder : MonoBehaviour {
 	public GameObject roomBoundryPrefab;
 	public GameObject corridorPrefab;
 
+	public GameObject circleHoleStampPrefab;
+	public GameObject rectHoleStampPrefab;
+
 	List<LabyrinthRoom> unfinishedRoomList;
 	List<LabyrinthRoom> finishedRoomList;
 
+	List<LabyrinthTunnel> tunnelList;
+
 	// Use this for initialization
 	void Start () {
+
+	}
+
+	public void GenerateLabyrinth(){
 		unfinishedRoomList = new List<LabyrinthRoom> ();
 		finishedRoomList = new List<LabyrinthRoom> ();
+		tunnelList = new List<LabyrinthTunnel> ();
+
 		BuildLabyrinth ();
+		ConvertLabyrinthToStampCollection ();
 	}
 
 	//Build a labyrinth room by room. Pick a random room, and explore a random direction from that room.
@@ -92,10 +104,25 @@ public class LabyrinthBuilder : MonoBehaviour {
 	}
 
 	void BuildCorridor(Vector3 start, Vector3 end){
-		Vector3 corridorPosition = (start + end) / 2f;
-		float corridorLength = (start - end).magnitude;
-		GameObject newCorridor = Instantiate (corridorPrefab, corridorPosition, Quaternion.identity);
-		newCorridor.transform.localScale = new Vector3 (1f, corridorLength, 1f);
+		LabyrinthTunnel newTunnel = new LabyrinthTunnel (start, end);
+		tunnelList.Add (newTunnel);
+
+		GameObject newCorridor = Instantiate (corridorPrefab, newTunnel.GetPosition(), Quaternion.identity);
+		newCorridor.transform.localScale = new Vector3 (1f, newTunnel.GetLength(), 1f);
 		newCorridor.transform.rotation = Quaternion.LookRotation (transform.forward, (start - end));
+	}
+
+	void ConvertLabyrinthToStampCollection(){
+		StampCollection rootStampCollection = this.transform.parent.GetComponentInChildren<StampCollection> () as StampCollection;
+
+		foreach (LabyrinthRoom room in finishedRoomList) {
+			GameObject newCircleStamp = Instantiate (circleHoleStampPrefab, room.GetPosition(), Quaternion.identity);
+			newCircleStamp.transform.localScale = new Vector3 (room.GetDiameter(), room.GetDiameter (), 1f);
+			rootStampCollection.AddChildStamp (newCircleStamp);
+		}
+
+		foreach (LabyrinthTunnel tunnel in tunnelList) {
+			
+		}
 	}
 }

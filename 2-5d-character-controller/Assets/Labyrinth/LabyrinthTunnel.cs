@@ -2,15 +2,34 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LabyrinthTunnel : MonoBehaviour {
+public class LabyrinthTunnel {
 
-	// Use this for initialization
-	void Start () {
-		
+	Vector3 start;
+	Vector3 end;
+	Vector3 position;
+	float length;
+
+	public LabyrinthTunnel(Vector3 start, Vector3 end){
+		this.start = start;
+		this.end = end;
+
+		this.position = (start + end) / 2f;
+		this.length = (start - end).magnitude;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+
+	public Vector3 GetStart(){
+		return start;
+	}
+
+	public Vector3 GetEnd(){
+		return end;
+	}
+
+	public Vector3 GetPosition(){
+		return position;
+	}
+
+	public float GetLength(){
+		return length;
 	}
 }

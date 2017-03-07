@@ -22,4 +22,8 @@ public class StampCollection : MonoBehaviour, IStampable {
 			childTransform.position = new Vector3 (childTransform.position.x, childTransform.position.y, this.transform.position.z -i);
 		}
 	}
+
+	public void AddChildStamp(GameObject childStamp){
+		childStamp.transform.SetParent (this.transform);
+	}
 }

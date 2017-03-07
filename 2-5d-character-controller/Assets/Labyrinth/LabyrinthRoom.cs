@@ -121,4 +121,12 @@ public class LabyrinthRoom {
 		}
 		return connectionPoint;
 	}
+
+	public float GetRadius(){
+		return radius;
+	}
+
+	public float GetDiameter(){
+		return diameter;
+	}
 }

@@ -49,7 +49,7 @@ public class Topography : MonoBehaviour {
 	private OreGrid oreGrid = null;
 	private bool[,] destructableArray;
 
-	private StampCollection stampCollection;
+	private StampCollection rootStampCollection;
 
 	private int priorityCollisionChunksPerFrame = 2;
 
@@ -79,9 +79,13 @@ public class Topography : MonoBehaviour {
 
 		destructableArray = oreGrid.GetDestructableArray ();
 
+		LabyrinthBuilder labyrinthBuilder = GetComponentInChildren<LabyrinthBuilder> () as LabyrinthBuilder;
+		if (labyrinthBuilder != null) {
+			labyrinthBuilder.GenerateLabyrinth ();
+		}
 
-		stampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
-		ApplyStampCollection (stampCollection);
+		rootStampCollection = this.transform.GetComponentInChildren<StampCollection> () as StampCollection;
+		ApplyStampCollection (rootStampCollection);
 
 		renderChunkPool = new Stack<RenderChunk> ();
 		renderChunkUpdateQueue = new Queue<RenderChunk> ();
@@ -450,5 +454,9 @@ public class Topography : MonoBehaviour {
 				FlagCollisionChunkForPriorityUpdate(collisionChunkArray[i, j]);
 			}
 		}
+	}
+
+	public StampCollection GetRootStampCollection(){
+		return rootStampCollection;
 	}
 }
