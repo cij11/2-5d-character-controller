@@ -43,8 +43,8 @@ public class LabyrinthBuilder : MonoBehaviour {
 				Vector3 proposedLocation = testingRoom.GetPosition () + exploringVector * (roomSeparation + Random.Range(0f, separationVariation));
 				float proposedDiameter = roomDiameter + Random.Range (0f, diamaterVariation);
 				if (TestProposedLocation (proposedLocation, proposedDiameter)) {
-					BuildRoom (proposedLocation, proposedDiameter);
-					BuildCorridor (proposedLocation, testingRoom.GetPosition());
+					LabyrinthRoom newRoom = BuildRoom (proposedLocation, proposedDiameter);
+					BuildCorridor (newRoom.GetIncomingConnectionPoint(exploringDirection), testingRoom.GetOutgoingConnectionPoint(exploringDirection));
 				}
 
 			} else { //Otherwise, add to finished room list, and remove from unfinished room list.
@@ -83,11 +83,12 @@ public class LabyrinthBuilder : MonoBehaviour {
 		*/
 	}
 
-	void BuildRoom(Vector3 location, float diameter){
-		LabyrinthRoom newRoom = new LabyrinthRoom (location);
+	LabyrinthRoom BuildRoom(Vector3 location, float diameter){
+		LabyrinthRoom newRoom = new LabyrinthRoom (location, diameter);
 		unfinishedRoomList.Add (newRoom);
 		GameObject newRoomBoundry = Instantiate (roomBoundryPrefab, location, Quaternion.identity);
 		newRoomBoundry.transform.localScale = new Vector3 (diameter, diameter, 1f);
+		return newRoom;
 	}
 
 	void BuildCorridor(Vector3 start, Vector3 end){

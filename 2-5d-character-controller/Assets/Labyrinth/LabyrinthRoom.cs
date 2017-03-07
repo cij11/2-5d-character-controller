@@ -4,15 +4,40 @@ using UnityEngine;
 
 public class LabyrinthRoom {
 	Vector3 position;
+	float diameter;
+	float radius;
 	List<MovementDirection> corridorDirections;
 
-	public LabyrinthRoom(Vector3 position){
+	Vector3 upVec;
+	Vector3 rightVec;
+
+	public LabyrinthRoom(Vector3 position, float diameter){
 		this.position = position;
+		this.diameter = diameter;
+		this.radius = diameter / 2f;
+
+		BuildExplorationDirectionList ();
+		CalculateRelativeVectors ();
+	}
+
+	//Build a list with the 4 potential directions to explore.
+	void BuildExplorationDirectionList(){
 		corridorDirections = new List<MovementDirection> ();
 		corridorDirections.Add (MovementDirection.RIGHT);
 		corridorDirections.Add (MovementDirection.LEFT);
 		corridorDirections.Add (MovementDirection.UP);
 		corridorDirections.Add (MovementDirection.DOWN);
+	}
+
+	//
+	void CalculateRelativeVectors(){
+		Vector3 directionFromCenter = position;
+		if (directionFromCenter.magnitude < 0.001f) {
+			directionFromCenter = new Vector3 (0.1f, 0f, 0f);
+		}
+		directionFromCenter.Normalize ();
+		upVec = directionFromCenter;
+		rightVec = new Vector3 (directionFromCenter.y, -directionFromCenter.x, 0);
 	}
 
 	public bool HasUnexploredDirection(){
@@ -37,24 +62,63 @@ public class LabyrinthRoom {
 
 	public Vector3 DirectionToVector(MovementDirection direction){
 		Vector3 vec = new Vector3 (1f, 0f, 0f);
-		Vector3 directionFromCenter = position;
-		directionFromCenter.Normalize ();
-		Vector3 tangentVec = new Vector3 (directionFromCenter.y, -directionFromCenter.x, 0);
 
 		switch (direction) {
 		case MovementDirection.RIGHT:
-			vec = tangentVec;
+			vec = rightVec;
 			break;
 		case MovementDirection.LEFT:
-			vec = -tangentVec;
+			vec = -rightVec;
 			break;
 		case MovementDirection.UP:
-			vec = directionFromCenter;
+			vec = upVec;
 			break;
 		case MovementDirection.DOWN:
-			vec = -directionFromCenter;
+			vec = -upVec;
 			break;
 		}
 		return vec;
+	}
+
+	//Get the point that a tunnel exploring outwards in the Up, Down, Left, or Right direction should sprout from
+	public Vector3 GetOutgoingConnectionPoint(MovementDirection outgoingDirection){
+		Vector3 connectionPoint = this.position;
+
+		switch (outgoingDirection) {
+		case MovementDirection.RIGHT:
+			connectionPoint = position + rightVec * radius;
+			break;
+		case MovementDirection.LEFT:
+			connectionPoint = position - rightVec * radius;
+			break;
+		case MovementDirection.UP:
+			connectionPoint = position + upVec * radius;
+			break;
+		case MovementDirection.DOWN:
+			connectionPoint = position - upVec * radius;
+			break;
+		}
+		return connectionPoint;
+	}
+
+	//Get the point that a connecting to a room FROM the right, left, up, or down should attach to.
+	public Vector3 GetIncomingConnectionPoint(MovementDirection outgoingDirection){
+		Vector3 connectionPoint = this.position;
+
+		switch (outgoingDirection) {
+		case MovementDirection.LEFT:
+			connectionPoint = position + rightVec * radius;
+			break;
+		case MovementDirection.RIGHT:
+			connectionPoint = position - rightVec * radius;
+			break;
+		case MovementDirection.DOWN:
+			connectionPoint = position + upVec * radius;
+			break;
+		case MovementDirection.UP:
+			connectionPoint = position - upVec * radius;
+			break;
+		}
+		return connectionPoint;
 	}
 }
