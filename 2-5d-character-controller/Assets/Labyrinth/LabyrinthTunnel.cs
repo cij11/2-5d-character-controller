@@ -8,13 +8,15 @@ public class LabyrinthTunnel {
 	Vector3 end;
 	Vector3 position;
 	float length;
+	float width;
 
-	public LabyrinthTunnel(Vector3 start, Vector3 end){
+	public LabyrinthTunnel(Vector3 start, Vector3 end, float width){
 		this.start = start;
 		this.end = end;
+		this.width = width;
 
 		this.position = (start + end) / 2f;
-		this.length = (start - end).magnitude + 2f;
+		this.length = (start - end).magnitude + 4f;
 	}
 
 	public Vector3 GetStart(){
@@ -31,5 +33,9 @@ public class LabyrinthTunnel {
 
 	public float GetLength(){
 		return length;
+	}
+
+	public float GetWidth(){
+		return width;
 	}
 }

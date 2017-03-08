@@ -9,6 +9,9 @@ public class LabyrinthBuilder : MonoBehaviour {
 	public float diamaterVariation = 4f;
 	public float separationVariation = 8f;
 	public float overlapAllowance = 1f;
+	public float tunnelWidth = 3f;
+	public float widthVariation = 3f;
+
 	public GameObject roomBoundryPrefab;
 	public GameObject corridorPrefab;
 
@@ -116,11 +119,11 @@ public class LabyrinthBuilder : MonoBehaviour {
 	}
 
 	void BuildCorridor(Vector3 start, Vector3 end){
-		LabyrinthTunnel newTunnel = new LabyrinthTunnel (start, end);
+		LabyrinthTunnel newTunnel = new LabyrinthTunnel (start, end, tunnelWidth + Random.Range(0f, widthVariation));
 		tunnelList.Add (newTunnel);
 
 		GameObject newCorridor = Instantiate (corridorPrefab, newTunnel.GetPosition(), Quaternion.identity);
-		newCorridor.transform.localScale = new Vector3 (1f, newTunnel.GetLength(), 1f);
+		newCorridor.transform.localScale = new Vector3 (newTunnel.GetWidth(), newTunnel.GetLength(), 1f);
 		newCorridor.transform.rotation = Quaternion.LookRotation (transform.forward, (start - end));
 
 		newCorridor.transform.parent = this.transform;
@@ -141,7 +144,7 @@ public class LabyrinthBuilder : MonoBehaviour {
 
 		foreach (LabyrinthTunnel tunnel in tunnelList) {
 			GameObject newRectStamp = Instantiate (rectHoleStampPrefab, tunnel.GetPosition (), Quaternion.identity);
-			newRectStamp.transform.localScale = new Vector3 (3f, tunnel.GetLength(), 1f);
+			newRectStamp.transform.localScale = new Vector3 (tunnel.GetWidth(), tunnel.GetLength(), 1f);
 			newRectStamp.transform.rotation = Quaternion.LookRotation (transform.forward, (tunnel.GetStart() - tunnel.GetEnd()));
 			rootStampCollection.AddChildStamp (newRectStamp);
 		}
