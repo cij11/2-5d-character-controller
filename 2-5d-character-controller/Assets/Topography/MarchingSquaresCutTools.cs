@@ -139,7 +139,9 @@ public class MarchingSquaresCutTools : CutTools {
 	}
 
 	void SetNodesToAchieveTopography(int acol, int arow, int bcol, int brow, float elevation, float overlap){
-
+		if (acol < 1 || arow < 1 || bcol < 1 || brow < 1 || acol > tileXSize - 1 || arow > tileXSize - 1 || bcol > tileXSize - 1 || brow > tileXSize - 1) {
+			return;
+		}
 		//If adjacent node already on the same side of elevation, set current node to elevation.
 		if (elevation >= 0.5) {
 			if (nodeArray [bcol, brow] > 0.5) {
