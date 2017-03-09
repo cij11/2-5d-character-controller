@@ -98,4 +98,8 @@ public class Spawner : MonoBehaviour {
 	public bool GetIsSpawnerExhausted(){
 		return exhausted;
 	}
+
+	public void SetSpawnables(GameObject[] newSpawnables){
+		spawnableObjects = newSpawnables;
+	}
 }

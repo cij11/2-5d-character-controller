@@ -15,6 +15,14 @@ public class Arena : MonoBehaviour {
 
 	public StampCollection stampCollection;
 
+	public bool fillsRectWithSpawners = false;
+	public float rectWidth;
+	public float rectHeight;
+	public GameObject spawnerPrefab;
+	public GameObject[] spawnableEnemies;
+	public GameObject[] spawnableBuffs;
+	public int numEnemySpawners = 0;
+	public int numBuffSpawners = 0;
 
 	bool spawnersExhausted = false;
 	Spawner[] spawners;
@@ -28,7 +36,20 @@ public class Arena : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		if (fillsRectWithSpawners) {
+			GenerateSpawners ();
+		}
 		StoreSpawners ();
+	}
+
+	void GenerateSpawners(){
+		for (int i = 0; i < numEnemySpawners; i++) {
+			Vector3 spawnerLocation = new Vector3 (Random.Range (-rectWidth / 2f, rectWidth / 2f), Random.Range (-rectHeight / 2f, rectHeight / 2f), 0f);
+			GameObject newSpawnerGO = Instantiate (spawnerPrefab, spawnerLocation, Quaternion.identity);
+			Spawner newSpawner = newSpawnerGO.GetComponent<Spawner> () as Spawner;
+			newSpawner.SetSpawnables (spawnableEnemies);
+			newSpawnerGO.transform.parent = this.transform;
+		}
 	}
 
 	// Get an array of all the Spawner's that are children of this arena's transform.
