@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Arena : MonoBehaviour {
 	public bool activated = false;
 	public Arena nextArena = null;
 	public bool clearsExit = false;
+	public bool endsLevel = false;
+	public bool endsGame = false;
+	public string sceneToLoad = "level_1";
 	public Vector3 botLeftClearRect;
 	public Vector3 topRightClearRect;
 
@@ -65,6 +69,9 @@ public class Arena : MonoBehaviour {
 		if(nextArena != null)
 			ActivateNextArena ();
 
+		if (endsLevel) {
+			Invoke ("LoadNextLevel", 2);
+		}
 
 	}
 
@@ -96,5 +103,9 @@ public class Arena : MonoBehaviour {
 
 	void ActivateNextArena(){
 
+	}
+
+	void LoadNextLevel(){
+		SceneManager.LoadScene (sceneToLoad, LoadSceneMode.Single);
 	}
 }
