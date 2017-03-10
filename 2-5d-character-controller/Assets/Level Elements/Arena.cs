@@ -52,6 +52,14 @@ public class Arena : MonoBehaviour {
 			newSpawner.SetSpawnables (spawnableEnemies);
 			newSpawnerGO.transform.parent = this.transform;
 		}
+
+		for (int i = 0; i < numBuffSpawners; i++) {
+			Vector3 spawnerLocation = new Vector3 (Random.Range (-rectWidth / 2f, rectWidth / 2f), Random.Range (-rectHeight / 2f, rectHeight / 2f), 0f);
+			GameObject newSpawnerGO = Instantiate (spawnerPrefab, spawnerLocation, Quaternion.identity);
+			Spawner newSpawner = newSpawnerGO.GetComponent<Spawner> () as Spawner;
+			newSpawner.SetSpawnables (spawnableBuffs);
+			newSpawnerGO.transform.parent = this.transform;
+		}
 	}
 
 	// Get an array of all the Spawner's that are children of this arena's transform.
