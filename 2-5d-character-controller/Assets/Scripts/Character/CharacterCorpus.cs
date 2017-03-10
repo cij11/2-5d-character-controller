@@ -21,6 +21,7 @@ public class CharacterCorpus : MonoBehaviour {
 
 	void Update(){
 		UpdateReeling ();
+		UpdateFallOffWorldDeath ();
 	}
 
 	void Die(){
@@ -66,5 +67,11 @@ public class CharacterCorpus : MonoBehaviour {
 
 	public bool GetIsAlive(){
 		return isAlive;
+	}
+
+	public void UpdateFallOffWorldDeath(){
+		if (this.transform.position.y < -300) {
+			Die ();
+		}
 	}
 }
