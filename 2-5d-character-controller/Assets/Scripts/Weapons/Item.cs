@@ -17,6 +17,12 @@ public class Item : MonoBehaviour {
 
 	private Character throwingCharacter;
 
+	Vector3 hoverPosition;
+	bool hoverDirectionUp = true;
+	float hoverRadius = 0.4f;
+	float hoverForce = 100f;
+	float startingHoverVelocity = 1f;
+
 	int throwDamage = 50;
 
 	// Use this for initialization
@@ -31,12 +37,23 @@ public class Item : MonoBehaviour {
 			localBarrelPosition = new Vector3 (0f, 0f, 0f);
 		}
 		itemState = ItemState.SPAWN_HOVER;
+		hoverPosition = this.transform.position;
+		body.velocity = new Vector3 (0f, startingHoverVelocity, 0f);
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (itemState == ItemState.DISCARDED || itemState == ItemState.THROWN) {
 			ApplyGravity ();
+		}
+
+		if (itemState == ItemState.SPAWN_HOVER) {
+			if (body.position.y > hoverPosition.y) {
+				body.AddForce (new Vector3 (0f, -hoverForce, 0f) * Time.deltaTime);
+			} else {
+				body.AddForce (-new Vector3 (0f, -hoverForce, 0f) * Time.deltaTime);
+			}
 		}
 	}
 
