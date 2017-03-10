@@ -6,6 +6,10 @@ public class LabyrinthBuilder : MonoBehaviour {
 	public float worldRadius = 100f;
 	public float worldWidth = 200f;
 	public float worldHeight = 150f;
+
+	public float diggableWidth = 150f;
+	public float diggableHeight = 100f;
+
 	public bool circularWorld = false;
 	public bool radiallyAlignedRooms = false;
 
@@ -22,6 +26,8 @@ public class LabyrinthBuilder : MonoBehaviour {
 
 	public GameObject circleHoleStampPrefab;
 	public GameObject rectHoleStampPrefab;
+	public GameObject rectSolidStampPrefab;
+	public GameObject impassableStampPrefab;
 
 	List<LabyrinthRoom> unfinishedRoomList;
 	List<LabyrinthRoom> finishedRoomList;
@@ -50,7 +56,7 @@ public class LabyrinthBuilder : MonoBehaviour {
 	//that room from the pool of unfinished rooms.
 	void BuildLabyrinth(){
 		//Build a starting room
-		BuildRoom (new Vector3 (1f, 0f, 0f), roomDiameter);
+		BuildRoom (new Vector3 (1f, 0f, 0f), roomDiameter * 2 + Random.Range(0f, diamaterVariation));
 
 		//While there are unfinished rooms
 		while (unfinishedRoomList.Count != 0 && finishedRoomList.Count < 200) {
@@ -93,13 +99,13 @@ public class LabyrinthBuilder : MonoBehaviour {
 				return false;
 			}
 		} else { //Test that the room is inside the rectangular world bounds
-			if (proposedLocation.x > worldWidth / 2f)
+			if (proposedLocation.x > diggableWidth / 2f)
 				return false;
-			if (proposedLocation.x < -worldWidth / 2f)
+			if (proposedLocation.x < -diggableWidth / 2f)
 				return false;
-			if (proposedLocation.y > worldHeight / 2f)
+			if (proposedLocation.y > diggableHeight / 2f)
 				return false;
-			if (proposedLocation.y < -worldHeight / 2f)
+			if (proposedLocation.y < -diggableHeight / 2f)
 				return false;
 		}
 
@@ -151,5 +157,41 @@ public class LabyrinthBuilder : MonoBehaviour {
 			newRectStamp.transform.rotation = Quaternion.LookRotation (transform.forward, (tunnel.GetStart() - tunnel.GetEnd()));
 			rootStampCollection.AddChildStamp (newRectStamp);
 		}
+
+		AddBoundingStamps (rootStampCollection);
+	}
+
+	void AddBoundingStamps(StampCollection rootStampCollection){
+		Vector3 topPos = new Vector3 (0f, worldHeight / 2f, 0f);
+		MakeRectStamp (topPos, worldWidth, 3f, rootStampCollection);
+		MakeImpassableStamp (topPos, worldWidth, 5f, rootStampCollection);
+
+		Vector3 botPos = new Vector3 (0f, -worldHeight / 2f, 0f);
+		MakeRectStamp (botPos, worldWidth, 3f, rootStampCollection);
+		MakeImpassableStamp (botPos, worldWidth, 5f, rootStampCollection);
+
+		Vector3 rightPos = new Vector3 (worldWidth / 2f, 0f, 0f);
+		MakeRectStamp (rightPos, 3f, worldHeight, rootStampCollection);
+		MakeImpassableStamp (rightPos, 10f, worldHeight, rootStampCollection);
+
+		Vector3 leftPos = new Vector3 (-worldWidth / 2f, 0f, 0f);
+		MakeRectStamp (leftPos, 3f, worldHeight, rootStampCollection);
+		MakeImpassableStamp (leftPos, 10f, worldHeight, rootStampCollection);
+	}
+
+	void MakeRectStamp(Vector3 location, float width, float height, StampCollection rootStampCollection){
+		width = width + 0.1f;
+		height = height + 0.1f;
+		GameObject newRectStamp = Instantiate (rectSolidStampPrefab, location, Quaternion.identity);
+		newRectStamp.transform.localScale = new Vector3 (width, height, 1f);
+		rootStampCollection.AddChildStamp (newRectStamp);
+	}
+
+	void MakeImpassableStamp(Vector3 location, float width, float height, StampCollection rootStampCollection){
+		width = width + 0.1f;
+		height = height + 0.1f;
+		GameObject newRectStamp = Instantiate (impassableStampPrefab, location, Quaternion.identity);
+		newRectStamp.transform.localScale = new Vector3 (width, height, 1f);
+		rootStampCollection.AddChildStamp (newRectStamp);
 	}
 }

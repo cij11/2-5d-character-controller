@@ -7,14 +7,16 @@ public class LabyrinthRoom {
 	float diameter;
 	float radius;
 	List<MovementDirection> corridorDirections;
+	bool radiallyAligned;
 
 	Vector3 upVec;
 	Vector3 rightVec;
 
-	public LabyrinthRoom(Vector3 position, float diameter){
+	public LabyrinthRoom(Vector3 position, float diameter, bool radiallyAligned = false){
 		this.position = position;
 		this.diameter = diameter;
 		this.radius = diameter / 2f;
+		this.radiallyAligned = radiallyAligned;
 
 		BuildExplorationDirectionList ();
 		CalculateRelativeVectors ();
@@ -31,13 +33,18 @@ public class LabyrinthRoom {
 
 	//
 	void CalculateRelativeVectors(){
-		Vector3 directionFromCenter = position;
-		if (directionFromCenter.magnitude < 0.001f) {
-			directionFromCenter = new Vector3 (0.1f, 0f, 0f);
+		if (radiallyAligned) {
+			Vector3 directionFromCenter = position;
+			if (directionFromCenter.magnitude < 0.001f) {
+				directionFromCenter = new Vector3 (0.1f, 0f, 0f);
+			}
+			directionFromCenter.Normalize ();
+			upVec = directionFromCenter;
+			rightVec = new Vector3 (directionFromCenter.y, -directionFromCenter.x, 0);
+		} else {
+			upVec = new Vector3 (0f, 1f, 0f);
+			rightVec = new Vector3 (1f, 0f, 0f);
 		}
-		directionFromCenter.Normalize ();
-		upVec = directionFromCenter;
-		rightVec = new Vector3 (directionFromCenter.y, -directionFromCenter.x, 0);
 	}
 
 	public bool HasUnexploredDirection(){

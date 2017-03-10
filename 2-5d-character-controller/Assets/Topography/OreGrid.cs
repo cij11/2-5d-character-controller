@@ -116,19 +116,19 @@ public class OreGrid {
 		switch (index) {
 		case 0:
 			if (OutsideBounds (x, y))
-				return (int)OreTypes.Mud;
+				return (int)OreTypes.Iron;
 			return terrainMap [x, y];
 		case 2:
 			if (OutsideBounds (x, y+1))
-				return (int)OreTypes.Mud;
+				return (int)OreTypes.Iron;
 			return terrainMap [x, y+1];
 		case 4:
 			if (OutsideBounds (x+1, y+1))
-				return (int)OreTypes.Mud;
+				return (int)OreTypes.Iron;
 			return terrainMap [x+1, y+1];
 		case 6:
 			if (OutsideBounds (x+1, y))
-				return (int)OreTypes.Mud;
+				return (int)OreTypes.Iron;
 			return terrainMap [x+1, y];
 		default:
 			return 0;
