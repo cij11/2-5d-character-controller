@@ -27,6 +27,7 @@ public class Item : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+
 		spriteRenderer = this.transform.GetComponentInChildren<SpriteRenderer> () as SpriteRenderer;
 		Barrel barrel = transform.GetComponentInChildren<Barrel> () as Barrel;
 		if (barrel != null) {
@@ -95,6 +96,10 @@ public class Item : MonoBehaviour {
 
 	public void SetVisibility(bool visible){
 		spriteRenderer.enabled = visible;
+	}
+
+	public void SetItemStateHeld(){
+		itemState = ItemState.HELD;
 	}
 
 	public Transform GetBarrelTransform(){

@@ -459,4 +459,20 @@ public class Topography : MonoBehaviour {
 	public StampCollection GetRootStampCollection(){
 		return rootStampCollection;
 	}
+
+	public bool TestTileEmpty(int x, int y){
+		if (x < 1)
+			return false;
+		if (y < 1)
+			return false;
+		if (x > worldSizeX -1f)
+			return false;
+		if (y > worldSizeY - 1f)
+			return false;
+
+		if (marchingGrid.GetNode (x, y) < 0.5f)
+			return true;
+
+		return false;
+	}
 }

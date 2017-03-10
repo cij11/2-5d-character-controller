@@ -46,6 +46,12 @@ public class Arena : MonoBehaviour {
 
 	void GenerateSpawners(){
 		for (int i = 0; i < numEnemySpawners; i++) {
+			float proposedLocationX = Random.Range (-rectWidth / 2f, rectWidth / 2f);
+			float proposedLocationY = Random.Range (-rectHeight / 2f, rectHeight / 2f);
+/*			while (!topography.TestTileEmpty ((int)proposedLocationX, (int)proposedLocationY)) {
+				proposedLocationX = Random.Range (-rectWidth / 2f, rectWidth / 2f);
+				proposedLocationY = Random.Range (-rectHeight / 2f, rectHeight / 2f);
+			}*/
 			Vector3 spawnerLocation = new Vector3 (Random.Range (-rectWidth / 2f, rectWidth / 2f), Random.Range (-rectHeight / 2f, rectHeight / 2f), 0f);
 			GameObject newSpawnerGO = Instantiate (spawnerPrefab, spawnerLocation, Quaternion.identity);
 			Spawner newSpawner = newSpawnerGO.GetComponent<Spawner> () as Spawner;

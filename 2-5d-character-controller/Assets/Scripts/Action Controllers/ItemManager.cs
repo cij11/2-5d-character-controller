@@ -43,6 +43,7 @@ public class ItemManager : MonoBehaviour {
 		itemWheel = GetComponentInChildren <ItemWheel> () as ItemWheel;
 
 		instantiatedDefault = Instantiate (defaultItemPrefab, this.transform.position, Quaternion.identity) as Item;
+		instantiatedDefault.SetItemStateHeld ();
 		EquipItem (instantiatedDefault);
 		inventory = new List<Item>();
 		AddItemToInventory (instantiatedDefault);
