@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LabyrinthBuilder : MonoBehaviour {
-	public float WorldRadius = 100f;
+	public float worldRadius = 100f;
+	public float worldWidth = 200f;
+	public float worldHeight = 150f;
+	public bool circularWorld = false;
+	public bool radiallyAlignedRooms = false;
+
 	public float roomDiameter = 8f;
 	public float roomSeparation = 12f;
 	public float diamaterVariation = 4f;
@@ -82,31 +87,29 @@ public class LabyrinthBuilder : MonoBehaviour {
 
 
 	bool TestProposedLocation(Vector3 proposedLocation, float proposedDiameter){
-		if (proposedLocation.magnitude > WorldRadius) {
-			return false;
+		//Test that the room is inside the circular world radius
+		if (circularWorld) {
+			if (proposedLocation.magnitude > worldRadius) {
+				return false;
+			}
+		} else { //Test that the room is inside the rectangular world bounds
+			if (proposedLocation.x > worldWidth / 2f)
+				return false;
+			if (proposedLocation.x < -worldWidth / 2f)
+				return false;
+			if (proposedLocation.y > worldHeight / 2f)
+				return false;
+			if (proposedLocation.y < -worldHeight / 2f)
+				return false;
 		}
 
+		//Test that the room doesn't overlap an existing room.
 		//Make the overlap sphere slightly smaller than the room, so that rooms can touch/merge
 		Collider[] overlappingRooms = (Physics.OverlapSphere (proposedLocation, (proposedDiameter-overlapAllowance) / 2f));
 		if (overlappingRooms.Length != 0){
 			return false;
 		}
 		return true;
-		/*
-		foreach (LabyrinthRoom existingRoom in unfinishedRoomList) {
-			float distanceBetweenExistingAndProposed = (existingRoom.GetPosition () - proposedLocation).magnitude;
-			if (distanceBetweenExistingAndProposed < roomSeparation) {
-				return false;
-			}
-		}
-
-		foreach (LabyrinthRoom existingRoom in finishedRoomList) {
-			float distanceBetweenExistingAndProposed = (existingRoom.GetPosition () - proposedLocation).magnitude;
-			if (distanceBetweenExistingAndProposed < roomSeparation) {
-				return false;
-			}
-		}
-		*/
 	}
 
 	LabyrinthRoom BuildRoom(Vector3 location, float diameter){

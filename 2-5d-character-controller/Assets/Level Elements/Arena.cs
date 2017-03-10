@@ -36,6 +36,8 @@ public class Arena : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		topography = (Topography)FindObjectOfType (typeof(Topography));
+
 		if (fillsRectWithSpawners) {
 			GenerateSpawners ();
 		}
@@ -108,7 +110,6 @@ public class Arena : MonoBehaviour {
 				explosionLocationList.Add (new Vector3 ((float)i, (float)j + Random.Range(-digExplosionVariation, digExplosionVariation), 0f));
 			}
 		}
-		topography = (Topography)FindObjectOfType (typeof(Topography));
 		Invoke ("BlastClearanceHole", 0.05f);
 
 	}
