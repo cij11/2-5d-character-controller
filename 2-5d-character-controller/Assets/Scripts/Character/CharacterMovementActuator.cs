@@ -388,7 +388,7 @@ public class CharacterMovementActuator : MonoBehaviour
 		}
 	}
 
-	void NegateGravity ()
+	public void NegateGravity ()
 	{
 		body.AddForce (body.transform.up * gravityForce * Time.deltaTime);
 	}
