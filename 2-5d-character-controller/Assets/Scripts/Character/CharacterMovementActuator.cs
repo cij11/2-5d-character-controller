@@ -15,6 +15,8 @@ public class CharacterMovementActuator : MonoBehaviour
 	public float maxWalkSpeed = 12;
 	public float jumpSpeed = 10f;
 
+	public bool grabsWalls = true;
+
 	//Speed the character walks at when left or right held
 
 	//Time to attain walk velocity from stationary.
@@ -514,11 +516,13 @@ public class CharacterMovementActuator : MonoBehaviour
 	}
 
 	public void SetWallHug(bool hug){
-		huggingWall = hug;
+		if (grabsWalls) {
+			huggingWall = hug;
 
-		if (huggingWall) {
-			if (contactSensor.GetHasContactStateChanged ()) {
-				LimitWallClimbSpeed ();
+			if (huggingWall) {
+				if (contactSensor.GetHasContactStateChanged ()) {
+					LimitWallClimbSpeed ();
+				}
 			}
 		}
 	}
