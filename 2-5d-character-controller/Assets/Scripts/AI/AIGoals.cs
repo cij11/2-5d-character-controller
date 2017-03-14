@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 //Stores information about AI objectives
 public class AIGoals : MonoBehaviour {
 	GameObject targetObject;
 	private string defaultTarget;
 	int forwardDirection;
+	MovementDirection roseDirection;
 
 	// Use this for initialization
 	void Start () {
@@ -34,5 +36,17 @@ public class AIGoals : MonoBehaviour {
 	}
 	public void ToggleForwardDirection(){
 		forwardDirection = -forwardDirection;
+	}
+
+	public void PickRandomRoseDirection(){
+		int randomInt = Random.Range (0, 8);
+		roseDirection = (MovementDirection)randomInt;
+		if (roseDirection == MovementDirection.NEUTRAL)
+			PickRandomRoseDirection ();
+			
+	}
+
+	public MovementDirection GetRoseDirection(){
+		return roseDirection;
 	}
 }

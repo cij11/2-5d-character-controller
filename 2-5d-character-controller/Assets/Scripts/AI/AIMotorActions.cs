@@ -62,6 +62,16 @@ public class AIMotorActions : MonoBehaviour {
 				ReleaseJump();
 				break;
 			}
+		case Action.PICK_RANDOM_ROSE_DIRECTION:
+			{
+				goals.PickRandomRoseDirection ();
+				break;
+			}
+		case Action.MOVE_ROSE_DIRECTION:
+			{
+				AimRoseDirection ();
+				break;
+			}
 			default:
 				ResetController();
 				break;
@@ -135,6 +145,46 @@ public class AIMotorActions : MonoBehaviour {
 		virtualController.ReleaseFire();
 		virtualController.ReleaseJump();
 		virtualController.ReleaseSwap();
+	}
+
+	void AimRoseDirection(){
+		MovementDirection roseDirection = goals.GetRoseDirection ();
+		switch (roseDirection) {
+		case MovementDirection.LEFT:
+			virtualController.PushHorAxis (-1);
+			virtualController.PushVertAxis (0);
+			break;
+		case MovementDirection.RIGHT:
+			virtualController.PushHorAxis (1);
+			virtualController.PushVertAxis (0);
+			break;
+		case MovementDirection.DOWN:
+			virtualController.PushHorAxis (0);
+			virtualController.PushVertAxis (-1);
+			break;
+		case MovementDirection.UP:
+			virtualController.PushHorAxis (0);
+			virtualController.PushVertAxis (1);
+			break;
+		case MovementDirection.NW:
+			virtualController.PushHorAxis (-1);
+			virtualController.PushVertAxis (1);
+			break;
+		case MovementDirection.NE:
+			virtualController.PushHorAxis (1);
+			virtualController.PushVertAxis (1);
+			break;
+		case MovementDirection.SW:
+			virtualController.PushHorAxis (-1);
+			virtualController.PushVertAxis (-1);
+			break;
+		case MovementDirection.SE:
+			virtualController.PushHorAxis (1);
+			virtualController.PushVertAxis (-1);
+			break;
+		default:
+			break;
+		}
 	}
 
 	float HorDirectionToPoint(Vector3 point){

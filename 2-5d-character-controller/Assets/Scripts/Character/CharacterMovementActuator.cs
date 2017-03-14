@@ -344,6 +344,13 @@ public class CharacterMovementActuator : MonoBehaviour
 		PhaseCommand (facing, 0f, speed, period);
 	}
 
+	public void FloatCommand(float hor, float vert, float speed){
+		NegateGravity ();
+		Vector3 floatDirection = body.transform.up * vert + body.transform.right * hor;
+		floatDirection.Normalize ();
+		body.AddForce (floatDirection *speed * Time.deltaTime);
+	}
+
 	public void PhaseCommand (float hor, float vert, float speed, float period)
 	{
 		InitialisePhasing (hor, vert, speed, period);
@@ -381,7 +388,7 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	void NegateGravity ()
 	{
-		body.AddForce (-body.transform.up * gravityForce * Time.deltaTime);
+		body.AddForce (body.transform.up * gravityForce * Time.deltaTime);
 	}
 
 	void HugGroundWhilePhasing ()

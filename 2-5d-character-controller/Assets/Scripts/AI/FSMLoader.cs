@@ -9,12 +9,12 @@ public class FSMLoader : MonoBehaviour {
 	private FSMState latestState; //Add transitions to the most recently added state;
 	private FSMTransition latestTransition; //Add expressions to the most recently created transition
 
-	private string startingStateName;
+	protected string startingStateName;
 
 	public void InitialiseLoader(){
 		states = new Dictionary<string, FSMState> ();
 		SeriallyLoadStates();
-		startingStateName = "patrol";
+		ChooseStartingState ();
 	}
 
 	protected virtual void SeriallyLoadStates(){
@@ -38,6 +38,10 @@ public class FSMLoader : MonoBehaviour {
 
 		AddState ("shoot_target", Action.RELEASE_FIRE_TARGET);
 		AddTransistion ("aim_target", Condition.TIMER, 0.1f, true);
+	}
+
+	protected virtual void ChooseStartingState(){
+		startingStateName = "patrol";
 	}
 
 	//Create a new state with the given name, action, and substate.
