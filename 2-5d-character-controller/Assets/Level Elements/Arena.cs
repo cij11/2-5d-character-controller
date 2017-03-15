@@ -15,6 +15,8 @@ public class Arena : MonoBehaviour {
 
 	public StampCollection stampCollection;
 
+	CharacterCorpus playerCharacter;
+
 	public bool fillsRectWithSpawners = false;
 	public float rectWidth;
 	public float rectHeight;
@@ -42,6 +44,9 @@ public class Arena : MonoBehaviour {
 			GenerateSpawners ();
 		}
 		StoreSpawners ();
+
+		GameObject playerGO = GameObject.FindGameObjectWithTag ("Player");
+		playerCharacter = playerGO.GetComponent<CharacterCorpus> () as CharacterCorpus;
 	}
 
 	void GenerateSpawners(){
@@ -81,6 +86,10 @@ public class Arena : MonoBehaviour {
 				activated = false;
 				EndArena ();
 			}
+		}
+
+		if (!playerCharacter.GetIsAlive ()) {
+			LoadNextLevel ();
 		}
 	}
 
