@@ -21,7 +21,7 @@ public class EnableFloating : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(floatsTowardsAiming)
-			movementActuator.FloatCommand (aimingController.GetHorizontalInput (), aimingController.GetVerticalAiming (), 10f);
+			movementActuator.FloatCommand (aimingController.GetHorizontalInput (), aimingController.GetVerticalAiming (), 100f);
 		if (hoversInPlace) {
 			float hor = Mathf.Sign (homePosition.x - this.transform.position.x);
 			float vert = Mathf.Sign (homePosition.y - this.transform.position.y);

@@ -348,7 +348,7 @@ public class CharacterMovementActuator : MonoBehaviour
 
 	public void FloatCommand(float hor, float vert, float speed){
 		NegateGravity ();
-		Vector3 floatDirection = body.transform.up * vert + body.transform.right * hor;
+		Vector3 floatDirection = body.transform.up * vert;// + body.transform.right * hor;
 		floatDirection.Normalize ();
 		body.AddForce (floatDirection *speed * Time.deltaTime);
 	}
