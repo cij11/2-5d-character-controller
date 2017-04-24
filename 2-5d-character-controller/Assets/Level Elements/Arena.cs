@@ -9,7 +9,9 @@ public class Arena : MonoBehaviour {
 	public bool clearsExit = false;
 	public bool endsLevel = false;
 	public bool endsGame = false;
+	public bool restartsLevelOnPlayerDeath = false;
 	public string sceneToLoad = "level_1";
+	public string sceneToRestart = "bunker_arena";
 	public Vector3 botLeftClearRect;
 	public Vector3 topRightClearRect;
 
@@ -47,6 +49,19 @@ public class Arena : MonoBehaviour {
 
 		GameObject playerGO = GameObject.FindGameObjectWithTag ("Player");
 		playerCharacter = playerGO.GetComponent<CharacterCorpus> () as CharacterCorpus;
+
+		//Find the door 'stamp', and store the corner coordinates.
+		Transform doorTransform = transform.FindChild ("Door");
+		if (doorTransform != null) {
+			Vector3 doorLocation = doorTransform.position;
+			float halfDoorWidth = doorTransform.lossyScale.x / 2f;
+			float halfDoorHeight = doorTransform.lossyScale.y / 2f;
+
+			botLeftClearRect = new Vector3 (doorLocation.x - halfDoorWidth, doorLocation.y - halfDoorHeight, 0f);
+			topRightClearRect = new Vector3 (doorLocation.x + halfDoorWidth, doorLocation.y + halfDoorHeight, 0f);
+
+			Destroy (doorTransform.gameObject);
+		}
 	}
 
 	void GenerateSpawners(){
@@ -89,7 +104,7 @@ public class Arena : MonoBehaviour {
 		}
 
 		if (!playerCharacter.GetIsAlive ()) {
-			LoadNextLevel ();
+			ReloadLevel ();
 		}
 	}
 
@@ -153,5 +168,9 @@ public class Arena : MonoBehaviour {
 
 	void LoadNextLevel(){
 		SceneManager.LoadScene (sceneToLoad, LoadSceneMode.Single);
+	}
+
+	void ReloadLevel(){
+		SceneManager.LoadScene (sceneToRestart, LoadSceneMode.Single);
 	}
 }
