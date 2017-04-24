@@ -62,6 +62,11 @@ public class AIMotorActions : MonoBehaviour {
 				ReleaseJump();
 				break;
 			}
+		case Action.PRESS_FIRE:
+			{
+				PressFire ();
+				break;
+			}
 		case Action.PICK_RANDOM_ROSE_DIRECTION:
 			{
 				goals.PickRandomRoseDirection ();
@@ -157,6 +162,10 @@ public class AIMotorActions : MonoBehaviour {
 
 	void ReleaseJump(){
 		virtualController.ReleaseJump();
+	}
+
+	void PressFire(){
+		virtualController.PushFire ();
 	}
 
 	void ResetController(){
