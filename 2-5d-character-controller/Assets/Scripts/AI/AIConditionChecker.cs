@@ -113,6 +113,11 @@ public class AIConditionChecker : MonoBehaviour {
 				}
 				break;
 			}
+		case Condition.ALWAYS:
+			{
+				return true;
+				break;
+			}
 		}
 		return false;
 	}

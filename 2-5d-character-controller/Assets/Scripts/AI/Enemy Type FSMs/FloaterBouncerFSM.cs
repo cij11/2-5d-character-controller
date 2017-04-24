@@ -6,17 +6,14 @@ public class FloaterBouncerFSM : FSMLoader {
 
 
 	protected override void SeriallyLoadStates(){
-		AddState ("float_randomly", Action.RUN_SUB_FSM, "pick_random_rose_direction");
+		AddState ("float_towards", Action.RUN_SUB_FSM, "float_towards_target");
 		AddTransistion ("attack", Condition.TARGET_IN_RADIUS, 5, true);
 
 		AddState ("attack", Action.RUN_SUB_FSM, "aim_target");
-		AddTransistion ("float_randomly", Condition.TARGET_IN_RADIUS, 5, false);
+		AddTransistion ("float_towards", Condition.TARGET_IN_RADIUS, 5, false);
 
-		AddState ("pick_random_rose_direction", Action.PICK_RANDOM_ROSE_DIRECTION);
-		AddTransistion ("move_random_rose_direction", Condition.FRAMES, 1, true);
-
-		AddState ("move_random_rose_direction", Action.MOVE_ROSE_DIRECTION);
-		AddTransistion ("pick_random_rose_direction", Condition.TIMER, 4, true);
+		AddState ("float_towards_target", Action.AIM_TARGET);
+		AddTransistion ("move_random_rose_direction", Condition.ALWAYS, 1, false);
 
 		AddState ("aim_target", Action.AIM_TARGET);
 		AddTransistion ("shoot_target", Condition.TIMER, 2, true);
@@ -26,7 +23,7 @@ public class FloaterBouncerFSM : FSMLoader {
 	}
 
 	protected override void ChooseStartingState(){
-		startingStateName = "float_randomly";
+		startingStateName = "float_towards";
 	}
 }
 	

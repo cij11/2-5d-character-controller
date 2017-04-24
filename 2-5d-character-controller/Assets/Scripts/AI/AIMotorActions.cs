@@ -67,6 +67,26 @@ public class AIMotorActions : MonoBehaviour {
 				goals.PickRandomRoseDirection ();
 				break;
 			}
+		case Action.PICK_RANDOM_ROSE_DIRECTION_TOWARDS_TARGET:
+			{
+				goals.PickRandomRoseDirection ();
+				Vector3 targetPosition = goals.GetTargetPosition ();
+
+				bool towardsTarget = false;
+				if (targetPosition != null) {
+					while (towardsTarget == false) {
+						goals.PickRandomRoseDirection ();
+						AimRoseDirection ();
+						Vector3 vecToTarget = targetPosition - this.transform.position;
+						if (Mathf.Sign (virtualController.GetHorAxis ()) == Mathf.Sign (vecToTarget.x))
+							towardsTarget = true;
+						if (Mathf.Sign (virtualController.GetVertAxis ()) == Mathf.Sign (vecToTarget.y))
+							towardsTarget = true;
+						
+					}
+				}
+				break;
+			}
 		case Action.MOVE_ROSE_DIRECTION:
 			{
 				AimRoseDirection ();

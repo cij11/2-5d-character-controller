@@ -7,7 +7,7 @@ public class AIGoals : MonoBehaviour {
 	GameObject targetObject;
 	private string defaultTarget;
 	int forwardDirection;
-	MovementDirection roseDirection;
+	private MovementDirection roseDirection;                
 
 	// Use this for initialization
 	void Start () {
