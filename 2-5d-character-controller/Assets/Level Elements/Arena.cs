@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class Arena : MonoBehaviour {
 	public bool activated = false;
-	public Arena nextArena = null;
+	public GameObject nextArenaGO = null;
 	public bool clearsExit = false;
 	public bool endsLevel = false;
 	public bool endsGame = false;
@@ -112,7 +112,7 @@ public class Arena : MonoBehaviour {
 		if(clearsExit)
 			DigExit ();
 
-		if(nextArena != null)
+		if(nextArenaGO != null)
 			ActivateNextArena ();
 
 		if (endsLevel) {
@@ -147,7 +147,8 @@ public class Arena : MonoBehaviour {
 	}
 
 	void ActivateNextArena(){
-
+		Arena nextArena = nextArenaGO.GetComponent<Arena> () as Arena;
+		nextArenaGO.SetActive (true);
 	}
 
 	void LoadNextLevel(){
