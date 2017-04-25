@@ -62,9 +62,19 @@ public class AIMotorActions : MonoBehaviour {
 				ReleaseJump();
 				break;
 			}
+		case Action.FIRE:
+			{
+				virtualController.TapFire ();
+				break;
+			}
 		case Action.PRESS_FIRE:
 			{
 				PressFire ();
+				break;
+			}
+		case Action.RELEASE_FIRE:
+			{
+				virtualController.ReleaseFire ();
 				break;
 			}
 		case Action.PICK_RANDOM_ROSE_DIRECTION:
