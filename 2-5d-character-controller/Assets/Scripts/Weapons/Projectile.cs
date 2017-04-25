@@ -12,7 +12,7 @@ public abstract class Projectile : MonoBehaviour {
 	public float maxLifespan = 0.4f;
 
 	public int damage = 50;
-	protected float knockbackSpeed = 30f;
+	protected float knockbackSpeed = 10f;
 
 	protected Transform spriteTransform;
 	protected int direction = 1;
@@ -29,6 +29,7 @@ public abstract class Projectile : MonoBehaviour {
 	public bool hasLifespan = true;
 	public bool bounceCasterOnHit = false;
 	public bool deflectsProjectiles = false;
+	public bool destroyOnCharDeath = false;
 
 	// Use this for initialization
 	void Start () {
@@ -52,6 +53,10 @@ public abstract class Projectile : MonoBehaviour {
 
 		if (destroyOnWeaponChange) {
 			CheckWeaponChangeAndDestroy ();
+		}
+
+		if (destroyOnCharDeath) {
+			CheckCharDeathAndDestroy ();
 		}
 	}
 
@@ -153,6 +158,14 @@ public abstract class Projectile : MonoBehaviour {
 					}
 				}
 			}
+		}
+	}
+
+	protected void CheckCharDeathAndDestroy(){
+		CharacterCorpus casterCorpus = componentData.GetCharacterCorpus ();
+		if (casterCorpus != null) {
+			if(!casterCorpus.GetIsAlive())
+				Destroy (this.gameObject);
 		}
 	}
 
