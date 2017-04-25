@@ -6,10 +6,10 @@ public class BarrierPatrolFSM : FSMLoader {
 
 	protected override void SeriallyLoadStates(){
 		AddState ("patrol", Action.RUN_SUB_FSM, "start_patrol");
-		AddTransistion ("attack", Condition.TARGET_IN_RADIUS, 3, true);
+		AddTransistion ("attack", Condition.TARGET_IN_RADIUS, 7, true);
 
 		AddState ("attack", Action.RUN_SUB_FSM, "aim_target");
-		AddTransistion ("patrol", Condition.TARGET_IN_RADIUS, 3, false);
+		AddTransistion ("patrol", Condition.TARGET_IN_RADIUS, 7, false);
 
 		AddState ("start_patrol", Action.IDLE);
 		AddTransistion ("move_forward", Condition.TIMER, 1, true);
