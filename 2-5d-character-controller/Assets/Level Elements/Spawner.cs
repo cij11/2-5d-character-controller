@@ -10,6 +10,7 @@ public class Spawner : MonoBehaviour {
 	public float spawnPeriod = 10f;
 	public float firstSpawnDelay = 2f;
 	public int numToSpawn = 4;
+	public bool activated = false;
 
 	int numSpawned = 0;
 	List<CharacterCorpus> spawnedCorpusus;
@@ -24,14 +25,16 @@ public class Spawner : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (!IsAllObjectsSpawned()) {
-			IncrementSpawnTimer();
-		}
+		if (activated) {
+			if (!IsAllObjectsSpawned ()) {
+				IncrementSpawnTimer ();
+			}
 
-		if (!exhausted) {
-			if (CheckSpawnerExhausted()) {
-				exhausted = true;
-				print ("Spawner exhausted");
+			if (!exhausted) {
+				if (CheckSpawnerExhausted ()) {
+					exhausted = true;
+					print ("Spawner exhausted");
+				}
 			}
 		}
 	}
@@ -101,5 +104,9 @@ public class Spawner : MonoBehaviour {
 
 	public void SetSpawnables(GameObject[] newSpawnables){
 		spawnableObjects = newSpawnables;
+	}
+
+	public void ActivateSpawner(){
+		activated = true;
 	}
 }

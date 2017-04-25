@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Arena : MonoBehaviour {
+	public bool startingArena = false;
 	public bool activated = false;
 	public GameObject nextArenaGO = null;
 	public bool clearsExit = false;
@@ -42,26 +43,17 @@ public class Arena : MonoBehaviour {
 	void Start () {
 		topography = (Topography)FindObjectOfType (typeof(Topography));
 
-		if (fillsRectWithSpawners) {
-			GenerateSpawners ();
-		}
 		StoreSpawners ();
+
+		if (startingArena) {
+			ActivateArena ();
+		}
 
 		GameObject playerGO = GameObject.FindGameObjectWithTag ("Player");
 		playerCharacter = playerGO.GetComponent<CharacterCorpus> () as CharacterCorpus;
 
 		//Find the door 'stamp', and store the corner coordinates.
-		Transform doorTransform = transform.FindChild ("Door");
-		if (doorTransform != null) {
-			Vector3 doorLocation = doorTransform.position;
-			float halfDoorWidth = doorTransform.lossyScale.x / 2f;
-			float halfDoorHeight = doorTransform.lossyScale.y / 2f;
-
-			botLeftClearRect = new Vector3 (doorLocation.x - halfDoorWidth, doorLocation.y - halfDoorHeight, 0f);
-			topRightClearRect = new Vector3 (doorLocation.x + halfDoorWidth, doorLocation.y + halfDoorHeight, 0f);
-
-			Destroy (doorTransform.gameObject);
-		}
+		ParseDoor();
 	}
 
 	void GenerateSpawners(){
@@ -95,16 +87,20 @@ public class Arena : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (!spawnersExhausted) {
-			if (CheckSpawnersExhausted ()) {
-				spawnersExhausted = true;
-				activated = false;
-				EndArena ();
+		if (activated) {
+			if (!spawnersExhausted) {
+				if (CheckSpawnersExhausted ()) {
+					spawnersExhausted = true;
+					activated = false;
+					EndArena ();
+				}
 			}
 		}
 
-		if (!playerCharacter.GetIsAlive ()) {
-			ReloadLevel ();
+		if (startingArena) {
+			if (!playerCharacter.GetIsAlive ()) {
+				ReloadLevel ();
+			}
 		}
 	}
 
@@ -164,6 +160,7 @@ public class Arena : MonoBehaviour {
 	void ActivateNextArena(){
 		Arena nextArena = nextArenaGO.GetComponent<Arena> () as Arena;
 		nextArenaGO.SetActive (true);
+		nextArena.ActivateArena ();
 	}
 
 	void LoadNextLevel(){
@@ -172,5 +169,37 @@ public class Arena : MonoBehaviour {
 
 	void ReloadLevel(){
 		SceneManager.LoadScene (sceneToRestart, LoadSceneMode.Single);
+	}
+
+	public void ActivateArena(){
+		activated = true;
+
+		if (fillsRectWithSpawners) {
+			GenerateSpawners ();
+		}
+		StoreSpawners ();
+
+		ActivateSpawners ();
+	}
+
+	private void ActivateSpawners(){
+		foreach (Spawner spawner in spawners) {
+			spawner.ActivateSpawner ();
+		}
+		print ("Stored number of spawners " + spawners.Length);
+	}
+
+	private void ParseDoor(){
+		Transform doorTransform = transform.FindChild ("Door");
+		if (doorTransform != null) {
+			Vector3 doorLocation = doorTransform.position;
+			float halfDoorWidth = doorTransform.lossyScale.x / 2f;
+			float halfDoorHeight = doorTransform.lossyScale.y / 2f;
+
+			botLeftClearRect = new Vector3 (doorLocation.x - halfDoorWidth, doorLocation.y - halfDoorHeight, 0f);
+			topRightClearRect = new Vector3 (doorLocation.x + halfDoorWidth, doorLocation.y + halfDoorHeight, 0f);
+
+			Destroy (doorTransform.gameObject);
+		}
 	}
 }
