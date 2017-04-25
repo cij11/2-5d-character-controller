@@ -8,6 +8,8 @@ public class CharacterCorpus : MonoBehaviour {
 	CharacterMovementActuator movementActuator;
 	bool isAlive = true;
 
+	public int team = 2;
+
 	float reelingPeriod = 0.2f;
 	float reelingTimer = 0f;
 
@@ -29,12 +31,14 @@ public class CharacterCorpus : MonoBehaviour {
 		movementActuator.KillCommand ();
 	}
 
-	public void TakeDamage(int damage){
-		reelingTimer = reelingPeriod;
-		heartBank.TakeDamage (damage);
-		PlayImpactSound ();
-		if (heartBank.GetIsOutOfHearts ()) {
-			Die ();
+	public void TakeDamage(int damage, int projectileTeam){
+		if (projectileTeam != team) {
+			reelingTimer = reelingPeriod;
+			heartBank.TakeDamage (damage);
+			PlayImpactSound ();
+			if (heartBank.GetIsOutOfHearts ()) {
+				Die ();
+			}
 		}
 	}
 
@@ -73,5 +77,9 @@ public class CharacterCorpus : MonoBehaviour {
 		if (this.transform.position.y < -300) {
 			Die ();
 		}
+	}
+
+	public int GetTeam(){
+		return team;
 	}
 }

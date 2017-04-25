@@ -126,7 +126,7 @@ public class Item : MonoBehaviour {
 			if (corpus != null) {
 				Character hitCharacter = other.collider.GetComponent<Character> () as Character;
 				if (hitCharacter != throwingCharacter) {
-					corpus.TakeDamage (throwDamage);
+					corpus.TakeDamage (throwDamage, 0); //Team 0 will damage all characters.
 					SetItemToDiscarded ();
 				}
 			}

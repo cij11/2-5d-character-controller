@@ -21,6 +21,8 @@ public abstract class Projectile : MonoBehaviour {
 	public Effect[] DestroyEffects;	//Cast when the item is destroyed
 	public ProjectileBehaviour[] behaviours;
 
+	protected int firingTeam;
+
 	public bool destroyOnTerrainContact = true;
 	public bool destroyOnCharacterContact = true;
 	public bool destroyOnWeaponChange = false;
@@ -86,6 +88,8 @@ public abstract class Projectile : MonoBehaviour {
 		worldLaunchVector = worldLaunch;
 		direction = facingDirection;
 
+		firingTeam = charData.GetCharacterCorpus ().GetTeam ();
+
 	}
 
 	public abstract void Launch();
@@ -122,13 +126,13 @@ public abstract class Projectile : MonoBehaviour {
 							if (castingAcuator.GetVerticalSpeed () < -1f) {
 								if (castingAcuator.transform.position.y > corpus.transform.position.y) {
 									castingAcuator.BounceCommand (8f);
-									corpus.TakeDamage (damage);
+									corpus.TakeDamage (damage, firingTeam);
 									corpus.TakeKnockback (worldLaunchVector, knockbackSpeed);
 								}
 							}
 						}
 					} else {
-						corpus.TakeDamage (damage);
+						corpus.TakeDamage (damage, firingTeam);
 						corpus.TakeKnockback (worldLaunchVector, knockbackSpeed);
 					}
 
