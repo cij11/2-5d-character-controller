@@ -4,6 +4,7 @@ using System.Collections;
 public class TargetController : MonoBehaviour {
 
 	AimingController aimingController;
+	CharacterCorpus corpus;
 	SpriteRenderer targetSprite;
 	Vector3 displacementFromBody;
 	Vector3 defaultDisplacement = new Vector3(0f, 0f, 0f);
@@ -15,6 +16,7 @@ public class TargetController : MonoBehaviour {
 		//Implement default behaviour for null commponent, and log.
 
 		aimingController = this.transform.parent.Find("ActionControllers").GetComponent<AimingController>();
+		corpus = this.transform.parent.GetComponent<CharacterCorpus> () as CharacterCorpus;
 		targetSprite = GetComponent<SpriteRenderer>();
 
 	}
@@ -46,6 +48,10 @@ public class TargetController : MonoBehaviour {
 			targetSprite.enabled = true;
 		}
 		else{
+			targetSprite.enabled = false;
+		}
+
+		if (!corpus.GetIsAlive ()) {
 			targetSprite.enabled = false;
 		}
 	}
