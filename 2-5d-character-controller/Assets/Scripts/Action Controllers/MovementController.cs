@@ -8,6 +8,7 @@ public class MovementController : MonoBehaviour
     CharacterContactSensor contactSensor;
     AimingController aimingController;
     FiringController firingController;
+	ItemManager itemManager;
     bool isTargetting;
     float hangtimePeriod = 1f;
     float hangtimeTimer = 0f;
@@ -27,6 +28,8 @@ public class MovementController : MonoBehaviour
         contactSensor = this.GetComponentInParent<CharacterContactSensor>() as CharacterContactSensor;
         aimingController = this.GetComponent<AimingController>() as AimingController;
         firingController = this.GetComponent<FiringController>() as FiringController;
+		itemManager = this.GetComponent<ItemManager> () as ItemManager;
+
     }
 
     // Update is called once per frame
@@ -72,8 +75,10 @@ public class MovementController : MonoBehaviour
     {
         if (!firingController.GetIsEncumbered())
         {
-            movementActuator.MoveHorizontalCommand(direction);
-			HugWallIfMoveIntoIt (direction);
+			if (!itemManager.GetIsSwapping ()) {
+				movementActuator.MoveHorizontalCommand (direction);
+				HugWallIfMoveIntoIt (direction);
+			}
         }
     }
 
