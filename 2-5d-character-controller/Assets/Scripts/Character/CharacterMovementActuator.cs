@@ -209,6 +209,11 @@ public class CharacterMovementActuator : MonoBehaviour
 		if (contactSensor.GetContactState () == ContactState.AIRBORNE) {
 			MoveArialHorizontal (Mathf.Sign (direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
 		}
+
+		//To allow for cases where the character is adjacent to, but not grabbing the wall
+		if ((contactSensor.GetContactState () == ContactState.WALLADJACENT) && !huggingWall) {
+			MoveArialHorizontal (Mathf.Sign (direction), airSpeedUpForce, airBreakForce, maxAirSpeed);
+		}
 	}
 
 	//If the current vertical speed is < the jump velocity, cancel any existing
