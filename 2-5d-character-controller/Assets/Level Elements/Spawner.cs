@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class Spawner : MonoBehaviour {
 
 	public GameObject[] spawnableObjects;
+	public GameObject spawnerWarning;
 
 	float spawnTimer = 0f;
 	public float spawnPeriod = 10f;
@@ -42,7 +43,8 @@ public class Spawner : MonoBehaviour {
 	void IncrementSpawnTimer(){
 		spawnTimer -= Time.deltaTime;
 		if (spawnTimer <= 0){
-			SpawnRandomObject();
+			ShowSpawnWarning ();
+			Invoke("SpawnRandomObject", 1.2f);
 			spawnTimer = spawnPeriod;
 			numSpawned++;
 		}
@@ -108,5 +110,9 @@ public class Spawner : MonoBehaviour {
 
 	public void ActivateSpawner(){
 		activated = true;
+	}
+
+	private void ShowSpawnWarning(){
+		Instantiate (spawnerWarning, this.transform.position, Quaternion.identity);
 	}
 }
