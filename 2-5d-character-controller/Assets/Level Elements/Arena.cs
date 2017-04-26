@@ -39,6 +39,11 @@ public class Arena : MonoBehaviour {
 	Topography topography;
 	List<Vector3> explosionLocationList;
 
+	ActivationZone activationZone;
+	float activationRadius;
+	Vector3 activationPosition;
+	bool hasActivationZone = false;
+
 	// Use this for initialization
 	void Start () {
 		topography = (Topography)FindObjectOfType (typeof(Topography));
@@ -54,6 +59,9 @@ public class Arena : MonoBehaviour {
 
 		//Find the door 'stamp', and store the corner coordinates.
 		ParseDoor();
+
+		ParseActivationZone ();
+
 	}
 
 	void GenerateSpawners(){
@@ -100,6 +108,18 @@ public class Arena : MonoBehaviour {
 		if (startingArena) {
 			if (!playerCharacter.GetIsAlive ()) {
 				ReloadLevel ();
+			}
+		}
+
+		if (!spawnersExhausted) {
+			if (!activated) {
+				if (hasActivationZone) {
+					Vector3 playerOffset = activationPosition - playerCharacter.transform.position;
+					if (playerOffset.magnitude < activationRadius) {
+						print ("Player in activation radius");
+						ActivateArena ();
+					}
+				}
 			}
 		}
 	}
@@ -218,6 +238,19 @@ public class Arena : MonoBehaviour {
 
 				i++;
 			}
+		}
+	}
+
+	private void ParseActivationZone(){
+		activationZone = GetComponentInChildren<ActivationZone>() as ActivationZone;
+		if (activationZone != null) {
+			hasActivationZone = true;
+			print ("activation zone found");
+			activationPosition = activationZone.transform.position;
+			print (activationPosition.ToString ());
+			activationRadius = activationZone.transform.lossyScale.x / 2f;
+			print (activationRadius.ToString ());
+			Destroy (activationZone.gameObject);
 		}
 	}
 }
