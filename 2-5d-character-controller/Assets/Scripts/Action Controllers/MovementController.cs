@@ -10,8 +10,10 @@ public class MovementController : MonoBehaviour
     FiringController firingController;
 	ItemManager itemManager;
     bool isTargetting;
+
     float hangtimePeriod = 1f;
     float hangtimeTimer = 0f;
+	bool isHangExhausted = false;
 
     float jumpAfterFallingGracePeriod = 0.1f;
     float fallingTimer = 0f;
@@ -46,6 +48,7 @@ public class MovementController : MonoBehaviour
         {
             fallingTimer = jumpAfterFallingGracePeriod;
             remainingDoubleJumps = maxDoubleJumps;
+			isHangExhausted = false;
         }
         if (fallingTimer > 0) fallingTimer -= Time.deltaTime;
     }
@@ -59,14 +62,15 @@ public class MovementController : MonoBehaviour
 
     void AimingHang()
     {
-        if (isTargetting)
+        if (isTargetting && !isHangExhausted)
         {
             hangtimeTimer -= Time.deltaTime;
             if (hangtimeTimer < 0)
             {
                 isTargetting = false;
+				isHangExhausted = true;
             }
-            movementActuator.ParachuteCommand();
+        //    movementActuator.ParachuteCommand();
         }
     }
 
