@@ -13,8 +13,8 @@ public class Arena : MonoBehaviour {
 	public bool restartsLevelOnPlayerDeath = false;
 	public string sceneToLoad = "level_1";
 	public string sceneToRestart = "bunker_arena";
-	public Vector3 botLeftClearRect;
-	public Vector3 topRightClearRect;
+	public Vector3[] botLeftClearRect;
+	public Vector3[] topRightClearRect;
 
 	public StampCollection stampCollection;
 
@@ -138,10 +138,13 @@ public class Arena : MonoBehaviour {
 			topography.ApplyStampCollection (stampCollection, botLeftClearRect, topRightClearRect);
 		}*/
 
+		//Loop through all clear rects, and add explosions to dig out their area.
 		explosionLocationList = new List<Vector3> ();
-		for (int i = (int)botLeftClearRect.x; i < (int)topRightClearRect.x; i+=digExplosionNodeSpacing) {
-			for (int j = (int)botLeftClearRect.y; j < (int)topRightClearRect.y; j+=digExplosionNodeSpacing) {
-				explosionLocationList.Add (new Vector3 ((float)i, (float)j + Random.Range(-digExplosionVariation, digExplosionVariation), 0f));
+		for (int k = 0; k < botLeftClearRect.Length; k++) {
+			for (int i = (int)botLeftClearRect[k].x; i < (int)topRightClearRect[k].x; i += digExplosionNodeSpacing) {
+				for (int j = (int)botLeftClearRect[k].y; j < (int)topRightClearRect[k].y; j += digExplosionNodeSpacing) {
+					explosionLocationList.Add (new Vector3 ((float)i, (float)j + Random.Range (-digExplosionVariation, digExplosionVariation), 0f));
+				}
 			}
 		}
 		Invoke ("BlastClearanceHole", 0.05f);
@@ -190,16 +193,31 @@ public class Arena : MonoBehaviour {
 	}
 
 	private void ParseDoor(){
-		Transform doorTransform = transform.FindChild ("Door");
-		if (doorTransform != null) {
-			Vector3 doorLocation = doorTransform.position;
-			float halfDoorWidth = doorTransform.lossyScale.x / 2f;
-			float halfDoorHeight = doorTransform.lossyScale.y / 2f;
 
-			botLeftClearRect = new Vector3 (doorLocation.x - halfDoorWidth, doorLocation.y - halfDoorHeight, 0f);
-			topRightClearRect = new Vector3 (doorLocation.x + halfDoorWidth, doorLocation.y + halfDoorHeight, 0f);
+		BlastZone[] blastZones = GetComponentsInChildren<BlastZone> ();
 
-			Destroy (doorTransform.gameObject);
+		botLeftClearRect = new Vector3[blastZones.Length];
+		topRightClearRect = new Vector3[blastZones.Length];
+		int i = 0;
+
+		foreach (BlastZone zone in blastZones) {
+
+			Transform zoneTransform = zone.transform;
+			if (zoneTransform != null) {
+				Vector3 doorLocation = zoneTransform.position;
+				float halfDoorWidth = zoneTransform.lossyScale.x / 2f;
+				float halfDoorHeight = zoneTransform.lossyScale.y / 2f;
+
+				Vector3 botLeftClearRectCoord = new Vector3 (doorLocation.x - halfDoorWidth, doorLocation.y - halfDoorHeight, 0f);
+				Vector3 topRightClearRectCoord = new Vector3 (doorLocation.x + halfDoorWidth, doorLocation.y + halfDoorHeight, 0f);
+
+				botLeftClearRect [i] = botLeftClearRectCoord;
+				topRightClearRect [i] = topRightClearRectCoord;
+
+				Destroy (zoneTransform.gameObject);
+
+				i++;
+			}
 		}
 	}
 }
