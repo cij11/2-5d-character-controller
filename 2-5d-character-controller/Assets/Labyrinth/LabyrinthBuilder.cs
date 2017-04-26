@@ -146,8 +146,24 @@ public class LabyrinthBuilder : MonoBehaviour {
 		foreach (LabyrinthRoom room in finishedRoomList) {
 			//GameObject newCircleStamp = Instantiate (circleHoleStampPrefab, room.GetPosition(), Quaternion.identity);
 			GameObject newArenaStamp = Instantiate(arenaCollection.GetRandomArena(), room.GetPosition(), Quaternion.identity);
-			newArenaStamp.transform.localScale = new Vector3 (room.GetDiameter(), room.GetDiameter (), 1f);
-			newArenaStamp.transform.rotation = Quaternion.LookRotation (transform.forward, room.GetUpVector ());
+
+			float horFlip = 1;
+			float vertFlip = 1;
+			//Flip horizontally or vertically randomly.
+			if (Random.Range (0, 1) > 0.5f) {
+				horFlip = -1;
+			}
+			if (Random.Range (0, 1) > 0.5f) {
+				vertFlip = -1;
+			}
+			newArenaStamp.transform.localScale = new Vector3 (room.GetDiameter() * horFlip, room.GetDiameter () * vertFlip, 1f);
+
+			//Rotate 90 degrees half the time
+			if (Random.Range (0, 1) > 0.5f) {
+				newArenaStamp.transform.rotation = Quaternion.LookRotation (transform.forward, room.GetUpVector ());
+			} else {
+				newArenaStamp.transform.rotation = Quaternion.LookRotation (transform.forward, room.GetRightVector ());
+			}
 			rootStampCollection.AddChildStamp (newArenaStamp);
 		}
 

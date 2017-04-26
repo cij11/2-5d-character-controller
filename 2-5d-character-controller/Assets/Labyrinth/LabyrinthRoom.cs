@@ -140,4 +140,8 @@ public class LabyrinthRoom {
 	public Vector3 GetUpVector(){
 		return upVec;
 	}
+
+	public Vector3 GetRightVector(){
+		return rightVec;
+	}
 }
