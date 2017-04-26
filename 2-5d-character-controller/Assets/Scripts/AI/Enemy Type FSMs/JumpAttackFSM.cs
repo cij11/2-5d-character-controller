@@ -8,11 +8,11 @@ public class JumpAttackFSM : FSMLoader {
 		//SuperFSM states
 		AddState ("patrol", Action.RUN_SUB_FSM, "start_patrol");
 		AddTransistion ("attack", Condition.TARGET_IN_FRONT_HORIZONTAL, 1, true);
-		AddExpression (Condition.TARGET_IN_RADIUS, 2, true); //By adding an expression to an existing transition, these two condtions are 'ANDed' together.
+		AddExpression (Condition.TARGET_IN_RADIUS, 5, true); //By adding an expression to an existing transition, these two condtions are 'ANDed' together.
 
 		AddState ("attack", Action.RUN_SUB_FSM, "jump");
 	//	AddTransistion ("patrol", Condition.TARGET_IN_FRONT_HORIZONTAL, 1, false); //By adding two seperate transitions, these two conditions are 'ORed' together.
-		AddTransistion ("patrol", Condition.TARGET_IN_RADIUS, 3f, false);
+		AddTransistion ("patrol", Condition.TARGET_IN_RADIUS, 5f, false);
 
 		//Patrol states
 		AddState ("start_patrol", Action.IDLE);

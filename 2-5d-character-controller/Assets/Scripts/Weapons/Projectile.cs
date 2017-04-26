@@ -125,7 +125,7 @@ public abstract class Projectile : MonoBehaviour {
 						if (castingAcuator != null) {
 							if (castingAcuator.GetVerticalSpeed () < -1f) {
 								if (castingAcuator.transform.position.y > corpus.transform.position.y) {
-									castingAcuator.BounceCommand (8f);
+									castingAcuator.BounceCommand (16f);
 									corpus.TakeDamage (damage, firingTeam);
 									corpus.TakeKnockback (worldLaunchVector, knockbackSpeed);
 								}
