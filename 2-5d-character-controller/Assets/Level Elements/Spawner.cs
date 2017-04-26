@@ -18,6 +18,12 @@ public class Spawner : MonoBehaviour {
 
 	bool exhausted = false;
 
+	public bool independentSpawner = false;
+	float activationRange = 10f;
+	float activationVariability = 5f;
+
+	GameObject playerGO;
+
 	// Use this for initialization
 	void Start () {
 		spawnedCorpusus = new List<CharacterCorpus> ();
@@ -26,6 +32,10 @@ public class Spawner : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		if (independentSpawner) {
+			CheckPlayerNearby ();
+		}
+
 		if (activated) {
 			if (!IsAllObjectsSpawned ()) {
 				IncrementSpawnTimer ();
@@ -114,5 +124,26 @@ public class Spawner : MonoBehaviour {
 
 	private void ShowSpawnWarning(){
 		Instantiate (spawnerWarning, this.transform.position, Quaternion.identity);
+	}
+
+	private void InitialiseIndependentSpawner(){
+		if (independentSpawner) {
+			activated = false;
+			playerGO = GameObject.FindGameObjectWithTag ("Player");
+		}
+	}
+
+	private void CheckPlayerNearby(){
+		Vector3 playerLocation = playerGO.transform.position;
+		Vector3 offset = playerLocation - this.transform.position;
+
+		if (offset.magnitude < activationRange) {
+			activated = true;
+		}
+	}
+
+	public void SetIndependent(){
+		independentSpawner = true;
+		InitialiseIndependentSpawner ();
 	}
 }

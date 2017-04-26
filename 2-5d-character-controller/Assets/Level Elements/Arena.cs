@@ -207,7 +207,8 @@ public class Arena : MonoBehaviour {
 
 	private void ActivateSpawners(){
 		foreach (Spawner spawner in spawners) {
-			spawner.ActivateSpawner ();
+		//	spawner.ActivateSpawner ();
+			spawner.SetIndependent();
 		}
 		print ("Stored number of spawners " + spawners.Length);
 	}
