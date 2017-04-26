@@ -35,13 +35,20 @@ public class LevelExit : MonoBehaviour {
 		int randomTimeout = 0;
 		int proposedX = 0;
 		int proposedY = 0;
-		while (!clearSpaceFound && randomTimeout < 200) {
+		while (!clearSpaceFound && randomTimeout < 2000) {
 			 proposedX = (int) Random.Range(0, worldWidth);
 			 proposedY = (int) Random.Range(0, worldWidth);
 
-			if(topography.TestTileEmpty(proposedX, proposedY)){
+			if (topography.TestTileEmpty (proposedX, proposedY)) {
 				clearSpaceFound = true;
 			}
+				//Reject positions too close to the player
+			if (proposedX > worldWidth / 4 && proposedX < worldWidth - worldWidth/ 4)
+					clearSpaceFound = false;
+			if (proposedY > worldHeight / 4 && proposedY < worldHeight -worldHeight/ 4)
+					clearSpaceFound = false;
+						
+
 		//	print ("  " + proposedX.ToString () + "  " + proposedY.ToString ());
 			randomTimeout++;
 		}
@@ -62,7 +69,7 @@ public class LevelExit : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (!reached) {
-			if (PlayerWithinRange ()) {
+							if (PlayerWithinRange (exitRadius)) {
 				Invoke ("EndLevel", 1f);
 				reached = true;
 			}
@@ -73,9 +80,9 @@ public class LevelExit : MonoBehaviour {
 		}
 	}
 
-	private bool PlayerWithinRange(){
+					private bool PlayerWithinRange(float radius){
 		Vector3 offset = player.transform.position - exitPosition;
-		if ( (offset.magnitude) < exitRadius) {
+		if ( (offset.magnitude) < radius) {
 			return true;
 		}
 		return false;
