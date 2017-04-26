@@ -9,6 +9,7 @@ public class Hand : MonoBehaviour {
 	CharacterContactSensor contactSensor;
 	CharacterMovementActuator movementActuator;
 	SpriteRenderer handSprite;
+	SpriteRenderer botSprite;
 
 	float idleX = 0.05f;
 	float idleY = 0.05f;
@@ -24,6 +25,8 @@ public class Hand : MonoBehaviour {
 		itemManager = this.transform.parent.GetComponentInChildren<ItemManager> () as ItemManager;
 		handSprite = GetComponent<SpriteRenderer>();
 		movementActuator = GetComponentInParent<CharacterMovementActuator> () as CharacterMovementActuator;
+
+		MatchArmMaterialToCharacter ();
 	}
 	
 	// Update is called once per frame
@@ -34,6 +37,7 @@ public class Hand : MonoBehaviour {
 		RotateHand ();
 		FlipHand ();
 		OrientHeldItem ();
+		SetHandDamageColor ();
 	//	DontRenderIfSwingingMelee ();
 	}
 
@@ -143,5 +147,16 @@ public class Hand : MonoBehaviour {
 		if (currentItem != null) {
 			currentItem.SetVisibility (visibility);
 		}
+	}
+
+	private void MatchArmMaterialToCharacter(){
+		GameObject botBillboard =  this.transform.parent.FindChild ("BotBillboard").gameObject;
+		botSprite = botBillboard.GetComponent<SpriteRenderer> () as SpriteRenderer;
+		handSprite.color = botSprite.color;
+	}
+
+	private void SetHandDamageColor(){
+	//	handSprite.color = botSprite.color;
+
 	}
 }
