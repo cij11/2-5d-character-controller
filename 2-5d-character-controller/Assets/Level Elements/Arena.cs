@@ -72,7 +72,9 @@ public class Arena : MonoBehaviour {
 				proposedLocationX = Random.Range (-rectWidth / 2f, rectWidth / 2f);
 				proposedLocationY = Random.Range (-rectHeight / 2f, rectHeight / 2f);
 			}*/
-			Vector3 spawnerLocation = new Vector3 (Random.Range (-rectWidth / 2f, rectWidth / 2f), Random.Range (-rectHeight / 2f, rectHeight / 2f), 0f);
+	//		Vector3 spawnerLocation = new Vector3 (Random.Range (-rectWidth / 2f, rectWidth / 2f), Random.Range (-rectHeight / 2f, rectHeight / 2f), 0f);
+			Vector3 spawnerLocation = topography.FindUnoccupiedTile();
+
 			GameObject newSpawnerGO = Instantiate (spawnerPrefab, spawnerLocation, Quaternion.identity);
 			Spawner newSpawner = newSpawnerGO.GetComponent<Spawner> () as Spawner;
 			newSpawner.SetSpawnables (spawnableEnemies);
@@ -80,12 +82,16 @@ public class Arena : MonoBehaviour {
 		}
 
 		for (int i = 0; i < numBuffSpawners; i++) {
-			Vector3 spawnerLocation = new Vector3 (Random.Range (-rectWidth / 2f, rectWidth / 2f), Random.Range (-rectHeight / 2f, rectHeight / 2f), 0f);
+		//	Vector3 spawnerLocation = new Vector3 (Random.Range (-rectWidth / 2f, rectWidth / 2f), Random.Range (-rectHeight / 2f, rectHeight / 2f), 0f);
+			Vector3 spawnerLocation = topography.FindUnoccupiedTile();
 			GameObject newSpawnerGO = Instantiate (spawnerPrefab, spawnerLocation, Quaternion.identity);
 			Spawner newSpawner = newSpawnerGO.GetComponent<Spawner> () as Spawner;
 			newSpawner.SetSpawnables (spawnableBuffs);
 			newSpawnerGO.transform.parent = this.transform;
 		}
+
+		StoreSpawners (); //Otherwise this will be missed when this is invoked on a delay
+		ActivateSpawners ();
 	}
 
 	// Get an array of all the Spawner's that are children of this arena's transform.
@@ -198,11 +204,9 @@ public class Arena : MonoBehaviour {
 		activated = true;
 
 		if (fillsRectWithSpawners) {
-			GenerateSpawners ();
+			Invoke("GenerateSpawners", 1f);
 		}
 		StoreSpawners ();
-
-		ActivateSpawners ();
 	}
 
 	private void ActivateSpawners(){

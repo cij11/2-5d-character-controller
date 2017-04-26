@@ -13,6 +13,11 @@ public class LevelExit : MonoBehaviour {
 
 	public string nextLevel;
 
+	bool reached = false;
+	Transform exitTransform;
+
+	float enlargeSpeed = 100f;
+
 	// Use this for initialization
 	void Start () {
 		Invoke("InitialisePosition", 1f);
@@ -37,7 +42,7 @@ public class LevelExit : MonoBehaviour {
 			if(topography.TestTileEmpty(proposedX, proposedY)){
 				clearSpaceFound = true;
 			}
-			print ("  " + proposedX.ToString () + "  " + proposedY.ToString ());
+		//	print ("  " + proposedX.ToString () + "  " + proposedY.ToString ());
 			randomTimeout++;
 		}
 
@@ -50,14 +55,21 @@ public class LevelExit : MonoBehaviour {
 	}
 
 	private void ResizeGraphic(){
-		Transform exitTransform = this.transform.FindChild ("Sphere");
+		exitTransform = this.transform.FindChild ("Sphere");
 		exitTransform.localScale = new Vector3 (exitRadius * 2f, exitRadius * 2f, 1f);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (PlayerWithinRange()) {
-			Invoke ("EndLevel", 2f);
+		if (!reached) {
+			if (PlayerWithinRange ()) {
+				Invoke ("EndLevel", 1f);
+				reached = true;
+			}
+		}
+
+		if (reached) {
+			exitTransform.localScale = new Vector3 (exitTransform.localScale.x + Time.deltaTime*enlargeSpeed, exitTransform.localScale.y + Time.deltaTime*enlargeSpeed, 1f);
 		}
 	}
 

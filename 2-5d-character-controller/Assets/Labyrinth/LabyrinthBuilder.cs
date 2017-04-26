@@ -65,11 +65,11 @@ public class LabyrinthBuilder : MonoBehaviour {
 		while (unfinishedRoomList.Count != 0 && finishedRoomList.Count < 200) {
 			int nextRoomIndex = Random.Range (0, unfinishedRoomList.Count);
 			LabyrinthRoom testingRoom = unfinishedRoomList [nextRoomIndex];
-			print ("Testing room number " + nextRoomIndex.ToString());
+		//	print ("Testing room number " + nextRoomIndex.ToString());
 			//If this room has remaining directions, pick a random direction to try and extend
 			if (testingRoom.HasUnexploredDirection ()) {
 				MovementDirection exploringDirection = testingRoom.PopRandomUnexploredDirection ();
-				print ("Testing direction " + exploringDirection.ToString ());
+		//		print ("Testing direction " + exploringDirection.ToString ());
 				Vector3 exploringVector = testingRoom.DirectionToVector (exploringDirection);
 
 				float proposedDiameter = roomDiameter + Random.Range (0f, diamaterVariation);

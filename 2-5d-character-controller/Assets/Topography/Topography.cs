@@ -475,4 +475,30 @@ public class Topography : MonoBehaviour {
 
 		return false;
 	}
+
+	//Return a vector corresponding to blank space
+	public Vector3 FindUnoccupiedTile(){
+		bool clearSpaceFound = false;
+		int randomTimeout = 0;
+		int proposedX = 0;
+		int proposedY = 0;
+
+		while (!clearSpaceFound && randomTimeout < 200) {
+			proposedX = (int) Random.Range(0, worldSizeX);
+			proposedY = (int) Random.Range(0, worldSizeY);
+
+			if(TestTileEmpty(proposedX, proposedY)){
+				clearSpaceFound = true;
+			}
+	//		print ("  " + proposedX.ToString () + "  " + proposedY.ToString ());
+			randomTimeout++;
+		}
+
+		if (clearSpaceFound) {
+			return new Vector3 ((float)proposedX - worldSizeX / 2f, (float)proposedY - worldSizeY / 2f, 0);
+		} else {
+			print ("Failed to find clear space. Returning random space");
+			return new Vector3 (Random.Range (0, worldSizeX), Random.Range (0, worldSizeY), 0) - new Vector3 (worldSizeX / 2f, worldSizeY / 2f, 0);
+		}
+	}
 }
