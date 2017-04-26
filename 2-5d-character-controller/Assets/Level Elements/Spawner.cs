@@ -44,9 +44,8 @@ public class Spawner : MonoBehaviour {
 		spawnTimer -= Time.deltaTime;
 		if (spawnTimer <= 0){
 			ShowSpawnWarning ();
-			Invoke("SpawnRandomObject", 1.2f);
+			Invoke("SpawnRandomObject", 1f);
 			spawnTimer = spawnPeriod;
-			numSpawned++;
 		}
 	}
 
@@ -66,6 +65,7 @@ public class Spawner : MonoBehaviour {
 		if (spawnedCorpus != null) {
 			spawnedCorpusus.Add (spawnedCorpus);
 		}
+		numSpawned++;
 	}
 
 	public bool CheckSpawnerExhausted(){
