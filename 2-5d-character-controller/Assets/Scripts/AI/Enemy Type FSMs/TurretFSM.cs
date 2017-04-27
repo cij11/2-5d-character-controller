@@ -6,23 +6,27 @@ public class TurretFSM : FSMLoader {
 
 
 	protected override void SeriallyLoadStates(){
-		AddState ("idle", Action.RUN_SUB_FSM, "float_in_place");
-		AddTransistion ("attack", Condition.TARGET_IN_RADIUS, 16, true);
+		AddState ("float_towards", Action.RUN_SUB_FSM, "aim_towards_target");
+		AddTransistion ("attack", Condition.TARGET_IN_RADIUS, 12, true);
 
 		AddState ("attack", Action.RUN_SUB_FSM, "aim_target");
-		AddTransistion ("idle", Condition.TARGET_IN_RADIUS, 16, false);
+		AddTransistion ("float_towards", Condition.TARGET_IN_RADIUS, 12, false);
 
-		AddState ("float_in_place", Action.IDLE);
+		AddState ("aim_towards_target", Action.AIM_TARGET);
+		AddTransistion ("float_current_direction", Condition.FRAMES, 2, true);
+
+		AddState ("float_current_direction", Action.PRESS_FIRE);
+		AddTransistion ("aim_towards_target", Condition.TIMER, 3, true);
 
 		AddState ("aim_target", Action.AIM_TARGET);
-		AddTransistion ("shoot_target", Condition.TIMER, 2, true);
+		AddTransistion ("shoot_target", Condition.TIMER, 1, true);
 
 		AddState ("shoot_target", Action.RELEASE_FIRE_TARGET);
 		AddTransistion ("aim_target", Condition.TIMER, 0.1f, true);
 	}
 
 	protected override void ChooseStartingState(){
-		startingStateName = "idle";
+		startingStateName = "float_towards";
 	}
 }
 	
