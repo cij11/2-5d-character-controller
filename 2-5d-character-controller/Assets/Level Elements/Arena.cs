@@ -91,7 +91,7 @@ public class Arena : MonoBehaviour {
 		}
 
 		StoreSpawners (); //Otherwise this will be missed when this is invoked on a delay
-		ActivateSpawners ();
+		SetSpawnersIndependent ();
 	}
 
 	// Get an array of all the Spawner's that are children of this arena's transform.
@@ -207,7 +207,9 @@ public class Arena : MonoBehaviour {
 			Invoke("GenerateSpawners", 1f);
 		}
 		StoreSpawners ();
-		ActivateSpawners ();
+
+		if(!fillsRectWithSpawners)
+			ActivateSpawners ();
 	}
 
 	private void SetSpawnersIndependent(){
