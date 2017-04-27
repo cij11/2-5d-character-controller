@@ -39,8 +39,8 @@ public class LabyrinthBuilder : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		Topography topography = GameObject.Find ("topography").GetComponent<Topography>() as Topography;
-		worldWidth = topography.chunkSize * topography.numChunks;
-		worldHeight = topography.chunkSize * topography.numChunks;
+		worldWidth = topography.chunkSize * topography.numChunks - topography.chunkSize * 3;
+		worldHeight = topography.chunkSize * topography.numChunks - topography.chunkSize * 3;
 
 	}
 
