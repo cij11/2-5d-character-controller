@@ -207,12 +207,18 @@ public class Arena : MonoBehaviour {
 			Invoke("GenerateSpawners", 1f);
 		}
 		StoreSpawners ();
+		ActivateSpawners ();
+	}
+
+	private void SetSpawnersIndependent(){
+		foreach (Spawner spawner in spawners) {
+			spawner.SetIndependent ();
+		}
 	}
 
 	private void ActivateSpawners(){
 		foreach (Spawner spawner in spawners) {
-		//	spawner.ActivateSpawner ();
-			spawner.SetIndependent();
+			spawner.ActivateSpawner ();
 		}
 		print ("Stored number of spawners " + spawners.Length);
 	}
